@@ -1,0 +1,16 @@
+{
+  "name": "bitshala-learn",
+  "version": "1.0.0",
+  "description": "A repository of bite-sized lessons on Bitcoin.",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "^3.9.9"
+  }
+}
