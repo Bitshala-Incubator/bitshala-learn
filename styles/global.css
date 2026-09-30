@@ -1,0 +1,71 @@
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  --bg: #f6f1e7;
+  --ink: #1f1b16;
+  --mut: #6e655a;
+  --acc: #a8482a;
+  --line: #d9d0bf;
+  --soft: #ebe3d3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #181512;
+    --ink: #ece5d8;
+    --mut: #a0978a;
+    --acc: #d9805e;
+    --line: #3a342c;
+    --soft: #25201b;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #181512;
+  --ink: #ece5d8;
+  --mut: #a0978a;
+  --acc: #d9805e;
+  --line: #3a342c;
+  --soft: #25201b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font:
+    20px/1.75 Charter,
+    "Iowan Old Style",
+    Georgia,
+    "Times New Roman",
+    serif;
+}
+
+nav {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  font:
+    13px system-ui,
+    sans-serif;
+  color: var(--mut);
+  padding: 8px 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#bar {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--acc);
+  width: 0;
+}

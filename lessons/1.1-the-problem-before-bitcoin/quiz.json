@@ -1,0 +1,55 @@
+{
+  "questions": [
+    {
+      "id": "q-double",
+      "concept": "double-spending",
+      "prompt": "Alice sends Bob 1 BTC and, using the same coin, sends Carol 1 BTC. What is the problem?",
+
+      "options": ["Encryption", "Double spending", "Mining", "Wallet recovery"],
+
+      "answer": 1,
+
+      "right": "Yes. The problem isn’t that there are two messages; it’s that both try to spend the same value.",
+
+      "wrong": "Not quite. Look at what Alice does with the same value."
+    },
+
+    {
+      "id": "q-intermediary",
+      "concept": "intermediary",
+      "prompt": "In a traditional digital payment system, who usually keeps the authoritative record?",
+
+      "options": [
+        "Every user separately",
+        "A central intermediary",
+        "Nobody",
+        "The recipient"
+      ],
+
+      "answer": 1,
+
+      "right": "Right. It is easy to coordinate, but everyone relies on that one keeper.",
+
+      "wrong": "Not quite. Think back to Maya’s notebook."
+    },
+
+    {
+      "id": "q-decentral",
+      "concept": "decentralisation",
+      "prompt": "Which of these best describes decentralisation?",
+
+      "options": [
+        "There are no rules",
+        "One computer controls everything",
+        "Participants independently verify against shared rules",
+        "Nothing is recorded"
+      ],
+
+      "answer": 2,
+
+      "right": "Yes. It isn’t rule-free; it just has no single controlling authority.",
+
+      "wrong": "Not quite. Decentralised does not mean there are no rules."
+    }
+  ]
+}
