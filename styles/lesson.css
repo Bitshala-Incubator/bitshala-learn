@@ -3,11 +3,9 @@
   margin: auto;
   padding: 0 20px 90px;
 }
-
 header {
   padding: 56px 0 8px;
 }
-
 .kicker,
 .label {
   font:
@@ -17,21 +15,18 @@ header {
   text-transform: uppercase;
   color: var(--acc);
 }
-
 h1 {
   font-size: clamp(34px, 7vw, 50px);
   line-height: 1.1;
   margin: 0.25em 0 0.3em;
   font-weight: 600;
 }
-
 .sub {
   font-style: italic;
   color: var(--mut);
   font-size: 22px;
   margin: 0;
 }
-
 .meta {
   font:
     14px system-ui,
@@ -39,37 +34,30 @@ h1 {
   color: var(--mut);
   margin-top: 16px;
 }
-
 section {
   margin: 72px 0;
 }
-
 h2 {
   font-size: 30px;
   line-height: 1.2;
   margin: 0.2em 0 0.7em;
   font-weight: 600;
 }
-
 p {
   margin: 0 0 1.1em;
 }
-
 .blk {
   margin: 1.2em 0;
 }
-
 .aside {
   border-left: 2px solid var(--acc);
   padding: 2px 0 2px 18px;
   font-style: italic;
   color: var(--mut);
 }
-
 figure {
   margin: 2em 0;
 }
-
 figcaption {
   font:
     italic 15px Georgia,
@@ -78,7 +66,6 @@ figcaption {
   text-align: center;
   margin-top: 8px;
 }
-
 svg {
   max-width: 100%;
   height: auto;
@@ -86,25 +73,21 @@ svg {
   margin: auto;
   color: var(--ink);
 }
-
 svg text {
   fill: var(--ink);
   font:
     13px system-ui,
     sans-serif;
 }
-
 .try {
   background: var(--soft);
   border-radius: 6px;
   padding: 20px 22px;
 }
-
 .try .label {
   display: block;
   margin-bottom: 8px;
 }
-
 button {
   font:
     15px system-ui,
@@ -117,24 +100,20 @@ button {
   padding: 8px 16px;
   margin: 4px 8px 4px 0;
 }
-
 button.ghost {
   background: transparent;
   color: var(--ink);
   border-color: var(--line);
 }
-
 .out p {
   margin: 0.6em 0 0;
   font-size: 18px;
 }
-
 .msg {
   min-height: 1.7em;
   font-style: italic;
   margin-top: 8px;
 }
-
 table {
   border-collapse: collapse;
   width: 100%;
@@ -143,7 +122,6 @@ table {
     sans-serif;
   margin-bottom: 8px;
 }
-
 td,
 th {
   padding: 6px 4px;
@@ -151,12 +129,10 @@ th {
   text-align: left;
   font-weight: 400;
 }
-
 th {
   color: var(--mut);
   font-size: 13px;
 }
-
 .opt {
   display: block;
   width: 100%;
@@ -172,17 +148,14 @@ th {
   padding: 12px 16px;
   border-radius: 4px;
 }
-
 .opt.right {
   border-color: var(--ink);
   background: var(--soft);
 }
-
 .opt.wrong {
   border-color: var(--acc);
   opacity: 0.6;
 }
-
 textarea {
   width: 100%;
   min-height: 96px;
@@ -197,26 +170,21 @@ textarea {
   padding: 12px;
   margin: 8px 0;
 }
-
 .q {
   margin: 1.6em 0;
 }
-
 .q b {
   font-weight: 600;
 }
-
 .tl {
   border-left: 1px solid var(--line);
   padding-left: 22px;
   margin: 1.6em 0;
 }
-
 .tl div {
   margin-bottom: 14px;
   font-size: 18px;
 }
-
 .tl b {
   display: block;
   font:
@@ -225,19 +193,16 @@ textarea {
   letter-spacing: 0.08em;
   color: var(--acc);
 }
-
 .next {
   border-top: 1px solid var(--line);
   margin-top: 2.4em;
   padding-top: 1.6em;
 }
-
 .next h3 {
   font-size: 26px;
   margin: 0.2em 0 0.4em;
   font-weight: 600;
 }
-
 #warn {
   display: none;
   border: 1px solid var(--acc);
@@ -247,7 +212,6 @@ textarea {
     sans-serif;
   margin-top: 20px;
 }
-
 details {
   margin-top: 60px;
   font:
@@ -255,7 +219,6 @@ details {
     sans-serif;
   color: var(--mut);
 }
-
 pre {
   overflow: auto;
   max-height: 380px;
@@ -263,4 +226,162 @@ pre {
   background: var(--soft);
   padding: 12px;
   border-radius: 4px;
+}
+.next-link {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 10px 14px;
+  border-radius: 4px;
+  background: var(--acc);
+  color: var(--bg);
+  font:
+    600 15px system-ui,
+    sans-serif;
+  text-decoration: none;
+}
+
+.next-link:hover,
+.next-link:focus-visible {
+  text-decoration: underline;
+}
+/* --- widgets specific to 1.2 --- */
+.screens {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 14px 0;
+}
+.screen {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 14px 16px;
+  cursor: pointer;
+  font:
+    15px system-ui,
+    sans-serif;
+  background: var(--bg);
+}
+.screen:hover {
+  border-color: var(--ink);
+}
+.screen .st {
+  font:
+    600 11px system-ui,
+    sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mut);
+  margin-bottom: 8px;
+}
+.screen .addr {
+  font:
+    13px/1.4 ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+  word-break: break-all;
+  margin: 6px 0;
+}
+.screen.right {
+  border-color: var(--ink);
+  background: var(--soft);
+}
+.screen.wrong {
+  border-color: var(--acc);
+  opacity: 0.55;
+}
+.match-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+.match-row .sit {
+  flex: 1;
+  min-width: 200px;
+  font-size: 17px;
+}
+.match-row .ans {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.chip {
+  font:
+    14px system-ui,
+    sans-serif;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  padding: 5px 12px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--ink) !important;
+}
+.chip.right {
+  border-color: var(--ink);
+  background: var(--soft);
+}
+.chip.wrong {
+  border-color: var(--acc);
+  opacity: 0.55;
+}
+.order-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+.order-item {
+  font:
+    15px system-ui,
+    sans-serif;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  background: var(--bg);
+  color: var(--ink) !important;
+}
+.order-item.used {
+  opacity: 0.35;
+  cursor: default;
+}
+.jcard button {
+  color: var(--bg) !important;
+}
+.jcard button.ghost {
+  color: var(--ink) !important;
+}
+.order-list {
+  list-style: none;
+  margin: 14px 0;
+  padding: 0;
+  min-height: 1.6em;
+}
+.order-list li {
+  border-bottom: 1px dashed var(--line);
+  padding: 6px 2px;
+  font-size: 17px;
+}
+.cardstack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 14px 0;
+}
+.jcard {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+.jcard p {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+.jcard .verdict {
+  font-style: italic;
+  color: var(--mut);
+  margin-top: 8px;
+  display: none;
 }

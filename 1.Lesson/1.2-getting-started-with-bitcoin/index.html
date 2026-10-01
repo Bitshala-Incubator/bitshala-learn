@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Getting Started with Bitcoin — Bitshala Learn 1.2</title>
+    <link rel="stylesheet" href="../../styles/global.css" />
+    <link rel="stylesheet" href="../../styles/lesson.css" />
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 1.2</span><span id="prog"></span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "1.2",
+        "title": "Getting Started with Bitcoin",
+        "subtitle": "You understand the problem. Now touch the machinery.",
+        "phase": "Bitcoin Foundations",
+        "module": "Introduction to Bitcoin",
+        "minutes": 22,
+        "level": "Beginner",
+        "concepts": [
+          "wallet",
+          "address",
+          "sending",
+          "receiving",
+          "recovery-information"
+        ],
+        "next": {
+          "id": "2.1",
+          "title": "Bitcoin Overview",
+          "teaser": "You’ve now seen Bitcoin from the user’s side. Next we zoom out and look underneath: what a wallet actually does when you press Send, and how the network agrees on what happened."
+        },
+        "sections": [
+          {
+            "id": "paid",
+            "label": "Getting paid",
+            "title": "Aarav owes you money",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "You finish a small piece of freelance work for Aarav. He could send the money to your bank account the way he always does, but this time he says something different.\n\n“Send me your Bitcoin address. I’ll pay you there.”\n\nYou open the wallet app on your phone. It shows a balance of zero, and two buttons: Receive and Send. You tap Receive, and a long string of letters and numbers appears on the screen."
+              },
+              {
+                "type": "text",
+                "md": "You send it to Aarav. He looks at it and asks a fair question: “Is this where I should send it?”\n\nBefore you answer, it’s worth slowing down. What is that string, exactly? Is it your wallet? And once Aarav sends something to it, how does the money end up being yours?"
+              }
+            ]
+          },
+
+          {
+            "id": "wallet",
+            "label": "The wallet",
+            "title": "Your wallet doesn’t hold coins",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "It’s natural to picture a Bitcoin wallet the way you picture a leather one: a container, with coins sitting inside it. That picture is wrong, and it’s worth correcting early, because it causes confusion later.\n\nA Bitcoin wallet is software. What it holds isn’t coins, but the information you need to use Bitcoin: your addresses, your balance as seen on the network, and the means to authorise a payment. Think of it less as a container and more as the tool you use to interact with a much larger, shared system."
+              },
+              {
+                "type": "aside",
+                "md": "You don’t need to know what that “means to authorise a payment” actually is yet. That’s a later lesson. For now, the wallet is simply your interface to Bitcoin, not a box that holds it."
+              }
+            ]
+          },
+
+          {
+            "id": "address",
+            "label": "The address",
+            "title": "So what was that long string?",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "The string your wallet showed you is a Bitcoin address: a piece of information you hand to someone who wants to pay you. It plays roughly the role a postal address plays for a parcel, except it’s built for Bitcoin transactions rather than for describing where you live.\n\nHere’s where it gets easy to trip up. Your wallet doesn’t only show you addresses for receiving. It also has a Send screen, where you type in someone else’s address to pay them. The two screens can look alike at a glance, and only one of them is meant to be handed to Aarav."
+              },
+              {
+                "type": "widget",
+                "id": "w-screen",
+                "name": "PickScreen",
+                "props": {
+                  "instruction": "Two screens from your wallet. Which one do you give Aarav?",
+                  "left": {
+                    "kind": "Send",
+                    "lines": ["To: bc1q9x7k2m4...", "Amount: 0.001 BTC"]
+                  },
+                  "right": {
+                    "kind": "Receive",
+                    "lines": ["Your address:", "bc1q8m2n5r7..."]
+                  },
+                  "answer": "right",
+                  "right_msg": "That’s the one. The Receive screen shows the address that belongs to you.",
+                  "wrong_msg": "That address is where you’d send a payment to someone else, not where you receive one."
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "receive",
+            "label": "Receiving",
+            "title": "What happens after you share it",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Once Aarav has your address, the rest happens mostly without you. He opens his own wallet, enters your address and the amount, and his wallet creates and sends out the payment. It travels across the Bitcoin network, and your wallet, watching for anything addressed to you, notices it and updates your balance.\n\nYou didn’t have to do anything to “accept” it, and there is no moment where you manually place the payment into your wallet. Sharing the address was the whole job."
+              },
+              {
+                "type": "figure",
+                "asset": "receive",
+                "caption": "You share an address; Aarav’s wallet does the rest."
+              }
+            ]
+          },
+
+          {
+            "id": "send",
+            "label": "Sending",
+            "title": "A few days later, you pay Meera",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Meera did something similar for you last month, and now it’s your turn to pay her. She sends you her address, and this time you’re the one opening the Send screen instead of Receive.\n\nYou type her address into the recipient field, enter an amount, and your wallet prepares the payment. From here it looks like the mirror image of what happened with Aarav: your wallet sends the payment out, and it’s now Meera’s wallet that’s watching for it."
+              },
+              {
+                "type": "figure",
+                "asset": "send",
+                "caption": "Sending looks the same as receiving, seen from the other side."
+              }
+            ]
+          },
+
+          {
+            "id": "which",
+            "label": "Which detail matters",
+            "title": "Aarav asks you for money this time",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Some weeks later, the roles flip again. Aarav messages you: “Send me 0.002 BTC for the domain renewal.”\n\nBefore you open your wallet, it’s worth asking yourself exactly what you need from him to make that happen, and just as importantly, what you don’t."
+              },
+              {
+                "type": "widget",
+                "id": "w-need",
+                "name": "Match",
+                "props": {
+                  "instruction": "For each situation, tap what you actually need.",
+                  "rows": [
+                    {
+                      "sit": "Aarav wants you to pay him.",
+                      "options": [
+                        "Aarav’s receiving address",
+                        "Your recovery phrase"
+                      ],
+                      "answer": 0,
+                      "right": "Right. You need his address so your wallet knows where to send the payment.",
+                      "wrong": "Think about who’s paying whom here. What does the person receiving money give you?"
+                    },
+                    {
+                      "sit": "You want to check the payment reached him.",
+                      "options": [
+                        "Your wallet password",
+                        "Your transaction history"
+                      ],
+                      "answer": 1,
+                      "right": "Right. Your wallet can show you what it sent and to where.",
+                      "wrong": "A password doesn’t tell you whether a payment went through."
+                    },
+                    {
+                      "sit": "You want to restore this wallet on a new phone.",
+                      "options": [
+                        "Your receiving address",
+                        "Your recovery information"
+                      ],
+                      "answer": 1,
+                      "right": "Right. Recovery information is what rebuilds a wallet from nothing.",
+                      "wrong": "An address only tells people where to pay you. It can’t rebuild a wallet."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "secret",
+            "label": "One thing is different",
+            "title": "Not everything in the wallet is for sharing",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "So far, everything you’ve handed to someone else has been an address, and addresses are made to be given out. But scroll further into your wallet’s settings and you’ll find something else: a short list of ordinary words, in order. Recovery information.\n\nIt looks unremarkable, which is exactly what makes it dangerous. Anyone holding those words can rebuild your wallet on their own device and spend from it as if they were you. An address identifies where money can be sent. Recovery information grants control over everything in the wallet."
+              },
+              {
+                "type": "aside",
+                "md": "You don’t need to know why a list of words can rebuild a wallet. That belongs to a later lesson on keys and seed phrases. For now, treat it as a fact: one kind of information is for handing out, and the other is never handed out, to anyone, for any reason."
+              }
+            ]
+          },
+
+          {
+            "id": "phishing",
+            "label": "Reading the room",
+            "title": "Someone will eventually ask for it",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Sooner or later, a message will arrive asking for something you shouldn’t give. Sometimes it’s obvious. Sometimes it’s dressed up as customer support, a verification step, or a “security check.” The wallet can’t tell the difference between a genuine request and a trap. You have to."
+              },
+              {
+                "type": "widget",
+                "id": "w-safe",
+                "name": "JudgeCards",
+                "props": {
+                  "instruction": "For each message, decide whether responding to it is safe or not.",
+                  "cards": [
+                    {
+                      "text": "“Send me your Bitcoin address so I can pay you.”",
+                      "answer": "safe",
+                      "note": "An address is made to be shared. This is an ordinary request."
+                    },
+                    {
+                      "text": "“Enter your recovery phrase on this page to verify your wallet.”",
+                      "answer": "unsafe",
+                      "note": "No genuine verification needs your recovery information. This rebuilds your wallet on someone else’s device."
+                    },
+                    {
+                      "text": "“Screenshot your Send screen and send it to me as proof.”",
+                      "answer": "unsafe",
+                      "note": "That screen can contain more than you intend to share, and there’s no reason a stranger needs it."
+                    },
+                    {
+                      "text": "“What’s your wallet’s balance? I’m curious.”",
+                      "answer": "safe",
+                      "note": "A balance is not a secret in the way recovery information is, though you’re free to decline for privacy."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "together",
+            "label": "Putting it together",
+            "title": "The shape of a payment, either direction",
+            "blocks": [
+              {
+                "type": "timeline",
+                "items": [
+                  {
+                    "when": "Receiving",
+                    "text": "Someone wants to pay you → you open Receive → you share your address → their wallet creates and sends the payment → your wallet detects it."
+                  },
+                  {
+                    "when": "Sending",
+                    "text": "You want to pay someone → you get their address → you open Send → you enter address and amount → your wallet sends the payment."
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "md": "Notice the one piece of information that never appears in either direction: your recovery information. It has no role in a payment at all. Its only job is rebuilding a wallet, which is exactly why it has to be protected so carefully."
+              }
+            ]
+          },
+
+          {
+            "id": "check",
+            "label": "Before you continue",
+            "title": "Put it in the right order, and in your own words",
+            "blocks": [
+              {
+                "type": "widget",
+                "id": "w-order",
+                "name": "OrderSteps",
+                "props": {
+                  "instruction": "You’re about to receive a payment from Meera. Tap the steps in the order they actually happen.",
+                  "items": [
+                    "Meera’s wallet broadcasts the payment",
+                    "You open Receive and share your address",
+                    "Your wallet detects the payment",
+                    "Meera enters your address and an amount"
+                  ],
+                  "correct": [1, 3, 0, 2]
+                }
+              },
+              {
+                "type": "quiz",
+                "id": "qz-1",
+                "questionIds": ["q-address", "q-wallet", "q-recovery"]
+              },
+              {
+                "type": "reflect",
+                "id": "r-explain",
+                "prompt": "A friend who has never used Bitcoin says: “So my wallet has the coins inside it, right?” In two or three sentences, correct them, and explain what an address is for while you’re at it.",
+                "placeholder": "Write it as you’d actually say it out loud.",
+                "model": "Not quite. Your wallet doesn’t hold coins, it holds the information you need to use Bitcoin, including addresses you can give out and the means to authorise a payment. An address is just a destination you hand to someone who wants to pay you, similar to how you’d give someone your postal address for a parcel."
+              }
+            ]
+          },
+
+          {
+            "id": "end",
+            "label": "Next",
+            "title": "What’s actually happening underneath",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "You now know the shape of a payment from where you’re sitting: open the wallet, share or enter an address, and let the network do the rest. What you haven’t seen yet is what your wallet actually builds when you press Send, or how a payment that touches no bank and no Maya is still something the whole network can agree happened.\n\nThat’s underneath the wallet, and it’s where we go next."
+              },
+              { "type": "next" }
+            ]
+          }
+        ]
+      }
+    </script>
+
+    <script type="application/json" id="quiz-bank">
+      [
+        {
+          "id": "q-address",
+          "concept": "address",
+          "prompt": "What is a Bitcoin address best described as?",
+          "options": [
+            "A password for your wallet",
+            "A destination you give someone to receive a payment",
+            "A copy of your recovery information",
+            "A record of your past transactions"
+          ],
+          "answer": 1,
+          "right": "Right. It’s something you hand out, like a postal address for a parcel.",
+          "wrong": "Not quite. Think about what you gave Aarav so he could pay you."
+        },
+        {
+          "id": "q-wallet",
+          "concept": "wallet",
+          "prompt": "Which is the more accurate way to think about a Bitcoin wallet?",
+          "options": [
+            "A container that physically holds your coins",
+            "A tool that helps you manage addresses and payments",
+            "A bank account with a Bitcoin logo",
+            "A password vault, and nothing else"
+          ],
+          "answer": 1,
+          "right": "Right. It’s your interface to Bitcoin, not a box the coins sit inside.",
+          "wrong": "Not quite. Coins never physically sit inside the app the way cash sits inside a wallet."
+        },
+        {
+          "id": "q-recovery",
+          "concept": "recovery-information",
+          "prompt": "Someone messages you claiming to be wallet support and asks for your recovery phrase to “verify” your account. What should you do?",
+          "options": [
+            "Send it, since it’s just for verification",
+            "Never share it, since it can rebuild your wallet on their device",
+            "Share half of it as a compromise",
+            "Share it only if they ask nicely"
+          ],
+          "answer": 1,
+          "right": "Right. No legitimate request needs your recovery information, ever.",
+          "wrong": "Not quite. Whoever holds your recovery information can rebuild your wallet and spend from it as if they were you."
+        }
+      ]
+    </script>
+
+    <script>
+      const ASSETS = {
+        receive: `<svg viewBox="0 0 420 170" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="70" cy="90" r="12"/><path d="M50 130c0-15 9-24 20-24s20 9 20 24"/><text x="70" y="160" text-anchor="middle" stroke="none">You</text><circle cx="350" cy="90" r="12"/><path d="M330 130c0-15 9-24 20-24s20 9 20 24"/><text x="350" y="160" text-anchor="middle" stroke="none">Aarav</text><path d="M100 78h220" stroke-dasharray="3 4"/><text x="210" y="70" text-anchor="middle" stroke="none" font-size="12">address, shared once</text><path d="M320 100L100 100" marker-end="url(#a1)"/><text x="210" y="120" text-anchor="middle" stroke="none" font-size="12">payment</text><defs><marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs></svg>`,
+        send: `<svg viewBox="0 0 420 170" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="70" cy="90" r="12"/><path d="M50 130c0-15 9-24 20-24s20 9 20 24"/><text x="70" y="160" text-anchor="middle" stroke="none">You</text><circle cx="350" cy="90" r="12"/><path d="M330 130c0-15 9-24 20-24s20 9 20 24"/><text x="350" y="160" text-anchor="middle" stroke="none">Meera</text><path d="M100 78h220" stroke-dasharray="3 4"/><text x="210" y="70" text-anchor="middle" stroke="none" font-size="12">her address, given to you</text><path d="M100 100L320 100" marker-end="url(#a2)"/><text x="210" y="120" text-anchor="middle" stroke="none" font-size="12">payment</text><defs><marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs></svg>`,
+      };
+    </script>
+
+    <script>
+      const $ = (s, r = document) => r.querySelector(s);
+      const L = JSON.parse($("#lesson-data").textContent),
+        QB = Object.fromEntries(
+          JSON.parse($("#quiz-bank").textContent).map((q) => [q.id, q]),
+        );
+      const KEY = "bitshala-learn:" + L.id;
+      let P = {};
+      try {
+        P = JSON.parse(localStorage.getItem(KEY) || "{}");
+      } catch (e) {}
+      const inl = (s) =>
+        s
+          .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+          .replace(/\*(.+?)\*/g, "<i>$1</i>");
+      const md = (s) =>
+        s
+          .split("\n\n")
+          .map((p) => `<p>${inl(p)}</p>`)
+          .join("");
+      const wrap = (h, c = "") => {
+        const d = document.createElement("div");
+        d.className = "blk " + c;
+        d.innerHTML = h;
+        return d;
+      };
+      const ACT = ["widget", "choice", "reflect"];
+      const total = () =>
+        L.sections
+          .flatMap((s) => s.blocks)
+          .reduce(
+            (n, b) =>
+              n +
+              (b.type === "quiz"
+                ? b.questionIds.length
+                : ACT.includes(b.type)
+                  ? 1
+                  : 0),
+            0,
+          );
+      function prog() {
+        const n = Object.keys(P).length,
+          t = total();
+        $("#prog").textContent = n + " of " + t + " activities";
+        $("#bar").style.width = (n / t) * 100 + "%";
+      }
+      function done(id) {
+        if (P[id]) return;
+        P[id] = 1;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(P));
+        } catch (e) {}
+        prog();
+      }
+
+      /* ---- widgets unique to this lesson: none of these existed in 1.1 ---- */
+      const WIDGETS = {
+        PickScreen(el, p, fin) {
+          el.classList.add("try");
+          el.innerHTML = `<span class="label">Try it</span><p>${p.instruction}</p><div class="screens">
+  <div class="screen" data-k="left"><div class="st">${p.left.kind}</div>${p.left.lines.map((l) => `<div class="addr">${l}</div>`).join("")}</div>
+  <div class="screen" data-k="right"><div class="st">${p.right.kind}</div>${p.right.lines.map((l) => `<div class="addr">${l}</div>`).join("")}</div>
+ </div><div class="msg"></div>`;
+          el.querySelectorAll(".screen").forEach(
+            (s) =>
+              (s.onclick = () => {
+                const ok = s.dataset.k === p.answer;
+                el.querySelectorAll(".screen").forEach((x) =>
+                  x.classList.remove("right", "wrong"),
+                );
+                s.classList.add(ok ? "right" : "wrong");
+                $(".msg", el).textContent = ok ? p.right_msg : p.wrong_msg;
+                if (ok) fin();
+              }),
+          );
+        },
+
+        Match(el, p, fin) {
+          el.classList.add("try");
+          let n = 0;
+          el.innerHTML =
+            `<span class="label">Try it</span><p>${p.instruction}</p>` +
+            p.rows
+              .map(
+                (r, i) =>
+                  `<div class="match-row" data-r="${i}"><div class="sit">${r.sit}</div><div class="ans">${r.options.map((o, j) => `<button class="chip" data-j="${j}">${o}</button>`).join("")}</div></div><div class="msg" id="m${i}"></div>`,
+              )
+              .join("");
+          p.rows.forEach((r, i) => {
+            const row = el.querySelector(`[data-r="${i}"]`);
+            row.querySelectorAll(".chip").forEach(
+              (c) =>
+                (c.onclick = () => {
+                  const ok = +c.dataset.j === r.answer;
+                  row
+                    .querySelectorAll(".chip")
+                    .forEach((x) => x.classList.remove("right", "wrong"));
+                  c.classList.add(ok ? "right" : "wrong");
+                  $("#m" + i, el).textContent = ok ? r.right : r.wrong;
+                  if (ok && !c.dataset.counted) {
+                    c.dataset.counted = 1;
+                    n++;
+                    if (n === p.rows.length) fin();
+                  }
+                }),
+            );
+          });
+        },
+
+        JudgeCards(el, p, fin) {
+          el.classList.add("try");
+          let n = 0;
+          el.innerHTML =
+            `<span class="label">Try it</span><p>${p.instruction}</p><div class="cardstack">` +
+            p.cards
+              .map(
+                (c, i) =>
+                  `<div class="jcard" data-i="${i}"><p>${c.text}</p><button data-v="safe">Safe</button><button class="ghost" data-v="unsafe">Not safe</button><div class="verdict"></div></div>`,
+              )
+              .join("") +
+            `</div>`;
+          el.querySelectorAll(".jcard").forEach((card, i) => {
+            const c = p.cards[i];
+            card.querySelectorAll("button").forEach(
+              (b) =>
+                (b.onclick = () => {
+                  const ok = b.dataset.v === c.answer;
+                  const v = card.querySelector(".verdict");
+                  v.style.display = "block";
+                  v.textContent = (ok ? "Correct. " : "Not quite. ") + c.note;
+                  card
+                    .querySelectorAll("button")
+                    .forEach((x) => (x.disabled = true));
+                  if (!card.dataset.counted) {
+                    card.dataset.counted = 1;
+                    n++;
+                    if (n === p.cards.length) fin();
+                  }
+                }),
+            );
+          });
+        },
+
+        OrderSteps(el, p, fin) {
+          el.classList.add("try");
+          let picked = [],
+            used = new Set();
+          const draw = () => {
+            el.innerHTML = `<span class="label">Try it</span><p>${p.instruction}</p><div class="order-pool">${p.items.map((it, i) => `<button class="order-item ${used.has(i) ? "used" : ""}" data-i="${i}" ${used.has(i) ? "disabled" : ""}>${it}</button>`).join("")}</div><ol class="order-list">${picked.map((i) => `<li>${p.items[i]}</li>`).join("")}</ol><button class="ghost" data-reset>Start over</button><div class="msg"></div>`;
+            el.querySelectorAll(".order-item").forEach(
+              (b) =>
+                (b.onclick = () => {
+                  const i = +b.dataset.i;
+                  used.add(i);
+                  picked.push(i);
+                  draw();
+                  if (picked.length === p.items.length) check();
+                }),
+            );
+            $("[data-reset]", el).onclick = () => {
+              picked = [];
+              used = new Set();
+              draw();
+            };
+          };
+          const check = () => {
+            const ok = picked.every((v, i) => v === p.correct[i]);
+            $(".msg", el).textContent = ok
+              ? "That’s the order it happens in."
+              : "Close, but not quite the order. Tap Start over and try again.";
+            if (ok) fin();
+          };
+          draw();
+        },
+      };
+
+      const BLOCKS = {
+        text: (b) => wrap(md(b.md)),
+        aside: (b) => wrap(inl(b.md), "aside"),
+        figure: (b) => {
+          const a = ASSETS[b.asset];
+          const el = document.createElement("figure");
+          el.innerHTML =
+            (/^(https?:|data:)/.test(a)
+              ? `<img src="${a}" alt="${b.caption}" style="max-width:100%">`
+              : a) + `<figcaption>${b.caption}</figcaption>`;
+          return el;
+        },
+        timeline: (b) =>
+          wrap(
+            b.items.map((i) => `<div><b>${i.when}</b>${i.text}</div>`).join(""),
+            "tl",
+          ),
+        widget: (b) => {
+          const el = wrap("");
+          WIDGETS[b.name](el, b.props || {}, () => done(b.id));
+          return el;
+        },
+        quiz: (b) => {
+          const el = wrap(
+            b.questionIds
+              .map((id) => {
+                const q = QB[id];
+                return `<div class="q"><b>${q.prompt}</b>${q.options.map((t, j) => `<button class="opt" data-q="${id}" data-j="${j}">${t}</button>`).join("")}<div class="msg" id="f-${id}"></div></div>`;
+              })
+              .join(""),
+          );
+          el.querySelectorAll("[data-q]").forEach(
+            (x) =>
+              (x.onclick = () => {
+                const q = QB[x.dataset.q],
+                  ok = +x.dataset.j === q.answer;
+                x.classList.add(ok ? "right" : "wrong");
+                $("#f-" + q.id, el).textContent = ok ? q.right : q.wrong;
+                if (ok) done("q:" + q.id);
+              }),
+          );
+          return el;
+        },
+        reflect: (b) => {
+          const el = wrap(
+            `<div class="try">${md(b.prompt)}<textarea placeholder="${b.placeholder || ""}"></textarea><button data-go>Compare with ours</button><div class="out" style="margin-top:14px"></div></div>`,
+          );
+          $("[data-go]", el).onclick = () => {
+            $(".out", el).innerHTML = `<p>${inl(b.model)}</p>`;
+            done(b.id);
+          };
+          return el;
+        },
+        next: () => {
+          const n = L.next;
+          return wrap(
+            `<span class="label">Next lesson</span><h3>${n.id} ${n.title}</h3><p>${n.teaser}</p>`,
+            "next",
+          );
+        },
+      };
+
+      const errs = [];
+      L.sections.forEach((s) =>
+        s.blocks.forEach((b) => {
+          if (!BLOCKS[b.type])
+            errs.push(s.id + ': unknown block "' + b.type + '"');
+          if (b.type === "widget" && !WIDGETS[b.name])
+            errs.push(s.id + ': unknown widget "' + b.name + '"');
+          if (b.type === "figure" && !ASSETS[b.asset])
+            errs.push(s.id + ': missing asset "' + b.asset + '"');
+          if (b.type === "quiz")
+            b.questionIds.forEach((q) => {
+              if (!QB[q]) errs.push(s.id + ': missing question "' + q + '"');
+            });
+        }),
+      );
+      if (errs.length) {
+        const w = $("#warn");
+        w.style.display = "block";
+        w.innerHTML = errs.join("<br>");
+      }
+
+      $("#head").innerHTML =
+        `<div class="kicker">${L.phase} · ${L.module}</div><h1>${L.title}</h1><p class="sub">${L.subtitle}</p><div class="meta">Lesson ${L.id} · about ${L.minutes} minutes · ${L.level}</div>`;
+      const main = $("#lesson");
+      L.sections.forEach((s, i) => {
+        const sec = document.createElement("section");
+        sec.id = s.id;
+        sec.innerHTML = `<div class="label">${s.label}</div><h2>${s.title}</h2>`;
+        s.blocks.forEach((b) => {
+          if (BLOCKS[b.type]) sec.appendChild(BLOCKS[b.type](b));
+        });
+        main.appendChild(sec);
+      });
+      prog();
+    </script>
+  </body>
+</html>
