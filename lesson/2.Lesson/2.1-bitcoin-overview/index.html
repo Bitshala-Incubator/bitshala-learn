@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Bitcoin Overview — Bitshala Learn 2.1</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 2.1</span><span id="prog"></span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "2.1",
+        "title": "Bitcoin Overview",
+        "subtitle": "Follow a payment from your wallet to everyone’s ledger.",
+        "phase": "Bitcoin Foundations",
+        "module": "How Bitcoin Works",
+        "minutes": 24,
+        "level": "Beginner",
+        "concepts": ["wallet", "transaction", "node", "miner", "blockchain"],
+        "next": {
+          "id": "2.2",
+          "title": "Transaction at a High Level",
+          "teaser": "You’ve followed the payment from the outside. Next we open the transaction itself and look at what’s actually written inside it."
+        },
+        "sections": [
+          {
+            "id": "again",
+            "label": "One more payment",
+            "title": "Aarav pays you again",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Another small job, another payment from Aarav. By now the routine is familiar: you open Receive, he opens Send, your address moves from your screen to his, and a minute later your balance changes.\n\nThis time, before you look away, you decide to actually watch what happens in between. You pressed nothing after sharing the address. Somehow the payment still arrived. Something happened in that gap, and it’s worth seeing what."
+              }
+            ]
+          },
+
+          {
+            "id": "system",
+            "label": "Not one thing",
+            "title": "“Bitcoin” is several things wearing one name",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "The word is used loosely. Sometimes it means the coin itself, sometimes the software, sometimes the network of computers running that software, sometimes the shared record they all keep. In the last two lessons you mostly met one piece of it: the wallet.\n\nTo see the rest, it helps to follow one payment all the way through, the way you’d follow a letter from a postbox to a doorstep. Aarav’s payment to you is as good a letter as any."
+              }
+            ]
+          },
+
+          {
+            "id": "user",
+            "label": "The user",
+            "title": "Aarav is a user, and so are you",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "A user is simply anyone taking part: sending, receiving, holding, running software that checks the rules, or pointing a machine at the harder work of building blocks. Nobody has to do all of it. Aarav sent a payment using nothing more than a wallet, the same way you received one using nothing more than an address.\n\nWhat happens after Aarav presses Send is where the rest of the system takes over."
+              }
+            ]
+          },
+
+          {
+            "id": "wallet2",
+            "label": "Inside the wallet",
+            "title": "What the wallet actually builds",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "You already know the wallet isn’t a container of coins. It’s worth being a little more exact about what it is, now that you’re looking underneath it.\n\nAarav’s wallet keeps track of keys: the information that proves certain bitcoin are his to spend. When he enters your address and an amount, the wallet doesn’t just fill in a form, it builds a **transaction**, a small piece of data that says, in effect, these funds are authorised to move under these conditions. The wallet then signs that data with Aarav’s key, the way you might sign a letter so the recipient knows it genuinely came from you."
+              },
+              {
+                "type": "aside",
+                "md": "You don’t need to know how a key signs something yet. For now: the transaction is the message, and the signature is what makes it genuinely Aarav’s."
+              },
+              {
+                "type": "figure",
+                "asset": "sign",
+                "caption": "The wallet builds the transaction, then signs it with Aarav’s key."
+              }
+            ]
+          },
+
+          {
+            "id": "broadcast",
+            "label": "Not a direct line",
+            "title": "The transaction doesn’t go straight to you",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Once it’s signed, the transaction doesn’t travel from Aarav’s wallet to yours the way a text message travels between two phones. It’s announced to the wider Bitcoin network, and it’s up to that network to carry it the rest of the way.\n\nThat network is made of computers called **nodes**, each running Bitcoin’s software and each talking to a handful of others nearby. A transaction spreads the way news does in a small town: not from a single announcement everyone hears at once, but from node to node, each one passing it on to the next."
+              },
+              {
+                "type": "aside",
+                "md": "This should sound familiar. Back in Lesson 1.1, you replaced Maya’s single notebook with many independent people checking the same rules. A node is that idea, built."
+              },
+              {
+                "type": "figure",
+                "asset": "spread",
+                "caption": "The transaction hops from node to node rather than travelling in a straight line."
+              }
+            ]
+          },
+
+          {
+            "id": "nodes2",
+            "label": "What a node checks",
+            "title": "Every node checks the rules for itself",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "When Aarav’s transaction reaches a node, the node doesn’t take it on faith. It checks the transaction against Bitcoin’s rules: is the signature genuine, are the funds actually his to spend, has this same value already been spent elsewhere. If it holds up, the node passes it on to its neighbours. If it doesn’t, the node simply drops it.\n\nNo single node needs to be trusted for this to work, because every node is doing the same check. That’s the whole point of removing Maya: not that nobody checks, but that everybody does."
+              },
+              {
+                "type": "figure",
+                "asset": "validate",
+                "caption": "Every node checks the same rules for itself before passing a transaction on."
+              }
+            ]
+          },
+
+          {
+            "id": "miner2",
+            "label": "Getting into a block",
+            "title": "Someone still has to write it down",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "A transaction spreading across the network is not yet a transaction that’s settled. Somewhere, it has to be written into the shared history in a way everyone will accept. That’s the job of **miners**.\n\nMiners gather up transactions that nodes consider valid and assemble them into a candidate block. Turning that candidate into an accepted block takes real, costly computational work, called **proof-of-work**, and only one miner’s block wins the right to be added at a time. The details of how that race works belong to a later lesson. For now, just notice what it achieves: it gives the network an orderly way to agree on one next block, instead of several competing versions."
+              },
+              {
+                "type": "figure",
+                "asset": "mine",
+                "caption": "Valid transactions are gathered into a candidate block; proof-of-work decides which one is added."
+              }
+            ]
+          },
+
+          {
+            "id": "chain2",
+            "label": "The shared record",
+            "title": "The blockchain is the history everyone keeps",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "When a miner’s block is accepted, every node adds it to its own copy of the record, linked to the block before it. That growing, linked sequence is the **blockchain**: not a single file sitting on one server, but a history that thousands of independent nodes hold and can check against each other.\n\nOnce Aarav’s transaction is inside an accepted block, it has a place in that shared history, and your balance reflects it. That’s the moment your wallet finally shows the payment, which is the moment that started this whole lesson."
+              },
+              {
+                "type": "figure",
+                "asset": "chain",
+                "caption": "Each block links to the one before it. The chain itself is the record."
+              }
+            ]
+          },
+
+          {
+            "id": "build",
+            "label": "See it happen",
+            "title": "Build the chain yourself",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Here is the same journey again, but this time you decide what happens at each stage. Answer correctly and that stage locks into place as a block. Answer wrong and nothing is lost, you just try that one stage again."
+              },
+              {
+                "type": "widget",
+                "id": "w-chain",
+                "name": "BuildChain",
+                "props": {
+                  "stages": [
+                    {
+                      "label": "Wallet",
+                      "head": "Aarav enters your address and an amount.",
+                      "prompt": "What does his wallet do with that?",
+                      "options": [
+                        "Creates and signs a transaction",
+                        "Adds the payment straight to the blockchain",
+                        "Performs proof-of-work on it"
+                      ],
+                      "answer": 0,
+                      "clarify": "Right. The wallet’s job ends once it has built and signed the transaction."
+                    },
+                    {
+                      "label": "Transaction",
+                      "head": "The wallet has produced something.",
+                      "prompt": "What is that something?",
+                      "options": [
+                        "A mining machine",
+                        "Data describing an authorised transfer, under Bitcoin’s rules",
+                        "A personal copy of the blockchain"
+                      ],
+                      "answer": 1,
+                      "clarify": "Right. A transaction is a message, not a machine or a ledger of its own."
+                    },
+                    {
+                      "label": "Nodes",
+                      "head": "The transaction reaches the network.",
+                      "prompt": "What can a node do with it?",
+                      "options": [
+                        "Validate it and relay it onward",
+                        "Create Aarav’s private key for him",
+                        "Guarantee a miner will include it"
+                      ],
+                      "answer": 0,
+                      "clarify": "Right. Checking and passing on is all a node promises. Nothing more."
+                    },
+                    {
+                      "label": "Miner",
+                      "head": "The transaction is now available to miners.",
+                      "prompt": "What is a miner trying to do with it?",
+                      "options": [
+                        "Build a candidate block and perform proof-of-work",
+                        "Create a wallet on your behalf",
+                        "Edit the transaction after it’s signed"
+                      ],
+                      "answer": 0,
+                      "clarify": "Right. A miner assembles, then competes for the right to add the block."
+                    },
+                    {
+                      "label": "Block",
+                      "head": "A miner produces a block that includes the transaction.",
+                      "prompt": "What happens to that block next?",
+                      "options": [
+                        "It’s broadcast so other nodes can check it",
+                        "It becomes valid automatically, no checks needed",
+                        "It quietly replaces every block before it"
+                      ],
+                      "answer": 0,
+                      "clarify": "Right. Even the winning block still has to pass the same checks as any transaction."
+                    },
+                    {
+                      "label": "Blockchain",
+                      "head": "Nodes accept the block.",
+                      "prompt": "What does that give everyone?",
+                      "options": [
+                        "A shared, verifiable history of what happened",
+                        "A private database the miner now owns",
+                        "A replacement for your wallet"
+                      ],
+                      "answer": 0,
+                      "clarify": "Right. That shared history is what your wallet is quietly checking against."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "roles",
+            "label": "One payment, six roles",
+            "title": "Walk it once more, in order",
+            "blocks": [
+              {
+                "type": "timeline",
+                "items": [
+                  {
+                    "when": "User",
+                    "text": "Aarav decides to pay. You decide to receive. Neither of you touches anything past the wallet."
+                  },
+                  {
+                    "when": "Wallet",
+                    "text": "Builds the transaction and signs it with Aarav’s key."
+                  },
+                  {
+                    "when": "Transaction",
+                    "text": "A signed message describing what’s authorised to move, and where."
+                  },
+                  {
+                    "when": "Nodes",
+                    "text": "Check it against the rules, independently, and relay it if it holds up."
+                  },
+                  {
+                    "when": "Miner",
+                    "text": "Gathers valid transactions into a block and wins the right to add it."
+                  },
+                  {
+                    "when": "Blockchain",
+                    "text": "Holds the block, and with it, your payment, as part of a history anyone can verify."
+                  }
+                ]
+              },
+              {
+                "type": "figure",
+                "asset": "pipeline",
+                "caption": "The whole journey, end to end. Not a straight pipe in reality, but this is the order each role plays its part."
+              },
+              {
+                "type": "text",
+                "md": "None of these does another’s job. A wallet never mines, a miner never manages your keys, a node never decides what’s valid on its own authority, it only applies the rules. Keeping that straight makes everything from here on easier to follow."
+              }
+            ]
+          },
+
+          {
+            "id": "check",
+            "label": "Before you continue",
+            "title": "Say it back",
+            "blocks": [
+              {
+                "type": "quiz",
+                "id": "qz-1",
+                "questionIds": ["q-user", "q-node", "q-blockchain"]
+              },
+              {
+                "type": "reflect",
+                "id": "r-explain",
+                "prompt": "Explain Aarav’s payment to someone who has only read Lesson 1.1, using the words wallet, node, and blockchain. Two or three sentences is enough.",
+                "placeholder": "Write it as you’d actually say it out loud.",
+                "model": "Aarav’s wallet builds and signs the transaction, the same way you’d sign a letter. It doesn’t go to me directly, it’s passed around a network of nodes, each one checking it against the rules on its own, the way many independent Mayas would. Once it’s bundled into a block that the network accepts, it becomes part of the blockchain, the shared history that makes the payment real."
+              }
+            ]
+          },
+
+          {
+            "id": "end",
+            "label": "Next",
+            "title": "What’s actually written inside a transaction",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "You now know the shape of the whole journey: a wallet builds it, the network checks and carries it, a miner locks it into a block, and the blockchain remembers it. What you haven’t seen is what a transaction actually contains, the inputs, outputs and conditions that make “these funds are authorised to move” into something a node can actually check.\n\nThat’s next."
+              },
+              { "type": "next" }
+            ]
+          }
+        ]
+      }
+    </script>
+
+    <script type="application/json" id="quiz-bank">
+      [
+        {
+          "id": "q-user",
+          "concept": "user",
+          "prompt": "Which of these is true of a Bitcoin user?",
+          "options": [
+            "Every user must run mining hardware",
+            "A user can take part using nothing more than a wallet",
+            "A user must operate a node to send a payment",
+            "Only the person receiving money counts as a user"
+          ],
+          "answer": 1,
+          "right": "Right. Aarav paid you using nothing but a wallet.",
+          "wrong": "Not quite. Think about what Aarav actually needed to send his payment."
+        },
+        {
+          "id": "q-node",
+          "concept": "node",
+          "prompt": "What does a Bitcoin node actually promise to do?",
+          "options": [
+            "Guarantee your transaction is included quickly",
+            "Check transactions and blocks against the rules, and relay what passes",
+            "Create private keys on behalf of users",
+            "Decide which transactions deserve to be valid, by its own judgment"
+          ],
+          "answer": 1,
+          "right": "Right. It applies the same shared rules, it doesn’t invent its own.",
+          "wrong": "Not quite. A node doesn’t get to decide on its own authority, it checks against shared rules."
+        },
+        {
+          "id": "q-blockchain",
+          "concept": "blockchain",
+          "prompt": "What does the blockchain provide that a single company’s database wouldn’t?",
+          "options": [
+            "Faster payments than any bank",
+            "A history kept and checked by many independent nodes, not one party",
+            "A way to avoid needing a wallet",
+            "Free transactions with no fees"
+          ],
+          "answer": 1,
+          "right": "Right. The value isn’t speed, it’s that no single party controls the record.",
+          "wrong": "Not quite. Think back to Maya’s notebook, and why it mattered that it wasn’t only hers."
+        }
+      ]
+    </script>
+
+    <script>
+      const AMK = (id) =>
+        `<marker id="${id}" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="currentColor"/></marker>`;
+      const ABOX = (x, y, w, h, r = 8) =>
+        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" style="fill:var(--soft)" stroke-width="1.3"/>`;
+
+      const ASSETS = {
+        chain: `<svg viewBox="0 0 480 140" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${[30, 145, 260].map((x) => ABOX(x, 35, 90, 70)).join("")}
+ <rect x="375" y="35" width="90" height="70" rx="8" fill="none" stroke-dasharray="4 4"/>
+ ${[30, 145, 260].map((x) => `<path d="M${x + 90} 70h25" marker-end="url(#chA)"/>`).join("")}
+ <text x="75" y="66" text-anchor="middle" stroke="none" font-size="12">block</text><text x="75" y="82" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">#1</text>
+ <text x="190" y="66" text-anchor="middle" stroke="none" font-size="12">block</text><text x="190" y="82" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">#2</text>
+ <text x="305" y="66" text-anchor="middle" stroke="none" font-size="12">block</text><text x="305" y="82" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">#3</text>
+ <text x="420" y="66" text-anchor="middle" stroke="none" font-size="12">new</text><text x="420" y="82" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">just added</text>
+ <defs>${AMK("chA")}</defs></svg>`,
+
+        sign: `<svg viewBox="0 0 480 160" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${ABOX(20, 55, 150, 55)}<text x="95" y="80" text-anchor="middle" stroke="none" font-size="13">Transaction</text><text x="95" y="96" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">unsigned</text>
+ <path d="M172 82h40" marker-end="url(#sgA)"/>
+ <g transform="translate(246,82)"><circle r="22" fill="none"/><path d="M-6 -3a6 6 0 0 1 12 0v6" /><rect x="-9" y="3" width="18" height="14" rx="2"/></g>
+ <text x="246" y="128" text-anchor="middle" stroke="none" font-size="11">Aarav’s key</text>
+ <path d="M290 82h40" marker-end="url(#sgA)"/>
+ ${ABOX(332, 50, 128, 64)}<text x="396" y="76" text-anchor="middle" stroke="none" font-size="13">Transaction</text><text x="396" y="94" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">signed ✓</text>
+ <defs>${AMK("sgA")}</defs></svg>`,
+
+        spread: `<svg viewBox="0 0 460 190" fill="none" stroke="currentColor" stroke-width="1.3">
+ <g opacity=".3">
+  <path d="M70 100L165 45M70 100L165 155M165 45L280 55M165 155L280 140M280 55L370 100M280 140L370 100M165 45L165 155M280 55L280 140"/>
+ </g>
+ <path d="M70 100L165 45L280 55L370 100" stroke-dasharray="5 4" marker-end="url(#spA)"/>
+ <circle cx="70" cy="100" r="15" style="fill:var(--soft)"/>
+ <circle cx="165" cy="45" r="11" fill="var(--bg)"/><circle cx="165" cy="155" r="11" fill="var(--bg)"/>
+ <circle cx="280" cy="55" r="11" fill="var(--bg)"/><circle cx="280" cy="140" r="11" fill="var(--bg)"/>
+ <circle cx="370" cy="100" r="15" style="fill:var(--soft)"/>
+ <text x="70" y="132" text-anchor="middle" stroke="none" font-size="12">you</text>
+ <text x="370" y="132" text-anchor="middle" stroke="none" font-size="12">Aarav</text>
+ <text x="220" y="20" text-anchor="middle" stroke="none" font-size="11" fill="var(--mut)">the transaction hops, node to node</text>
+ <defs>${AMK("spA")}</defs></svg>`,
+
+        validate: `<svg viewBox="0 0 480 170" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${ABOX(15, 65, 120, 42)}<text x="75" y="90" text-anchor="middle" stroke="none" font-size="12">transaction</text>
+ <path d="M135 86h40" marker-end="url(#vdA)"/>
+ <circle cx="248" cy="86" r="46" fill="none"/>
+ <g transform="translate(248,86)" stroke-width="1.1" opacity=".8">
+  <path d="M-20 -14h40"/><path d="M-20 0h40"/><path d="M-20 14h28"/>
+ </g>
+ <text x="248" y="142" text-anchor="middle" stroke="none" font-size="11">node, checking the rules</text>
+ <path d="M291 69h45" marker-end="url(#vdA)"/>
+ ${ABOX(336, 48, 128, 42)}<text x="400" y="73" text-anchor="middle" stroke="none" font-size="12">valid → relayed</text>
+ <path d="M264 129h72" marker-end="url(#vdA)" stroke-dasharray="3 3"/>
+ <rect x="336" y="108" width="128" height="42" rx="8" fill="none" stroke-dasharray="3 3"/><text x="400" y="133" text-anchor="middle" stroke="none" font-size="12">invalid → dropped</text>
+ <defs>${AMK("vdA")}</defs></svg>`,
+
+        mine: `<svg viewBox="0 0 480 190" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${[0, 1, 2].map((i) => `<rect x="20" y="${22 + i * 38}" width="86" height="26" rx="5" style="fill:var(--soft)"/><text x="63" y="${22 + i * 38 + 17}" text-anchor="middle" stroke="none" font-size="11">tx</text>`).join("")}
+ ${[35, 73, 111].map((y) => `<path d="M106 ${y}h34" marker-end="url(#mnA)"/>`).join("")}
+ <rect x="162" y="15" width="140" height="140" rx="8" fill="none"/>
+ <text x="232" y="40" text-anchor="middle" stroke="none" font-size="11" fill="var(--mut)">candidate block</text>
+ <g transform="translate(232,100)"><circle r="26" fill="none"/><path d="M-13 0h26M0 -13v26M-9 -9l18 18M9 -9l-18 18" stroke-width="1"/></g>
+ <text x="232" y="143" text-anchor="middle" stroke="none" font-size="11">proof-of-work</text>
+ <path d="M302 85h34" marker-end="url(#mnA)"/>
+ ${ABOX(344, 60, 116, 50)}<text x="402" y="90" text-anchor="middle" stroke="none" font-size="13">block</text>
+ <defs>${AMK("mnA")}</defs></svg>`,
+
+        pipeline: `<svg viewBox="0 0 480 120" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${["User", "Wallet", "Transaction", "Nodes", "Miner", "Blockchain"]
+   .map((l, i) => {
+     const x = 8 + i * 79,
+       w = 68,
+       y = 38,
+       h = 44;
+     return (
+       ABOX(x, y, w, h, 6) +
+       `<text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" stroke="none" font-size="10.5">${l}</text>` +
+       (i < 5
+         ? `<path d="M${x + w} ${y + h / 2}h11" marker-end="url(#plA)"/>`
+         : "")
+     );
+   })
+   .join("")}
+ <defs>${AMK("plA")}</defs></svg>`,
+      };
+    </script>
+
+    <script>
+      const $ = (s, r = document) => r.querySelector(s);
+      const L = JSON.parse($("#lesson-data").textContent),
+        QB = Object.fromEntries(
+          JSON.parse($("#quiz-bank").textContent).map((q) => [q.id, q]),
+        );
+      const KEY = "bitshala-learn:" + L.id;
+      let P = {};
+      try {
+        P = JSON.parse(localStorage.getItem(KEY) || "{}");
+      } catch (e) {}
+      const inl = (s) =>
+        s
+          .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+          .replace(/\*(.+?)\*/g, "<i>$1</i>");
+      const md = (s) =>
+        s
+          .split("\n\n")
+          .map((p) => `<p>${inl(p)}</p>`)
+          .join("");
+      const wrap = (h, c = "") => {
+        const d = document.createElement("div");
+        d.className = "blk " + c;
+        d.innerHTML = h;
+        return d;
+      };
+      const ACT = ["widget", "choice", "reflect"];
+      const total = () =>
+        L.sections
+          .flatMap((s) => s.blocks)
+          .reduce(
+            (n, b) =>
+              n +
+              (b.type === "quiz"
+                ? b.questionIds.length
+                : ACT.includes(b.type)
+                  ? 1
+                  : 0),
+            0,
+          );
+      function prog() {
+        const n = Object.keys(P).length,
+          t = total();
+        $("#prog").textContent = n + " of " + t + " activities";
+        $("#bar").style.width = (n / t) * 100 + "%";
+      }
+      function done(id) {
+        if (P[id]) return;
+        P[id] = 1;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(P));
+        } catch (e) {}
+        prog();
+      }
+
+      const WIDGETS = {
+        BuildChain(el, p, fin) {
+          el.classList.add("try");
+          let i = 0;
+          const locked = [];
+          const draw = () => {
+            const s = p.stages[i];
+            el.innerHTML = `<span class="label">Try it</span>
+   <div class="chain-row">${locked.map((l) => `<span class="link">${l}</span><span class="sep">—</span>`).join("")}${s ? `<span class="slot">?</span>` : ""}</div>
+   ${
+     s
+       ? `<div class="stagehead">Stage ${i + 1} of ${p.stages.length} · ${s.label}</div><p>${s.head}</p><p><b>${s.prompt}</b></p>${s.options.map((o, j) => `<button class="opt" data-j="${j}">${o}</button>`).join("")}<div class="clarify"></div>`
+       : `<div class="done-banner">Six stages, six locked blocks. That’s the whole journey a single payment makes.</div>`
+   }`;
+            if (s)
+              el.querySelectorAll(".opt").forEach(
+                (b) =>
+                  (b.onclick = () => {
+                    const ok = +b.dataset.j === s.answer;
+                    el.querySelectorAll(".opt").forEach((x) =>
+                      x.classList.remove("right", "wrong"),
+                    );
+                    b.classList.add(ok ? "right" : "wrong");
+                    if (ok) {
+                      $(".clarify", el).textContent = s.clarify;
+                      setTimeout(() => {
+                        locked.push(s.label);
+                        i++;
+                        draw();
+                        if (i === p.stages.length) fin();
+                      }, 650);
+                    } else {
+                      $(".clarify", el).textContent =
+                        "Not that one. Think about whose job this actually is, and try again.";
+                    }
+                  }),
+              );
+          };
+          draw();
+        },
+      };
+
+      const BLOCKS = {
+        text: (b) => wrap(md(b.md)),
+        aside: (b) => wrap(inl(b.md), "aside"),
+        figure: (b) => {
+          const a = ASSETS[b.asset];
+          const el = document.createElement("figure");
+          el.innerHTML =
+            (/^(https?:|data:)/.test(a)
+              ? `<img src="${a}" alt="${b.caption}" style="max-width:100%">`
+              : a) + `<figcaption>${b.caption}</figcaption>`;
+          return el;
+        },
+        timeline: (b) =>
+          wrap(
+            b.items.map((i) => `<div><b>${i.when}</b>${i.text}</div>`).join(""),
+            "tl",
+          ),
+        widget: (b) => {
+          const el = wrap("");
+          WIDGETS[b.name](el, b.props || {}, () => done(b.id));
+          return el;
+        },
+        quiz: (b) => {
+          const el = wrap(
+            b.questionIds
+              .map((id) => {
+                const q = QB[id];
+                return `<div class="q"><b>${q.prompt}</b>${q.options.map((t, j) => `<button class="opt" data-q="${id}" data-j="${j}">${t}</button>`).join("")}<div class="msg" id="f-${id}"></div></div>`;
+              })
+              .join(""),
+          );
+          el.querySelectorAll("[data-q]").forEach(
+            (x) =>
+              (x.onclick = () => {
+                const q = QB[x.dataset.q],
+                  ok = +x.dataset.j === q.answer;
+                x.classList.add(ok ? "right" : "wrong");
+                $("#f-" + q.id, el).textContent = ok ? q.right : q.wrong;
+                if (ok) done("q:" + q.id);
+              }),
+          );
+          return el;
+        },
+        reflect: (b) => {
+          const el = wrap(
+            `<div class="try">${md(b.prompt)}<textarea placeholder="${b.placeholder || ""}"></textarea><button data-go>Compare with ours</button><div class="out" style="margin-top:14px"></div></div>`,
+          );
+          $("[data-go]", el).onclick = () => {
+            $(".out", el).innerHTML = `<p>${inl(b.model)}</p>`;
+            done(b.id);
+          };
+          return el;
+        },
+        next: () => {
+          const n = L.next;
+          return wrap(
+            `<span class="label">Next lesson</span><h3>${n.id} ${n.title}</h3><p>${n.teaser}</p><a class="next-link" href="../1.2-getting-started-with-bitcoin/">Start lesson ${n.id} →</a>`,
+            "next",
+          );
+        },
+      };
+
+      const errs = [];
+      L.sections.forEach((s) =>
+        s.blocks.forEach((b) => {
+          if (!BLOCKS[b.type])
+            errs.push(s.id + ': unknown block "' + b.type + '"');
+          if (b.type === "widget" && !WIDGETS[b.name])
+            errs.push(s.id + ': unknown widget "' + b.name + '"');
+          if (b.type === "figure" && !ASSETS[b.asset])
+            errs.push(s.id + ': missing asset "' + b.asset + '"');
+          if (b.type === "quiz")
+            b.questionIds.forEach((q) => {
+              if (!QB[q]) errs.push(s.id + ': missing question "' + q + '"');
+            });
+        }),
+      );
+      if (errs.length) {
+        const w = $("#warn");
+        w.style.display = "block";
+        w.innerHTML = errs.join("<br>");
+      }
+
+      $("#head").innerHTML =
+        `<div class="kicker">${L.phase} · ${L.module}</div><h1>${L.title}</h1><p class="sub">${L.subtitle}</p><div class="meta">Lesson ${L.id} · about ${L.minutes} minutes · ${L.level}</div>`;
+      const main = $("#lesson");
+      L.sections.forEach((s, i) => {
+        const sec = document.createElement("section");
+        sec.id = s.id;
+        sec.innerHTML = `<div class="label">${s.label}</div><h2>${s.title}</h2>`;
+        s.blocks.forEach((b) => {
+          if (BLOCKS[b.type]) sec.appendChild(BLOCKS[b.type](b));
+        });
+        main.appendChild(sec);
+      });
+      prog();
+    </script>
+  </body>
+</html>
