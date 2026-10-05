@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Bitcoin Core — Bitshala Learn 3.1</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 3.1</span><span id="prog"></span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "3.1",
+        "title": "Bitcoin Core",
+        "subtitle": "Stop reading about a node. Run one, and ask it questions yourself.",
+        "phase": "Bitcoin Foundations",
+        "module": "How Bitcoin Works",
+        "minutes": 28,
+        "level": "Beginner",
+        "concepts": [
+          "full-node",
+          "data-directory",
+          "blocks",
+          "chainstate",
+          "bitcoin-conf",
+          "bitcoin-cli"
+        ],
+        "next": {
+          "id": "3.2",
+          "title": "Bitcoin Core RPC",
+          "teaser": "You’ve started a node and learned to read what it tells you. Next you’ll talk to it more directly, through the same RPC interface bitcoin-cli uses underneath."
+        },
+        "sections": [
+          {
+            "id": "turn",
+            "label": "Your turn",
+            "title": "You decide to stop reading and start running one",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Everything so far has been something you watched happen: Aarav’s wallet signing a transaction, nodes checking it, a miner locking it into a block. All of it was real, and none of it was something your own computer actually did.\n\nThat changes now. The software most of those nodes run is called **Bitcoin Core**, and it’s open for anyone to install and run. Once you do, your own computer stops being a spectator."
+              }
+            ]
+          },
+
+          {
+            "id": "what2",
+            "label": "The software",
+            "title": "What Bitcoin Core actually is",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Bitcoin Core is open-source software that implements the Bitcoin protocol. Install it, start it, and your computer becomes one more participant in the same peer-to-peer network you’ve been reading about since Lesson 2.1, talking to other nodes, not through any central server."
+              },
+              {
+                "type": "figure",
+                "asset": "peers",
+                "caption": "Once it’s running, your node is just one more voice in the same network Aarav’s payment travelled through."
+              }
+            ]
+          },
+
+          {
+            "id": "fullnode2",
+            "label": "What it promises",
+            "title": "A full node doesn’t take anyone’s word for it",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Run Bitcoin Core as a full node, and it will connect to peers, receive transactions and blocks, and validate every one of them against Bitcoin’s rules itself. It keeps the blockchain, and it keeps track of which outputs are still unspent. None of that is outsourced.\n\nThat’s the whole point stated plainly: you can verify the rules yourself, instead of trusting someone else to tell you they were followed."
+              }
+            ]
+          },
+
+          {
+            "id": "notmaya2",
+            "label": "The alternative",
+            "title": "Compare it to just asking someone",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Picture two people checking whether a payment is real. One of them asks a service, the kind of app that simply tells you “yes, that’s valid,” and takes the answer on trust. The other runs their own full node and checks it directly.\n\nThis should sound familiar. It’s Maya’s notebook again, from Lesson 1.1, wearing different clothes. Asking a service is fast and easy, and it also means trusting whoever runs that service to be honest, correct, and online. Running your own node is more work, and it’s the option that doesn’t ask you to trust anyone."
+              },
+              {
+                "type": "figure",
+                "asset": "compare",
+                "caption": "Same trade-off as Maya’s notebook: ask someone, or check it yourself."
+              }
+            ]
+          },
+
+          {
+            "id": "starts2",
+            "label": "Starting up",
+            "title": "What happens in the seconds after you start it",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Start Bitcoin Core and a short sequence runs before it’s useful to you. It reads its configuration, opens the folder where it keeps its data, loads whatever state it already has, and reaches out to other nodes. From there it exchanges information with them and validates everything it receives, building up its own view of the network as it goes.\n\nIf it’s a brand-new node, that last part can take a while: it has history to download and check before its view of the chain catches up to everyone else’s."
+              },
+              {
+                "type": "figure",
+                "asset": "startup",
+                "caption": "None of this is instant. A new node earns its view of the chain, it doesn’t just download it."
+              }
+            ]
+          },
+
+          {
+            "id": "verify2",
+            "label": "Not just downloading",
+            "title": "Downloading isn’t the important part",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "It’s tempting to picture a full node as something that just downloads a copy of the blockchain, the way you’d download a large file. That undersells it.\n\nWhen another node sends yours a block, your node doesn’t say “thanks, saved.” It checks that block against Bitcoin’s rules before accepting it, the same way a node checked Aarav’s transaction back in Lesson 2.1. Downloading is just how the data arrives. Verifying is the actual job."
+              }
+            ]
+          },
+
+          {
+            "id": "datadir2",
+            "label": "Where it keeps things",
+            "title": "Your node needs somewhere to put all this",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "All of that data, downloaded and checked, has to live somewhere on your computer: Bitcoin Core’s **data directory**. Exactly where it sits depends on your operating system, but what’s inside it is worth knowing. Open it up and have a look around."
+              },
+              {
+                "type": "widget",
+                "id": "w-files",
+                "name": "FileExplorer",
+                "props": {
+                  "instruction": "Tap each item to see what it’s for.",
+                  "items": [
+                    {
+                      "name": "blocks/",
+                      "desc": "The blockchain itself, block by block, exactly as it was downloaded and verified."
+                    },
+                    {
+                      "name": "chainstate/",
+                      "desc": "Not history, a snapshot of right now: every output the node currently considers unspent."
+                    },
+                    {
+                      "name": "bitcoin.conf",
+                      "desc": "Settings. Which network to use, whether RPC is on, and other choices about how the node behaves."
+                    },
+                    {
+                      "name": "wallets/",
+                      "desc": "Wallet data, if a wallet is enabled on this node. Optional, separate from the blockchain itself."
+                    },
+                    {
+                      "name": "debug.log",
+                      "desc": "A running log of what the node has been doing, useful when something looks wrong."
+                    }
+                  ],
+                  "question": "Which of these holds the node’s current UTXO set?",
+                  "options": ["blocks/", "chainstate/", "bitcoin.conf"],
+                  "answer": 1,
+                  "right": "Right. Chainstate is the live, spendable snapshot, not the history.",
+                  "wrong": "Not that one. Think about which folder represents right now, not the whole past."
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "chainstate2",
+            "label": "Two different things",
+            "title": "Blocks and chainstate are not the same job",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "It’s worth keeping these two apart in your head, because they answer different questions. Blocks hold every confirmed transaction there has ever been, the whole history, unchanged. Chainstate holds only what’s still spendable right now, the part that actually matters when your node checks whether a new transaction is valid.\n\nWhen a node validates a transaction, it isn’t replaying the entire history each time. It checks the input against chainstate, the current snapshot, which is exactly why chainstate exists at all."
+              },
+              {
+                "type": "figure",
+                "asset": "blockschain",
+                "caption": "One is the full story. The other is only what’s still true right now."
+              }
+            ]
+          },
+
+          {
+            "id": "config2",
+            "label": "Telling it what to do",
+            "title": "A short file does the configuring",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Bitcoin Core reads its settings from a configuration file, usually called **bitcoin.conf**. It’s how you’d tell it, for instance, to run on testnet while you’re still learning rather than on the real network, with a line as small as:"
+              },
+              {
+                "type": "aside",
+                "md": "testnet=1\n\nThat one line is enough to change which network your node joins. Configuration doesn’t need to be elaborate to matter."
+              }
+            ]
+          },
+
+          {
+            "id": "cli2",
+            "label": "Talking to it",
+            "title": "bitcoind runs it, bitcoin-cli talks to it",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Bitcoin Core comes as more than one piece. **bitcoind** is the program that actually runs the node in the background. **bitcoin-cli** is how you talk to it, sending it commands through an interface called RPC and getting answers back.\n\nYou won’t touch bitcoind directly very often. bitcoin-cli is where you’ll actually spend your time, and that’s where you’re headed next."
+              },
+              {
+                "type": "figure",
+                "asset": "clidiagram",
+                "caption": "You never query the node directly. bitcoin-cli and RPC sit in between."
+              }
+            ]
+          },
+
+          {
+            "id": "check3",
+            "label": "Ask it yourself",
+            "title": "Run the commands, read the real answer",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Enough description. Here’s a terminal connected to a running node. Run each command and decide for yourself what the answer means, the same question Lesson 15 of your curriculum asks directly: is this node connected, and is it caught up?"
+              },
+              {
+                "type": "widget",
+                "id": "w-term",
+                "name": "Terminal",
+                "props": {
+                  "steps": [
+                    {
+                      "cmd": "bitcoin-cli getblockchaininfo",
+                      "output": "{\n  \"chain\": \"main\",\n  \"blocks\": 850000,\n  \"headers\": 850000,\n  \"initialblockdownload\": false\n}",
+                      "question": "Blocks and headers match, and initial block download is false. Is this node caught up?",
+                      "options": ["Yes, it’s synced", "No, still syncing"],
+                      "answer": 0,
+                      "note": "Right. Blocks equals headers, and it’s no longer in initial block download. There’s nothing left to catch up on."
+                    },
+                    {
+                      "cmd": "bitcoin-cli getpeerinfo",
+                      "output": "3 peers connected:\n  71.12.xx.xx\n  94.23.xx.xx\n  188.40.xx.xx",
+                      "question": "Is this node actually talking to the network?",
+                      "options": [
+                        "Yes, it has active peers",
+                        "No, it’s isolated"
+                      ],
+                      "answer": 0,
+                      "note": "Right. Three peers, actively exchanging data. It isn’t working alone."
+                    },
+                    {
+                      "cmd": "bitcoin-cli getblockchaininfo",
+                      "output": "{\n  \"chain\": \"main\",\n  \"blocks\": 500000,\n  \"headers\": 900000,\n  \"initialblockdownload\": true\n}",
+                      "question": "Now blocks and headers don’t match. What’s going on here?",
+                      "options": [
+                        "Still synced, nothing to worry about",
+                        "Still syncing, it hasn’t caught up yet"
+                      ],
+                      "answer": 1,
+                      "note": "Right. 400,000 blocks behind what it knows exists, and initial block download is still true. This node has work left to do."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "careful2",
+            "label": "One rule",
+            "title": "Leave the files alone",
+            "blocks": [
+              {
+                "type": "aside",
+                "md": "You can look inside the data directory, but don’t edit or delete anything in it by hand while Bitcoin Core is running. If you want to change how the node behaves, that’s what configuration, command-line options, and RPC are for. The blockchain data itself is managed by the software, not by you."
+              }
+            ]
+          },
+
+          {
+            "id": "big2",
+            "label": "Zooming back out",
+            "title": "Everything you just touched, in one picture",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Put it together, and your node is doing several jobs at once: talking to the network, keeping the blockchain and chainstate on disk, and answering you through RPC whenever you ask."
+              },
+              {
+                "type": "figure",
+                "asset": "bigpicture",
+                "caption": "Bitcoin Core isn’t just a wallet with extra steps. It’s a full node, doing all three of these at once."
+              }
+            ]
+          },
+
+          {
+            "id": "check4",
+            "label": "Before you continue",
+            "title": "Say it back",
+            "blocks": [
+              {
+                "type": "quiz",
+                "id": "qz-1",
+                "questionIds": ["q-fullnode", "q-chainstate", "q-cli"]
+              },
+              {
+                "type": "reflect",
+                "id": "r-explain",
+                "prompt": "A friend asks: “Isn’t a full node just downloading the blockchain?” Correct them in two or three sentences, using the words verify and chainstate.",
+                "placeholder": "Write it as you’d actually say it out loud.",
+                "model": "Not quite, downloading is just how the data arrives. The real job is verification: every block and transaction gets checked against Bitcoin’s rules before the node accepts it. It also keeps a chainstate, a live snapshot of which outputs are still spendable, which is what it actually checks new transactions against."
+              }
+            ]
+          },
+
+          {
+            "id": "end3",
+            "label": "Next",
+            "title": "Talking to the node directly",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "You’ve started a node, found your way around its data directory, told the difference between blocks and chainstate, and asked it real questions through bitcoin-cli. What you’ve mostly done so far is read its answers.\n\nNext, you’ll learn to ask it for exactly what you want."
+              },
+              { "type": "next" }
+            ]
+          }
+        ]
+      }
+    </script>
+
+    <script type="application/json" id="quiz-bank">
+      [
+        {
+          "id": "q-fullnode",
+          "concept": "full-node",
+          "prompt": "What makes a full node different from a service that just tells you a transaction is valid?",
+          "options": [
+            "A full node is faster, nothing more",
+            "A full node checks the rules itself instead of trusting someone else’s answer",
+            "A full node only works on testnet",
+            "There’s no real difference"
+          ],
+          "answer": 1,
+          "right": "Right. That’s the whole trade-off, independent verification instead of trust.",
+          "wrong": "Not quite. Think back to Maya’s notebook, and what changed when you removed her."
+        },
+        {
+          "id": "q-chainstate",
+          "concept": "chainstate",
+          "prompt": "What does chainstate actually represent?",
+          "options": [
+            "Every transaction that has ever happened",
+            "The node’s current software version",
+            "Which outputs are still unspent, right now",
+            "A backup of bitcoin.conf"
+          ],
+          "answer": 2,
+          "right": "Right. It’s the live, spendable snapshot the node checks new transactions against.",
+          "wrong": "Not quite. That’s what the blocks folder is for. Chainstate answers a narrower question."
+        },
+        {
+          "id": "q-cli",
+          "concept": "bitcoin-cli",
+          "prompt": "What is bitcoin-cli actually doing when you run a command with it?",
+          "options": [
+            "Running the node itself, in place of bitcoind",
+            "Sending a request to a running node through its RPC interface",
+            "Editing the blockchain data directly",
+            "Downloading new blocks on its own"
+          ],
+          "answer": 1,
+          "right": "Right. bitcoind runs the node. bitcoin-cli just asks it questions.",
+          "wrong": "Not quite. bitcoin-cli doesn’t run the node, it talks to one that’s already running."
+        }
+      ]
+    </script>
+
+    <script>
+      const AMK = (id) =>
+        `<marker id="${id}" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="currentColor"/></marker>`;
+      const ABOX = (x, y, w, h, r = 8) =>
+        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" style="fill:var(--soft)" stroke-width="1.3"/>`;
+
+      const ASSETS = {
+        peers: `<svg viewBox="0 0 460 230" fill="none" stroke="currentColor" stroke-width="1.1">
+ <text x="230" y="22" text-anchor="middle" stroke="none" font-size="11" fill="var(--mut)">the Bitcoin peer-to-peer network</text>
+ <g opacity=".4">
+  <path d="M230 115L70 50"/><path d="M230 115L390 50"/><path d="M230 115L70 180"/><path d="M230 115L390 180"/>
+ </g>
+ ${[
+   [70, 50],
+   [390, 50],
+   [70, 180],
+   [390, 180],
+ ]
+   .map(
+     (p) =>
+       `<circle cx="${p[0]}" cy="${p[1]}" r="22" fill="var(--bg)"/><text x="${p[0]}" y="${p[1] + 4}" text-anchor="middle" stroke="none" font-size="10">peer</text>`,
+   )
+   .join("")}
+ ${ABOX(170, 90, 120, 50)}<text x="230" y="110" text-anchor="middle" stroke="none" font-size="12">Your Node</text><text x="230" y="126" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">Bitcoin Core</text>
+ </svg>`,
+
+        compare: `<svg viewBox="0 0 460 200" fill="none" stroke="currentColor" stroke-width="1.3">
+ <text x="120" y="22" text-anchor="middle" stroke="none" font-size="11" fill="var(--mut)">User A</text>
+ ${ABOX(50, 45, 140, 50)}<text x="120" y="66" text-anchor="middle" stroke="none" font-size="12">asks a service</text><text x="120" y="82" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">“is this valid?”</text>
+ <path d="M120 95v35" marker-end="url(#cmpA)"/>
+ ${ABOX(50, 130, 140, 50)}<text x="120" y="151" text-anchor="middle" stroke="none" font-size="12">trusts the answer</text><text x="120" y="167" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">can’t check it directly</text>
+ <text x="340" y="22" text-anchor="middle" stroke="none" font-size="11" fill="var(--mut)">User B</text>
+ ${ABOX(270, 45, 140, 50)}<text x="340" y="66" text-anchor="middle" stroke="none" font-size="12">runs a full node</text><text x="340" y="82" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">asks nobody</text>
+ <path d="M340 95v35" marker-end="url(#cmpA)"/>
+ ${ABOX(270, 130, 140, 50)}<text x="340" y="151" text-anchor="middle" stroke="none" font-size="12">verifies it directly</text><text x="340" y="167" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">no service required</text>
+ <defs>${AMK("cmpA")}</defs></svg>`,
+
+        startup: `<svg viewBox="0 0 460 400" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${[
+   "Load configuration",
+   "Open the data directory",
+   "Load local chain state",
+   "Connect to peers",
+   "Validate & stay in sync",
+ ]
+   .map((l, i) => {
+     const yTop = 14 + i * 78,
+       cy = yTop + 26;
+     let s = `<circle cx="40" cy="${cy}" r="16" style="fill:var(--soft)"/><text x="40" y="${cy + 4}" text-anchor="middle" stroke="none" font-size="12">${i + 1}</text>`;
+     s +=
+       ABOX(80, yTop, 340, 52, 8) +
+       `<text x="250" y="${cy + 4}" text-anchor="middle" stroke="none" font-size="13">${l}</text>`;
+     if (i < 4) s += `<path d="M40 ${cy + 16}v46" marker-end="url(#stA)"/>`;
+     return s;
+   })
+   .join("")}
+ <defs>${AMK("stA")}</defs></svg>`,
+
+        blockschain: `<svg viewBox="0 0 460 170" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${ABOX(40, 40, 170, 90)}<text x="125" y="70" text-anchor="middle" stroke="none" font-size="13">Blocks</text><text x="125" y="92" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">every transaction,</text><text x="125" y="108" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">ever confirmed</text>
+ ${ABOX(250, 40, 170, 90)}<text x="335" y="70" text-anchor="middle" stroke="none" font-size="13">Chainstate</text><text x="335" y="92" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">which outputs are</text><text x="335" y="108" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">unspent, right now</text>
+ <text x="230" y="150" text-anchor="middle" stroke="none" font-size="11" fill="var(--mut)">the full story, versus a snapshot of what’s still true</text></svg>`,
+
+        clidiagram: `<svg viewBox="0 0 480 150" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${["You", "bitcoin-cli", "RPC", "bitcoin node"]
+   .map((l, i) => {
+     const x = 10 + i * 120,
+       w = 100,
+       y = 50,
+       h = 50;
+     return (
+       ABOX(x, y, w, h) +
+       `<text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" stroke="none" font-size="11">${l}</text>` +
+       (i < 3
+         ? `<path d="M${x + w} ${y + h / 2}h20" marker-end="url(#cliA)"/>`
+         : "")
+     );
+   })
+   .join("")}
+ <defs>${AMK("cliA")}</defs></svg>`,
+
+        bigpicture: `<svg viewBox="0 0 480 230" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${ABOX(190, 15, 100, 40, 6)}<text x="240" y="39" text-anchor="middle" stroke="none" font-size="10">Bitcoin Network</text>
+ <path d="M240 55v30" marker-end="url(#bigA)"/>
+ ${ABOX(190, 85, 100, 50)}<text x="240" y="104" text-anchor="middle" stroke="none" font-size="11">Your Node</text><text x="240" y="120" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">Bitcoin Core</text>
+ <path d="M240 135L90 190" marker-end="url(#bigA)"/><path d="M240 135L240 190" marker-end="url(#bigA)"/><path d="M240 135L390 190" marker-end="url(#bigA)"/>
+ ${ABOX(40, 190, 100, 40, 6)}<text x="90" y="214" text-anchor="middle" stroke="none" font-size="10">Peers</text>
+ ${ABOX(190, 190, 100, 40, 6)}<text x="240" y="214" text-anchor="middle" stroke="none" font-size="10">Local data</text>
+ ${ABOX(340, 190, 100, 40, 6)}<text x="390" y="214" text-anchor="middle" stroke="none" font-size="10">RPC interface</text>
+ <defs>${AMK("bigA")}</defs></svg>`,
+      };
+    </script>
+
+    <script>
+      const $ = (s, r = document) => r.querySelector(s);
+      const L = JSON.parse($("#lesson-data").textContent),
+        QB = Object.fromEntries(
+          JSON.parse($("#quiz-bank").textContent).map((q) => [q.id, q]),
+        );
+      const KEY = "bitshala-learn:" + L.id;
+      let P = {};
+      try {
+        P = JSON.parse(localStorage.getItem(KEY) || "{}");
+      } catch (e) {}
+      const inl = (s) =>
+        s
+          .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+          .replace(/\*(.+?)\*/g, "<i>$1</i>");
+      const md = (s) =>
+        s
+          .split("\n\n")
+          .map((p) => `<p>${inl(p)}</p>`)
+          .join("");
+      const wrap = (h, c = "") => {
+        const d = document.createElement("div");
+        d.className = "blk " + c;
+        d.innerHTML = h;
+        return d;
+      };
+      const ACT = ["widget", "choice", "reflect"];
+      const total = () =>
+        L.sections
+          .flatMap((s) => s.blocks)
+          .reduce(
+            (n, b) =>
+              n +
+              (b.type === "quiz"
+                ? b.questionIds.length
+                : ACT.includes(b.type)
+                  ? 1
+                  : 0),
+            0,
+          );
+      function prog() {
+        const n = Object.keys(P).length,
+          t = total();
+        $("#prog").textContent = n + " of " + t + " activities";
+        $("#bar").style.width = (n / t) * 100 + "%";
+      }
+      function done(id) {
+        if (P[id]) return;
+        P[id] = 1;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(P));
+        } catch (e) {}
+        prog();
+      }
+
+      const WIDGETS = {
+        /* a real-feeling terminal: run a command, read genuine-looking output,
+   then answer a question about what that output actually means */
+        Terminal(el, p, fin) {
+          el.classList.add("try");
+          let i = 0;
+          const log = [];
+          const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+          const renderLog = () =>
+            log
+              .map(
+                (e) =>
+                  `<div class="tline"><span class="tprompt">$</span>${esc(e.cmd)}</div><div class="tout">${esc(e.output)}</div>`,
+              )
+              .join("");
+          const draw = () => {
+            const s = p.steps[i];
+            let h = `<span class="label">Try it</span><div class="termbox">${renderLog()}`;
+            if (s && !s._ran)
+              h += `<div class="tline pending"><span class="tprompt">$</span>${esc(s.cmd)}</div>`;
+            h += `</div>`;
+            if (s && !s._ran) h += `<button data-run>Run this command</button>`;
+            if (s && s._ran)
+              h += `<p><b>${s.question}</b></p>${s.options.map((o, j) => `<button class="opt" data-j="${j}">${o}</button>`).join("")}<div class="msg"></div>`;
+            if (!s)
+              h += `<div class="done-banner">Three commands, and now you can answer it yourself: is a node connected, and is it caught up?</div>`;
+            el.innerHTML = h;
+            if (s && !s._ran)
+              $("[data-run]", el).onclick = () => {
+                s._ran = true;
+                log.push({ cmd: s.cmd, output: s.output });
+                draw();
+              };
+            if (s && s._ran)
+              el.querySelectorAll(".opt").forEach(
+                (b) =>
+                  (b.onclick = () => {
+                    const ok = +b.dataset.j === s.answer;
+                    el.querySelectorAll(".opt").forEach((x) =>
+                      x.classList.remove("right", "wrong"),
+                    );
+                    b.classList.add(ok ? "right" : "wrong");
+                    if (ok) {
+                      $(".msg", el).textContent = s.note;
+                      setTimeout(() => {
+                        i++;
+                        draw();
+                        if (i === p.steps.length) fin();
+                      }, 700);
+                    } else {
+                      $(".msg", el).textContent =
+                        "Look at the numbers again before deciding.";
+                    }
+                  }),
+              );
+          };
+          draw();
+        },
+
+        FileExplorer(el, p, fin) {
+          el.classList.add("try");
+          let answered = false;
+          el.innerHTML = `<span class="label">Try it</span><p>${p.instruction}</p>
+  <div class="filelist">${p.items.map((it, i) => `<div class="frow" data-i="${i}"><div class="fhead"><span>${it.name}</span><span class="ftoggle">+</span></div><div class="fdesc" style="display:none">${it.desc}</div></div>`).join("")}</div>
+  <p><b>${p.question}</b></p>${p.options.map((o, j) => `<button class="opt" data-j="${j}">${o}</button>`).join("")}<div class="msg"></div>`;
+          el.querySelectorAll(".frow").forEach(
+            (row) =>
+              (row.querySelector(".fhead").onclick = () => {
+                const d = row.querySelector(".fdesc"),
+                  open = d.style.display === "none";
+                d.style.display = open ? "block" : "none";
+                row.querySelector(".ftoggle").textContent = open ? "–" : "+";
+              }),
+          );
+          el.querySelectorAll(".opt").forEach(
+            (b) =>
+              (b.onclick = () => {
+                const ok = +b.dataset.j === p.answer;
+                el.querySelectorAll(".opt").forEach((x) =>
+                  x.classList.remove("right", "wrong"),
+                );
+                b.classList.add(ok ? "right" : "wrong");
+                $(".msg", el).textContent = ok ? p.right : p.wrong;
+                if (ok && !answered) {
+                  answered = true;
+                  fin();
+                }
+              }),
+          );
+        },
+      };
+
+      const BLOCKS = {
+        text: (b) => wrap(md(b.md)),
+        aside: (b) => wrap(inl(b.md).replace(/\n\n/g, "<br><br>"), "aside"),
+        figure: (b) => {
+          const a = ASSETS[b.asset];
+          const el = document.createElement("figure");
+          el.innerHTML =
+            (/^(https?:|data:)/.test(a)
+              ? `<img src="${a}" alt="${b.caption}" style="max-width:100%">`
+              : a) + `<figcaption>${b.caption}</figcaption>`;
+          return el;
+        },
+        widget: (b) => {
+          const el = wrap("");
+          WIDGETS[b.name](el, b.props || {}, () => done(b.id));
+          return el;
+        },
+        quiz: (b) => {
+          const el = wrap(
+            b.questionIds
+              .map((id) => {
+                const q = QB[id];
+                return `<div class="q"><b>${q.prompt}</b>${q.options.map((t, j) => `<button class="opt" data-q="${id}" data-j="${j}">${t}</button>`).join("")}<div class="msg" id="f-${id}"></div></div>`;
+              })
+              .join(""),
+          );
+          el.querySelectorAll("[data-q]").forEach(
+            (x) =>
+              (x.onclick = () => {
+                const q = QB[x.dataset.q],
+                  ok = +x.dataset.j === q.answer;
+                x.classList.add(ok ? "right" : "wrong");
+                $("#f-" + q.id, el).textContent = ok ? q.right : q.wrong;
+                if (ok) done("q:" + q.id);
+              }),
+          );
+          return el;
+        },
+        reflect: (b) => {
+          const el = wrap(
+            `<div class="try">${md(b.prompt)}<textarea placeholder="${b.placeholder || ""}"></textarea><button data-go>Compare with ours</button><div class="out" style="margin-top:14px"></div></div>`,
+          );
+          $("[data-go]", el).onclick = () => {
+            $(".out", el).innerHTML = `<p>${inl(b.model)}</p>`;
+            done(b.id);
+          };
+          return el;
+        },
+        next: () => {
+          const n = L.next;
+          return wrap(
+            `<span class="label">Next lesson</span><h3>${n.id} ${n.title}</h3><p>${n.teaser}</p>`,
+            "next",
+          );
+        },
+      };
+
+      const errs = [];
+      L.sections.forEach((s) =>
+        s.blocks.forEach((b) => {
+          if (!BLOCKS[b.type])
+            errs.push(s.id + ': unknown block "' + b.type + '"');
+          if (b.type === "widget" && !WIDGETS[b.name])
+            errs.push(s.id + ': unknown widget "' + b.name + '"');
+          if (b.type === "figure" && !ASSETS[b.asset])
+            errs.push(s.id + ': missing asset "' + b.asset + '"');
+          if (b.type === "quiz")
+            b.questionIds.forEach((q) => {
+              if (!QB[q]) errs.push(s.id + ': missing question "' + q + '"');
+            });
+        }),
+      );
+      if (errs.length) {
+        const w = $("#warn");
+        w.style.display = "block";
+        w.innerHTML = errs.join("<br>");
+      }
+
+      $("#head").innerHTML =
+        `<div class="kicker">${L.phase} · ${L.module}</div><h1>${L.title}</h1><p class="sub">${L.subtitle}</p><div class="meta">Lesson ${L.id} · about ${L.minutes} minutes · ${L.level}</div>`;
+      const main = $("#lesson");
+      L.sections.forEach((s, i) => {
+        const sec = document.createElement("section");
+        sec.id = s.id;
+        sec.innerHTML = `<div class="label">${s.label}</div><h2>${s.title}</h2>`;
+        s.blocks.forEach((b) => {
+          if (BLOCKS[b.type]) sec.appendChild(BLOCKS[b.type](b));
+        });
+        main.appendChild(sec);
+      });
+      prog();
+    </script>
+  </body>
+</html>
