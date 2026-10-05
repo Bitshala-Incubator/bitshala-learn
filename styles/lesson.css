@@ -385,3 +385,57 @@ pre {
   margin-top: 8px;
   display: none;
 }
+.chain-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  min-height: 52px;
+  margin-bottom: 18px;
+}
+.link {
+  font:
+    600 13px system-ui,
+    sans-serif;
+  letter-spacing: 0.03em;
+  border: 1px solid var(--ink);
+  border-radius: 4px;
+  padding: 8px 14px;
+  background: var(--soft);
+}
+.link + .link::before {
+  content: "";
+  display: none;
+}
+.chain-row .sep {
+  color: var(--mut);
+  padding: 0 8px;
+  font-size: 18px;
+}
+.chain-row .slot {
+  font:
+    13px system-ui,
+    sans-serif;
+  color: var(--mut);
+  border: 1px dashed var(--line);
+  border-radius: 4px;
+  padding: 8px 14px;
+}
+.stagehead {
+  font:
+    600 12px system-ui,
+    sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mut);
+  margin-bottom: 6px;
+}
+.clarify {
+  margin-top: 10px;
+  font-size: 17px;
+}
+.done-banner {
+  font-style: italic;
+  color: var(--mut);
+  margin-top: 10px;
+}

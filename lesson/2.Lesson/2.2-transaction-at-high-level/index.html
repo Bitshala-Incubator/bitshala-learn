@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Transaction at a High Level — Bitshala Learn 2.2</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+   <link rel="stylesheet" href="../../../styles/lesson.css" />
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 2.2</span><span id="prog"></span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "2.2",
+        "title": "Transaction at a High Level",
+        "subtitle": "Open up the envelope. See what a payment actually says.",
+        "phase": "Bitcoin Foundations",
+        "module": "How Bitcoin Works",
+        "minutes": 24,
+        "level": "Beginner",
+        "concepts": [
+          "utxo",
+          "input",
+          "output",
+          "change",
+          "fee",
+          "transaction-vs-block"
+        ],
+        "next": {
+          "id": "3.1",
+          "title": "Bitcoin Core",
+          "teaser": "You now understand the pieces and how a transaction is built. Next we look at the actual software that runs all of this, Bitcoin Core, the program most nodes are running underneath everything you’ve learned."
+        },
+        "sections": [
+          {
+            "id": "zoomin",
+            "label": "Opening it up",
+            "title": "You asked what’s inside, so let’s look",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Last time, you watched Aarav’s payment travel from his wallet to yours without ever asking what the payment actually said. It’s time to ask.\n\nA transaction isn’t a note that reads “send 0.001 BTC to you.” It’s something more specific, and a little stranger: a description of exactly which bitcoin are being spent, and exactly where the value is allowed to go afterward. To see what that means, we need two ideas: **inputs** and **outputs**."
+              }
+            ]
+          },
+
+          {
+            "id": "coins",
+            "label": "Where it comes from",
+            "title": "Aarav doesn’t have a balance, he has pieces",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "It’s tempting to imagine Aarav has an account somewhere with a number in it, the way a bank balance works. Bitcoin doesn’t keep accounts. What Aarav actually controls is a handful of separate, previously received pieces of value, each one sitting there from some earlier payment.\n\nEach piece is called an **unspent transaction output**, or **UTXO**. You can think of it, for now, almost like a single coin of an odd denomination: whole, unspent, and sitting in Aarav’s wallet until he decides to use it."
+              },
+              {
+                "type": "figure",
+                "asset": "utxo",
+                "caption": "A UTXO is just a leftover piece of an earlier transaction, waiting to be spent."
+              }
+            ]
+          },
+
+          {
+            "id": "input2",
+            "label": "Spending it",
+            "title": "An input points backward",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Say Aarav has a UTXO worth 0.003 BTC, left over from a payment he received a while ago. When he builds a new transaction, that UTXO becomes an **input**: a pointer back to the exact earlier output he’s spending.\n\nThe transaction is effectively saying, *I am spending this specific, previously created piece of value.* Bitcoin still needs one more thing before it’ll believe him."
+              }
+            ]
+          },
+
+          {
+            "id": "auth2",
+            "label": "Proving it’s his",
+            "title": "The signature does the proving",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "That UTXO came with conditions attached, usually something like “only the person holding a particular key may spend this.” Aarav’s wallet produces a signature using that key, and the signature is what satisfies the condition.\n\nYou met this idea already, back when Aarav’s wallet signed a transaction to pay you. It’s the same signature doing the same job here: proof that whoever is spending this UTXO is actually allowed to."
+              },
+              {
+                "type": "aside",
+                "md": "Nobody asks a central authority whether Aarav is allowed to spend it. Nodes just check the signature against the conditions themselves, the same independent checking you saw in the last lesson."
+              }
+            ]
+          },
+
+          {
+            "id": "out2",
+            "label": "Where it goes",
+            "title": "An output says where the value can go next",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Spending the whole 0.003 BTC UTXO doesn’t mean Aarav has to give all of it away. His transaction creates new **outputs**, each one specifying an amount and the conditions under which it can be spent later.\n\nSay he wants to send you 0.001 BTC, and the network’s current fee is 0.0001 BTC. His transaction doesn’t just create one output. It creates two: one for you, and one sending the rest back to himself."
+              },
+              {
+                "type": "figure",
+                "asset": "inout",
+                "caption": "One input, split across outputs. Aarav isn’t sending the whole UTXO to you, only part of it."
+              }
+            ]
+          },
+
+          {
+            "id": "change2",
+            "label": "The leftover piece",
+            "title": "Change is just another output",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "That second output, the one returning value to Aarav, is called **change**, and it’s worth being precise about what it is. It isn’t a special kind of bitcoin, and it isn’t stored anywhere differently. It’s an ordinary output, with ordinary spending conditions, that happens to point back to Aarav himself.\n\nNotice, too, that the fee never shows up as an output at all. It’s simply whatever is left over once the outputs are subtracted from the input, the gap nobody claimed, which is exactly what a miner is paid for including the transaction."
+              }
+            ]
+          },
+
+          {
+            "id": "build2",
+            "label": "Build one yourself",
+            "title": "Help Aarav build the payment",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Here’s your chance to put the pieces together the way his wallet would, one decision at a time."
+              },
+              {
+                "type": "widget",
+                "id": "w-build",
+                "name": "BuildPayment",
+                "props": {
+                  "recipient": "you",
+                  "target": 0.002,
+                  "fee": 0.0001,
+                  "utxos": [
+                    { "id": "A", "amt": 0.001 },
+                    { "id": "B", "amt": 0.003 }
+                  ],
+                  "outputChoices": [0.003, 0.002, 0.0009]
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "nodecheck2",
+            "label": "Before it counts",
+            "title": "A node still won’t take Aarav’s word for it",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "When this transaction reaches a node, it goes through the same kind of scrutiny you saw before, just aimed at more specific questions now. Is the UTXO being spent actually still unspent? Does the signature satisfy the conditions attached to it? Do the outputs add up to no more than the input allows? Has this exact input already been spent somewhere else?\n\nAny one of those failing is enough for the node to refuse to treat it as a valid transaction at all."
+              }
+            ]
+          },
+
+          {
+            "id": "doublespend2",
+            "label": "The old problem, precisely",
+            "title": "Now you can see exactly what a double spend is",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Back in Lesson 1.1, double spending was a story about a coin sent to three friends at once. Now you can state it exactly: it’s one UTXO used as the input to two different transactions.\n\nSuppose Aarav tried to use his 0.003 BTC UTXO twice, once in a transaction paying you, and once in a transaction paying Meera. Both transactions might look individually valid. What makes them conflict is that they both point back to the exact same input, and a UTXO can only ever be spent once."
+              },
+              {
+                "type": "figure",
+                "asset": "doublespend2",
+                "caption": "Same UTXO, two transactions. Whichever one nodes accept first wins, and the other is rejected."
+              }
+            ]
+          },
+
+          {
+            "id": "txblock2",
+            "label": "Not the same thing",
+            "title": "A transaction is not a block",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "It’s easy to blur these together, so it’s worth separating them cleanly. A transaction describes one transfer: an input or inputs, and the outputs they become. A block is a container that holds many transactions at once, bundled together with the information that links it to the block before it.\n\nA transaction can exist, fully valid and fully signed, before it’s anywhere near a block. It only becomes part of Bitcoin’s confirmed history once a block containing it is accepted into the chain."
+              },
+              {
+                "type": "figure",
+                "asset": "txblock2",
+                "caption": "A block doesn’t replace a transaction. It just holds many of them at once."
+              }
+            ]
+          },
+
+          {
+            "id": "lifecycle2",
+            "label": "The full journey",
+            "title": "From a decision to a confirmed fact",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Put every stage together, and Aarav’s payment to you goes through more steps than it looks like from the outside."
+              },
+              {
+                "type": "figure",
+                "asset": "lifecycle2",
+                "caption": "Eight steps, and your wallet only shows you the very last one."
+              }
+            ]
+          },
+
+          {
+            "id": "spot2",
+            "label": "Quick recall",
+            "title": "Spot the mistake",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "A few statements about what you’ve just learned. Some are right, some sound right but aren’t. Decide which is which."
+              },
+              {
+                "type": "widget",
+                "id": "w-spot",
+                "name": "StatementCards",
+                "props": {
+                  "instruction": "True or false?",
+                  "statements": [
+                    {
+                      "text": "A Bitcoin transaction is stored inside a wallet.",
+                      "isTrue": false,
+                      "note": "The wallet manages keys and helps build transactions, but the transaction itself lives on the network and, once confirmed, inside a block."
+                    },
+                    {
+                      "text": "A transaction can have more than one input and more than one output.",
+                      "isTrue": true,
+                      "note": "Nothing limits a transaction to exactly one of each."
+                    },
+                    {
+                      "text": "Change is a special kind of bitcoin that only exists for wallets.",
+                      "isTrue": false,
+                      "note": "Change is an ordinary output. It just happens to point back to the sender."
+                    },
+                    {
+                      "text": "A transaction and a block are the same thing.",
+                      "isTrue": false,
+                      "note": "A block is a container that can hold many transactions at once."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "check2",
+            "label": "Before you continue",
+            "title": "Say it back",
+            "blocks": [
+              {
+                "type": "quiz",
+                "id": "qz-1",
+                "questionIds": ["q-utxo", "q-output", "q-txblock"]
+              },
+              {
+                "type": "reflect",
+                "id": "r-explain",
+                "prompt": "A friend asks: “What actually happens to a 0.003 BTC UTXO when Aarav uses it to send 0.002 BTC to someone?” Answer in two or three sentences, using the words input, output, and change.",
+                "placeholder": "Write it as you’d actually say it out loud.",
+                "model": "The 0.003 BTC UTXO becomes the input to a new transaction. That transaction creates two outputs: 0.002 BTC to the recipient, and the remainder, minus the fee, back to Aarav as change. The original UTXO is now spent and can never be used as an input again."
+              }
+            ]
+          },
+
+          {
+            "id": "end2",
+            "label": "Next",
+            "title": "The software underneath all of this",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "You now have a working model of a transaction: inputs pointing back to what’s being spent, outputs describing where the value goes next, a signature proving it’s authorised, and a fee that’s simply whatever’s left unclaimed.\n\nEverything so far has described what Bitcoin does. Next, you’ll meet the actual program that does it."
+              },
+              { "type": "next" }
+            ]
+          }
+        ]
+      }
+    </script>
+
+    <script type="application/json" id="quiz-bank">
+      [
+        {
+          "id": "q-utxo",
+          "concept": "utxo",
+          "prompt": "What is a UTXO, in plain terms?",
+          "options": [
+            "A password that unlocks a wallet",
+            "A leftover, unspent piece of value from an earlier transaction",
+            "A record kept by a central authority",
+            "A fee paid to a miner"
+          ],
+          "answer": 1,
+          "right": "Right. It’s simply a previously created output that hasn’t been spent yet.",
+          "wrong": "Not quite. Think about where Aarav’s 0.003 BTC actually came from."
+        },
+        {
+          "id": "q-output",
+          "concept": "output",
+          "prompt": "Why does Aarav’s transaction usually create more than one output?",
+          "options": [
+            "Bitcoin requires exactly two outputs by law",
+            "One output pays the recipient, and another often returns change to the sender",
+            "Extra outputs make the transaction faster",
+            "Outputs are only needed when the fee is zero"
+          ],
+          "answer": 1,
+          "right": "Right. The UTXO gets fully spent, and whatever isn’t sent to the recipient or taken as a fee comes back as change.",
+          "wrong": "Not quite. Think about what happens to the part of the UTXO Aarav isn’t sending away."
+        },
+        {
+          "id": "q-txblock",
+          "concept": "transaction-vs-block",
+          "prompt": "What’s the real difference between a transaction and a block?",
+          "options": [
+            "There is no difference, they’re the same thing",
+            "A transaction describes one transfer; a block is a container holding many transactions",
+            "A block is created by a wallet; a transaction is created by a miner",
+            "A transaction only exists after it’s confirmed"
+          ],
+          "answer": 1,
+          "right": "Right. A transaction can be valid and signed long before any block contains it.",
+          "wrong": "Not quite. Think about which one holds the other."
+        }
+      ]
+    </script>
+
+    <script>
+      const AMK = (id) =>
+        `<marker id="${id}" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="currentColor"/></marker>`;
+      const ABOX = (x, y, w, h, r = 8) =>
+        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" style="fill:var(--soft)" stroke-width="1.3"/>`;
+
+      const ASSETS = {
+        utxo: `<svg viewBox="0 0 320 180" fill="none" stroke="currentColor" stroke-width="1.3">
+ <rect x="110" y="12" width="100" height="30" rx="6" fill="none" stroke-dasharray="3 3"/><text x="160" y="31" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">earlier transaction</text>
+ <path d="M160 42v22" marker-end="url(#utA)"/>
+ ${ABOX(80, 64, 160, 60)}<text x="160" y="90" text-anchor="middle" stroke="none" font-size="13">0.003 BTC</text><text x="160" y="108" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">unspent output, UTXO</text>
+ <defs>${AMK("utA")}</defs></svg>`,
+
+        inout: `<svg viewBox="0 0 480 200" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${ABOX(20, 80, 120, 50)}<text x="80" y="100" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">input</text><text x="80" y="117" text-anchor="middle" stroke="none" font-size="13">0.003 BTC</text>
+ <path d="M140 105L300 45" marker-end="url(#ioA)"/>
+ <path d="M140 105L300 145" marker-end="url(#ioA)"/>
+ ${ABOX(300, 20, 150, 50)}<text x="375" y="40" text-anchor="middle" stroke="none" font-size="13">0.001 BTC</text><text x="375" y="56" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">→ you</text>
+ ${ABOX(300, 120, 150, 50)}<text x="375" y="140" text-anchor="middle" stroke="none" font-size="13">0.0019 BTC</text><text x="375" y="156" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">→ Aarav, change</text>
+ <text x="240" y="186" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">0.0001 BTC never appears as an output. It’s the fee.</text>
+ <defs>${AMK("ioA")}</defs></svg>`,
+
+        doublespend2: `<svg viewBox="0 0 460 220" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${ABOX(170, 16, 120, 50)}<text x="230" y="38" text-anchor="middle" stroke="none" font-size="12">0.003 BTC</text><text x="230" y="54" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">UTXO</text>
+ <path d="M230 66L110 136" marker-end="url(#dsA)" stroke-dasharray="4 4"/>
+ <path d="M230 66L350 136" marker-end="url(#dsA)" stroke-dasharray="4 4"/>
+ ${ABOX(40, 136, 140, 50)}<text x="110" y="156" text-anchor="middle" stroke="none" font-size="12">Transaction A</text><text x="110" y="172" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">→ you</text>
+ ${ABOX(280, 136, 140, 50)}<text x="350" y="156" text-anchor="middle" stroke="none" font-size="12">Transaction B</text><text x="350" y="172" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">→ Meera</text>
+ <text x="230" y="208" text-anchor="middle" stroke="none" font-size="12" style="fill:var(--acc)">only one of these can be valid</text>
+ <defs>${AMK("dsA")}</defs></svg>`,
+
+        txblock2: `<svg viewBox="0 0 440 210" fill="none" stroke="currentColor" stroke-width="1.3">
+ <rect x="40" y="20" width="300" height="170" rx="10" fill="none" stroke-dasharray="4 4"/>
+ <text x="60" y="42" stroke="none" font-size="10" fill="var(--mut)">block</text>
+ ${ABOX(70, 55, 240, 28, 5)}<text x="190" y="74" text-anchor="middle" stroke="none" font-size="11">transaction</text>
+ ${ABOX(70, 91, 240, 28, 5)}<text x="190" y="110" text-anchor="middle" stroke="none" font-size="11">transaction</text>
+ ${ABOX(70, 127, 240, 28, 5)}<text x="190" y="146" text-anchor="middle" stroke="none" font-size="11">transaction</text>
+ <text x="190" y="175" text-anchor="middle" stroke="none" font-size="11" fill="var(--mut)">… and more</text>
+ <path d="M340 105h24" marker-end="url(#tbA)"/>
+ <rect x="368" y="80" width="56" height="50" rx="6" fill="none" stroke-dasharray="3 3"/>
+ <text x="396" y="109" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">next</text>
+ <text x="396" y="123" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">block</text>
+ <defs>${AMK("tbA")}</defs></svg>`,
+
+        lifecycle2: `<svg viewBox="0 0 480 170" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${["Choose", "Create", "Authorise", "Broadcast"]
+   .map((l, i) => {
+     const x = 10 + i * 115;
+     return (
+       ABOX(x, 15, 100, 40, 6) +
+       `<text x="${x + 50}" y="39" text-anchor="middle" stroke="none" font-size="11">${l}</text>` +
+       (i < 3 ? `<path d="M${x + 100} 35h15" marker-end="url(#lcA)"/>` : "")
+     );
+   })
+   .join("")}
+ ${["Validate", "Relay", "Include", "Confirm"]
+   .map((l, i) => {
+     const x = 10 + i * 115;
+     return (
+       ABOX(x, 110, 100, 40, 6) +
+       `<text x="${x + 50}" y="134" text-anchor="middle" stroke="none" font-size="11">${l}</text>` +
+       (i < 3 ? `<path d="M${x + 100} 130h15" marker-end="url(#lcA)"/>` : "")
+     );
+   })
+   .join("")}
+ <path d="M405 55V82H60V110" marker-end="url(#lcA)"/>
+ <defs>${AMK("lcA")}</defs></svg>`,
+      };
+    </script>
+
+    <script>
+      const $ = (s, r = document) => r.querySelector(s);
+      const L = JSON.parse($("#lesson-data").textContent),
+        QB = Object.fromEntries(
+          JSON.parse($("#quiz-bank").textContent).map((q) => [q.id, q]),
+        );
+      const KEY = "bitshala-learn:" + L.id;
+      let P = {};
+      try {
+        P = JSON.parse(localStorage.getItem(KEY) || "{}");
+      } catch (e) {}
+      const inl = (s) =>
+        s
+          .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+          .replace(/\*(.+?)\*/g, "<i>$1</i>");
+      const md = (s) =>
+        s
+          .split("\n\n")
+          .map((p) => `<p>${inl(p)}</p>`)
+          .join("");
+      const wrap = (h, c = "") => {
+        const d = document.createElement("div");
+        d.className = "blk " + c;
+        d.innerHTML = h;
+        return d;
+      };
+      const ACT = ["widget", "choice", "reflect"];
+      const total = () =>
+        L.sections
+          .flatMap((s) => s.blocks)
+          .reduce(
+            (n, b) =>
+              n +
+              (b.type === "quiz"
+                ? b.questionIds.length
+                : ACT.includes(b.type)
+                  ? 1
+                  : 0),
+            0,
+          );
+      function prog() {
+        const n = Object.keys(P).length,
+          t = total();
+        $("#prog").textContent = n + " of " + t + " activities";
+        $("#bar").style.width = (n / t) * 100 + "%";
+      }
+      function done(id) {
+        if (P[id]) return;
+        P[id] = 1;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(P));
+        } catch (e) {}
+        prog();
+      }
+
+      const WIDGETS = {
+        /* a four-stage wizard: pick real UTXOs, pick the real output, then type the
+   change yourself, numeric free entry, nothing like this in earlier lessons */
+        BuildPayment(el, p, fin) {
+          el.classList.add("try");
+          let stage = 1,
+            chosen = new Set(),
+            total = 0;
+          const fmt = (n) => {
+            let s = n.toFixed(4).replace(/0+$/, "");
+            if (s.endsWith(".")) s = s.slice(0, -1);
+            return s + " BTC";
+          };
+          const draw = () => {
+            if (stage === 1) {
+              el.innerHTML = `<span class="label">Try it</span><p>Aarav needs to send <b>${fmt(p.target)}</b> to ${p.recipient}, plus a fee of ${fmt(p.fee)}. He has these UTXOs. Tap the one his wallet should use.</p>
+    <div class="utxo-row">${p.utxos.map((u) => `<button class="utxo-card" data-id="${u.id}"><b>${fmt(u.amt)}</b>UTXO ${u.id}</button>`).join("")}</div>
+    <div class="msg"></div><button data-go>Use this input</button>`;
+              el.querySelectorAll(".utxo-card").forEach(
+                (c) =>
+                  (c.onclick = () => {
+                    c.classList.toggle("sel");
+                    const id = c.dataset.id;
+                    chosen.has(id) ? chosen.delete(id) : chosen.add(id);
+                    total = [...chosen].reduce(
+                      (s, id) => s + p.utxos.find((u) => u.id === id).amt,
+                      0,
+                    );
+                    $(".msg", el).textContent = chosen.size
+                      ? "Selected: " + fmt(total)
+                      : "";
+                  }),
+              );
+              $("[data-go]", el).onclick = () => {
+                if (chosen.size === 0) {
+                  $(".msg", el).textContent = "Pick at least one UTXO first.";
+                  return;
+                }
+                if (total < p.target + p.fee - 1e-9) {
+                  $(".msg", el).textContent =
+                    "That’s not enough to cover the payment and the fee. Try another UTXO.";
+                  return;
+                }
+                stage = 2;
+                draw();
+              };
+            } else if (stage === 2) {
+              el.innerHTML = `<span class="label">Try it</span><p>The wallet is spending <b>${fmt(total)}</b> as input. Which output should go to <b>${p.recipient}</b>?</p>
+    ${p.outputChoices.map((c) => `<button class="opt" data-v="${c}">${fmt(c)}</button>`).join("")}<div class="msg"></div>`;
+              el.querySelectorAll(".opt").forEach(
+                (b) =>
+                  (b.onclick = () => {
+                    const v = parseFloat(b.dataset.v),
+                      ok = Math.abs(v - p.target) < 1e-9;
+                    el.querySelectorAll(".opt").forEach((x) =>
+                      x.classList.remove("right", "wrong"),
+                    );
+                    b.classList.add(ok ? "right" : "wrong");
+                    if (ok) {
+                      $(".msg", el).textContent =
+                        "Right. That’s the payment itself.";
+                      setTimeout(() => {
+                        stage = 3;
+                        draw();
+                      }, 550);
+                    } else {
+                      $(".msg", el).textContent =
+                        "Not that amount. Look again at what " +
+                        p.recipient +
+                        " is actually owed.";
+                    }
+                  }),
+              );
+            } else if (stage === 3) {
+              const change = total - p.target - p.fee;
+              el.innerHTML = `<span class="label">Try it</span><p>Input <b>${fmt(total)}</b>, minus <b>${fmt(p.target)}</b> to ${p.recipient}, minus the <b>${fmt(p.fee)}</b> fee. How much comes back to Aarav as change?</p>
+    <input class="num" type="text" placeholder="0.000X BTC"><button data-go>Check</button><div class="msg"></div>`;
+              $("[data-go]", el).onclick = () => {
+                const v = parseFloat($(".num", el).value);
+                if (isNaN(v)) {
+                  $(".msg", el).textContent =
+                    "Enter it as a number, like 0.0009.";
+                  return;
+                }
+                if (Math.abs(v - change) < 0.00005) {
+                  stage = 4;
+                  draw();
+                  fin();
+                } else {
+                  $(".msg", el).textContent =
+                    "Not quite. Input, minus the payment, minus the fee. Try again.";
+                }
+              };
+            } else {
+              const change = total - p.target - p.fee;
+              el.innerHTML = `<span class="label">Built</span><div class="chain-row"><span class="link">input ${fmt(total)}</span><span class="sep">→</span><span class="link">${fmt(p.target)} to ${p.recipient}</span><span class="sep">+</span><span class="link">${fmt(change)} change</span></div>
+    <p class="msg" style="font-style:italic">The missing ${fmt(p.fee)} never shows up as an output. It’s simply what’s left for whoever mines the block.</p>`;
+            }
+          };
+          draw();
+        },
+
+        StatementCards(el, p, fin) {
+          el.classList.add("try");
+          let n = 0;
+          el.innerHTML = `<span class="label">Try it</span><p>${p.instruction}</p><div class="cardstack">${p.statements.map((s, i) => `<div class="jcard" data-i="${i}"><p>“${s.text}”</p><button data-v="true">True</button><button class="ghost" data-v="false">False</button><div class="verdict"></div></div>`).join("")}</div>`;
+          el.querySelectorAll(".jcard").forEach((card, i) => {
+            const s = p.statements[i];
+            card.querySelectorAll("button").forEach(
+              (b) =>
+                (b.onclick = () => {
+                  const ok = (b.dataset.v === "true") === s.isTrue,
+                    v = card.querySelector(".verdict");
+                  v.style.display = "block";
+                  v.textContent = (ok ? "Right. " : "Not quite. ") + s.note;
+                  card
+                    .querySelectorAll("button")
+                    .forEach((x) => (x.disabled = true));
+                  if (!card.dataset.counted) {
+                    card.dataset.counted = 1;
+                    n++;
+                    if (n === p.statements.length) fin();
+                  }
+                }),
+            );
+          });
+        },
+      };
+
+      const BLOCKS = {
+        text: (b) => wrap(md(b.md)),
+        aside: (b) => wrap(inl(b.md), "aside"),
+        figure: (b) => {
+          const a = ASSETS[b.asset];
+          const el = document.createElement("figure");
+          el.innerHTML =
+            (/^(https?:|data:)/.test(a)
+              ? `<img src="${a}" alt="${b.caption}" style="max-width:100%">`
+              : a) + `<figcaption>${b.caption}</figcaption>`;
+          return el;
+        },
+        timeline: (b) =>
+          wrap(
+            b.items.map((i) => `<div><b>${i.when}</b>${i.text}</div>`).join(""),
+            "tl",
+          ),
+        widget: (b) => {
+          const el = wrap("");
+          WIDGETS[b.name](el, b.props || {}, () => done(b.id));
+          return el;
+        },
+        quiz: (b) => {
+          const el = wrap(
+            b.questionIds
+              .map((id) => {
+                const q = QB[id];
+                return `<div class="q"><b>${q.prompt}</b>${q.options.map((t, j) => `<button class="opt" data-q="${id}" data-j="${j}">${t}</button>`).join("")}<div class="msg" id="f-${id}"></div></div>`;
+              })
+              .join(""),
+          );
+          el.querySelectorAll("[data-q]").forEach(
+            (x) =>
+              (x.onclick = () => {
+                const q = QB[x.dataset.q],
+                  ok = +x.dataset.j === q.answer;
+                x.classList.add(ok ? "right" : "wrong");
+                $("#f-" + q.id, el).textContent = ok ? q.right : q.wrong;
+                if (ok) done("q:" + q.id);
+              }),
+          );
+          return el;
+        },
+        reflect: (b) => {
+          const el = wrap(
+            `<div class="try">${md(b.prompt)}<textarea placeholder="${b.placeholder || ""}"></textarea><button data-go>Compare with ours</button><div class="out" style="margin-top:14px"></div></div>`,
+          );
+          $("[data-go]", el).onclick = () => {
+            $(".out", el).innerHTML = `<p>${inl(b.model)}</p>`;
+            done(b.id);
+          };
+          return el;
+        },
+        next: () => {
+          const n = L.next;
+          return wrap(
+            `<span class="label">Next lesson</span><h3>${n.id} ${n.title}</h3><p>${n.teaser}</p>`,
+            "next",
+          );
+        },
+      };
+
+      const errs = [];
+      L.sections.forEach((s) =>
+        s.blocks.forEach((b) => {
+          if (!BLOCKS[b.type])
+            errs.push(s.id + ': unknown block "' + b.type + '"');
+          if (b.type === "widget" && !WIDGETS[b.name])
+            errs.push(s.id + ': unknown widget "' + b.name + '"');
+          if (b.type === "figure" && !ASSETS[b.asset])
+            errs.push(s.id + ': missing asset "' + b.asset + '"');
+          if (b.type === "quiz")
+            b.questionIds.forEach((q) => {
+              if (!QB[q]) errs.push(s.id + ': missing question "' + q + '"');
+            });
+        }),
+      );
+      if (errs.length) {
+        const w = $("#warn");
+        w.style.display = "block";
+        w.innerHTML = errs.join("<br>");
+      }
+
+      $("#head").innerHTML =
+        `<div class="kicker">${L.phase} · ${L.module}</div><h1>${L.title}</h1><p class="sub">${L.subtitle}</p><div class="meta">Lesson ${L.id} · about ${L.minutes} minutes · ${L.level}</div>`;
+      const main = $("#lesson");
+      L.sections.forEach((s, i) => {
+        const sec = document.createElement("section");
+        sec.id = s.id;
+        sec.innerHTML = `<div class="label">${s.label}</div><h2>${s.title}</h2>`;
+        s.blocks.forEach((b) => {
+          if (BLOCKS[b.type]) sec.appendChild(BLOCKS[b.type](b));
+        });
+        main.appendChild(sec);
+      });
+      prog();
+    </script>
+  </body>
+</html>
