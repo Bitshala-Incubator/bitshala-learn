@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Bitcoin Core RPC — Bitshala Learn 3.2</title>
+    <link rel="stylesheet" href ="../../../styles/global.css">
+    <link rel="stylesheet" href="../../../styles/lesson.css"
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 3.2</span><span id="prog"></span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "3.2",
+        "title": "Bitcoin Core RPC",
+        "subtitle": "Stop reading status. Start asking your node exact questions.",
+        "phase": "Bitcoin Foundations",
+        "module": "How Bitcoin Works",
+        "minutes": 26,
+        "level": "Beginner",
+        "concepts": [
+          "rpc",
+          "bitcoin-cli",
+          "method",
+          "parameters",
+          "read-only-vs-state-changing"
+        ],
+        "next": {
+          "id": "3.3",
+          "title": "Inside a Real Block",
+          "teaser": "You can now pull any transaction out of your node on demand. Next we slow down and take a whole block apart, piece by piece, to see exactly what holds it together."
+        },
+        "sections": [
+          {
+            "id": "want2",
+            "label": "Something specific",
+            "title": "You stop asking \u201cis it working\u201d and start asking a real question",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Last time, you asked your node whether it was healthy: connected, synced, caught up. Fair enough questions, but they only ever had two possible answers.\n\nHere\u2019s a better one. Somewhere inside your node, sitting in some block, is the exact payment Aarav sent you back in Lesson 2.2, the one you built by hand: 0.002 BTC to you, 0.0009 BTC back to him as change. Can you actually go find it?"
+              }
+            ]
+          },
+
+          {
+            "id": "whatisrpc",
+            "label": "What\u2019s underneath",
+            "title": "bitcoin-cli isn\u2019t doing anything magic",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Every time you\u2019ve typed a bitcoin-cli command, something very ordinary has been happening underneath. bitcoin-cli takes what you typed, turns it into a small, specific request, and sends it to your running node over its **RPC** interface. The node runs the request and sends back a result. bitcoin-cli just displays it.\n\nRPC stands for remote procedure call, which is a formal way of saying: ask a program, running somewhere, to run one of its functions for you, and hand you back the answer."
+              },
+              {
+                "type": "figure",
+                "asset": "rpcunderneath",
+                "caption": "bitcoin-cli is a translator. The actual conversation is a request and a result."
+              }
+            ]
+          },
+
+          {
+            "id": "anatomy2",
+            "label": "The shape of a call",
+            "title": "Every call is a name and some parameters",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "An RPC call always has the same two parts: a **method**, the name of the thing you want the node to do, and **parameters**, the specific details it needs to do it. `getblockhash` is a method. The block height you want the hash for is its parameter.\n\nSome methods need no parameters at all, like simply asking for the current block count. Others need to be fed something specific before they can answer you."
+              },
+              {
+                "type": "figure",
+                "asset": "anatomy",
+                "caption": "Method plus parameters, sent in, a result comes back out."
+              }
+            ]
+          },
+
+          {
+            "id": "readonly2",
+            "label": "Looking versus doing",
+            "title": "Not every call is as harmless as it sounds",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Some RPC calls only look. They read something that already exists and change nothing, no matter how many times you call them. Others actually do something: they create data, move funds, or alter what your wallet knows. It\u2019s worth being able to tell the two apart before you start experimenting freely.\n\nA few calls are sneakier than they sound. Try sorting these."
+              },
+              {
+                "type": "widget",
+                "id": "w-cards",
+                "name": "CallCards",
+                "props": {
+                  "instruction": "Read-only, or does it change something?",
+                  "items": [
+                    {
+                      "name": "getblockcount",
+                      "isReadOnly": true,
+                      "note": "Just reports a number. Call it a thousand times, nothing changes."
+                    },
+                    {
+                      "name": "getrawtransaction",
+                      "isReadOnly": true,
+                      "note": "Looks up data that already exists. Nothing is created or altered."
+                    },
+                    {
+                      "name": "getnewaddress",
+                      "isReadOnly": false,
+                      "note": "It feels like \u201cjust asking,\u201d but it generates a brand-new address and adds it to the wallet. That\u2019s a change."
+                    },
+                    {
+                      "name": "sendtoaddress",
+                      "isReadOnly": false,
+                      "note": "Creates and broadcasts an actual payment. About as far from read-only as it gets."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "hunt",
+            "label": "The actual hunt",
+            "title": "Find Aarav\u2019s payment, one call at a time",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Here\u2019s your chance to use exactly what you just learned. At each step, you have a goal and three possible methods. Pick the one that actually gets you there."
+              },
+              {
+                "type": "widget",
+                "id": "w-rpc",
+                "name": "RPCBuilder",
+                "props": {
+                  "stages": [
+                    {
+                      "goal": "You want to know how many blocks your node currently has.",
+                      "options": [
+                        "getblockcount",
+                        "getnewaddress",
+                        "getpeerinfo"
+                      ],
+                      "answer": 0,
+                      "param": "",
+                      "output": "850214",
+                      "note": "Right. No parameters needed, it just reports the current height."
+                    },
+                    {
+                      "goal": "You want the hash of block 850210, the one you suspect holds Aarav\u2019s payment.",
+                      "options": [
+                        "getblockhash",
+                        "getblock",
+                        "getbestblockhash"
+                      ],
+                      "answer": 0,
+                      "param": "850210",
+                      "output": "00000000000000000003a1f...e91c",
+                      "note": "Right. Feed it a height, it hands back that block\u2019s hash."
+                    },
+                    {
+                      "goal": "You have the hash. Now see what\u2019s actually inside that block.",
+                      "options": [
+                        "getblock",
+                        "getrawtransaction",
+                        "decoderawtransaction"
+                      ],
+                      "answer": 0,
+                      "param": "00000000000000000003a1f...e91c",
+                      "output": "transactions: 2,431\n...\n7f3a9c2b...d204   \u2190 this one",
+                      "note": "Right. getblock lists every transaction it holds, including the one you\u2019re after."
+                    },
+                    {
+                      "goal": "You found the txid. Now see exactly what it spent and created.",
+                      "options": [
+                        "getrawtransaction (verbose)",
+                        "getblockcount",
+                        "getpeerinfo"
+                      ],
+                      "answer": 0,
+                      "param": "7f3a9c2b...d204 true",
+                      "output": "vin:  UTXO 0.003 BTC (Aarav)\nvout[0]:  0.002 BTC  \u2192 you\nvout[1]:  0.0009 BTC \u2192 Aarav (change)",
+                      "note": "Right. There it is, the exact transaction you built by hand back in Lesson 2.2."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "trail2",
+            "label": "Looking back",
+            "title": "Four calls, one straight line to the answer",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Notice what just happened. You didn\u2019t ask one all-knowing question. You asked a small, specific question, used its answer to ask the next one, and followed the trail until you landed on the exact transaction."
+              },
+              {
+                "type": "figure",
+                "asset": "trail",
+                "caption": "Each call\u2019s output became the next call\u2019s input."
+              }
+            ]
+          },
+
+          {
+            "id": "caution3",
+            "label": "One more rule",
+            "title": "The same caution, pointed at RPC now",
+            "blocks": [
+              {
+                "type": "aside",
+                "md": "Querying freely, getblockcount, getrawtransaction, getblock, costs you nothing and risks nothing. Calls that create or move things, getnewaddress, sendtoaddress, and their relatives, deserve the same care you\u2019d give to anything that actually does something. Know which kind of call you\u2019re making before you make it."
+              }
+            ]
+          },
+
+          {
+            "id": "lab",
+            "label": "Hands-on Lab",
+            "title": "Ask Your Node",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Everything above was real, but you were reading canned output, not your own. Now actually type it. You don\u2019t need the whole Bitcoin blockchain for this, **regtest** gives you a private, empty blockchain that lives entirely on your machine, where new blocks appear the instant you ask for them.\n\nYou\u2019re about to recreate Aarav\u2019s payment yourself, from nothing, by typing every command yourself. Get one wrong and you\u2019ll be told why, the way a real terminal would. Get it right, and you\u2019ll see the real output."
+              },
+              {
+                "type": "aside",
+                "md": "Commands you\u2019ll need somewhere along the way: `bitcoind -regtest -daemon`, `bitcoin-cli -regtest getblockchaininfo`, `createwallet`, `getnewaddress`, `generatetoaddress <count> <address>`, `sendtoaddress <address> <amount>`, `getblockcount`, `getblockhash <height>`, `getblock <hash>`, and `getrawtransaction <txid> true`. The terminal below will tell you what\u2019s still missing, not which one to type next."
+              },
+              {
+                "type": "widget",
+                "id": "w-lab",
+                "name": "LabTerminal",
+                "props": {}
+              },
+              {
+                "type": "reflect",
+                "id": "r-lab",
+                "prompt": "Write down what you found on your second, unguided payment: the block height, the block hash, and the transaction id, and which command got you each one.",
+                "placeholder": "Height: ... / Hash: ... / Txid: ...",
+                "model": "There\u2019s no single right answer here, your height, hash, and txid are your own, generated fresh each time you run this. A complete answer names a specific value for each one, and shows the same trail: getblockcount for the height, getblockhash to turn that height into a hash, getblock to find the txid inside it, and getrawtransaction to confirm the payment is actually there."
+              }
+            ]
+          },
+
+          {
+            "id": "check5",
+            "label": "Before you continue",
+            "title": "Say it back",
+            "blocks": [
+              {
+                "type": "quiz",
+                "id": "qz-1",
+                "questionIds": ["q-rpc", "q-method", "q-readonly"]
+              },
+              {
+                "type": "reflect",
+                "id": "r-explain",
+                "prompt": "A friend asks: \u201cIsn\u2019t bitcoin-cli just a program on its own?\u201d Correct them in two or three sentences, using the words RPC and method.",
+                "placeholder": "Write it as you\u2019d actually say it out loud.",
+                "model": "Not quite, bitcoin-cli doesn\u2019t do the work itself. It turns what you type into an RPC request, a method name plus whatever parameters it needs, sends that to a running node, and shows you the result that comes back. The actual node is doing the work, bitcoin-cli is just how you talk to it."
+              }
+            ]
+          },
+
+          {
+            "id": "end4",
+            "label": "Next",
+            "title": "Taking a block apart completely",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "You can now get your node to answer specific questions on demand, not just tell you it\u2019s healthy. You followed a real trail, from a block height down to the exact inputs and outputs of one transaction.\n\nNext, instead of asking for one transaction at a time, you\u2019ll take an entire block apart and see exactly what holds all of it together."
+              },
+              { "type": "next" }
+            ]
+          }
+        ]
+      }
+    </script>
+
+    <script type="application/json" id="quiz-bank">
+      [
+        {
+          "id": "q-rpc",
+          "concept": "rpc",
+          "prompt": "What does RPC actually let you do?",
+          "options": [
+            "Edit the blockchain data directly",
+            "Ask a running program to run one of its functions and hand back the result",
+            "Download blocks faster",
+            "Replace bitcoin-cli with a faster tool"
+          ],
+          "answer": 1,
+          "right": "Right. That\u2019s the whole idea, a request in, a result back.",
+          "wrong": "Not quite. Think about what actually happens after you type a bitcoin-cli command."
+        },
+        {
+          "id": "q-method",
+          "concept": "method",
+          "prompt": "In an RPC call like getblockhash 850210, what is 850210?",
+          "options": [
+            "The method",
+            "A parameter",
+            "The result",
+            "The RPC port"
+          ],
+          "answer": 1,
+          "right": "Right. getblockhash is the method, 850210 is the detail it needs to answer you.",
+          "wrong": "Not quite. The method is the name of what you\u2019re asking for."
+        },
+        {
+          "id": "q-readonly",
+          "concept": "read-only-vs-state-changing",
+          "prompt": "Which of these actually changes something, even though it might not sound like it?",
+          "options": [
+            "getblockcount",
+            "getrawtransaction",
+            "getnewaddress",
+            "getblock"
+          ],
+          "answer": 2,
+          "right": "Right. It feels like asking a question, but it adds a new address to the wallet.",
+          "wrong": "Not quite. That one only reads data that already exists."
+        }
+      ]
+    </script>
+
+    <script>
+      const AMK = (id) =>
+        `<marker id="${id}" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="currentColor"/></marker>`;
+      const ABOX = (x, y, w, h, r = 8) =>
+        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" style="fill:var(--soft)" stroke-width="1.3"/>`;
+
+      const ASSETS = {
+        rpcunderneath: `<svg viewBox="0 0 480 170" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${[
+   ["bitcoin-cli", "getblockcount"],
+   ["request", "method: getblockcount"],
+   ["Bitcoin", "Core"],
+   ["result", "850214"],
+ ]
+   .map((l, i) => {
+     const x = 10 + i * 120,
+       w = 100,
+       y = 50,
+       h = 58;
+     return (
+       ABOX(x, y, w, h) +
+       `<text x="${x + w / 2}" y="${y + 26}" text-anchor="middle" stroke="none" font-size="11">${l[0]}</text><text x="${x + w / 2}" y="${y + 42}" text-anchor="middle" stroke="none" font-size="9" fill="var(--mut)">${l[1]}</text>` +
+       (i < 3
+         ? `<path d="M${x + w} ${y + h / 2}h20" marker-end="url(#rpA)"/>`
+         : "")
+     );
+   })
+   .join("")}
+ <defs>${AMK("rpA")}</defs></svg>`,
+
+        anatomy: `<svg viewBox="0 0 460 150" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${ABOX(10, 50, 160, 50)}<text x="90" y="70" text-anchor="middle" stroke="none" font-size="11" fill="var(--mut)">method</text><text x="90" y="88" text-anchor="middle" stroke="none" font-size="12">getblockhash</text>
+ <path d="M170 75h30" marker-end="url(#anA)"/>
+ ${ABOX(200, 50, 120, 50)}<text x="260" y="70" text-anchor="middle" stroke="none" font-size="11" fill="var(--mut)">parameter</text><text x="260" y="88" text-anchor="middle" stroke="none" font-size="12">850210</text>
+ <path d="M320 75h30" marker-end="url(#anA)"/>
+ ${ABOX(350, 50, 100, 50)}<text x="400" y="70" text-anchor="middle" stroke="none" font-size="11" fill="var(--mut)">result</text><text x="400" y="88" text-anchor="middle" stroke="none" font-size="11">block hash</text>
+ <defs>${AMK("anA")}</defs></svg>`,
+
+        trail: `<svg viewBox="0 0 480 110" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${["getblockcount", "getblockhash", "getblock", "getrawtransaction"]
+   .map((l, i) => {
+     const x = 8 + i * 119,
+       w = 103,
+       y = 30,
+       h = 46;
+     return (
+       ABOX(x, y, w, h, 6) +
+       `<text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" stroke="none" font-size="9.5">${l}</text>` +
+       (i < 3
+         ? `<path d="M${x + w} ${y + h / 2}h16" marker-end="url(#trA)"/>`
+         : "")
+     );
+   })
+   .join("")}
+ <defs>${AMK("trA")}</defs></svg>`,
+      };
+    </script>
+
+    <script>
+      const $ = (s, r = document) => r.querySelector(s);
+      const L = JSON.parse($("#lesson-data").textContent),
+        QB = Object.fromEntries(
+          JSON.parse($("#quiz-bank").textContent).map((q) => [q.id, q]),
+        );
+      const KEY = "bitshala-learn:" + L.id;
+      let P = {};
+      try {
+        P = JSON.parse(localStorage.getItem(KEY) || "{}");
+      } catch (e) {}
+      const inl = (s) =>
+        s
+          .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+          .replace(/\*(.+?)\*/g, "<i>$1</i>")
+          .replace(/`(.+?)`/g, "<code>$1</code>");
+      const md = (s) =>
+        s
+          .split("\n\n")
+          .map((p) => `<p>${inl(p)}</p>`)
+          .join("");
+      const wrap = (h, c = "") => {
+        const d = document.createElement("div");
+        d.className = "blk " + c;
+        d.innerHTML = h;
+        return d;
+      };
+      const ACT = ["widget", "choice", "reflect"];
+      const total = () =>
+        L.sections
+          .flatMap((s) => s.blocks)
+          .reduce(
+            (n, b) =>
+              n +
+              (b.type === "quiz"
+                ? b.questionIds.length
+                : ACT.includes(b.type)
+                  ? 1
+                  : 0),
+            0,
+          );
+      function prog() {
+        const n = Object.keys(P).length,
+          t = total();
+        $("#prog").textContent = n + " of " + t + " activities";
+        $("#bar").style.width = (n / t) * 100 + "%";
+      }
+      function done(id) {
+        if (P[id]) return;
+        P[id] = 1;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(P));
+        } catch (e) {}
+        prog();
+      }
+
+      const WIDGETS = {
+        RPCBuilder(el, p, fin) {
+          el.classList.add("try");
+          let i = 0;
+          const log = [];
+          const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+          const renderLog = () =>
+            log
+              .map(
+                (e) =>
+                  `<div class="tline"><span class="tprompt">$</span>bitcoin-cli ${esc(e.cmd)}</div><div class="tout">${esc(e.output)}</div>`,
+              )
+              .join("");
+          const draw = () => {
+            const s = p.stages[i];
+            let h = `<span class="label">Try it</span>`;
+            if (log.length) h += `<div class="termbox">${renderLog()}</div>`;
+            if (s)
+              h += `<p>${s.goal}</p><div>${s.options.map((o, j) => `<button class="mopt" data-j="${j}">${o}</button>`).join("")}</div><div class="msg"></div>`;
+            else
+              h += `<div class="done-banner">Four calls, and you landed exactly on it.</div>`;
+            el.innerHTML = h;
+            if (s)
+              el.querySelectorAll(".mopt").forEach(
+                (b) =>
+                  (b.onclick = () => {
+                    const ok = +b.dataset.j === s.answer;
+                    el.querySelectorAll(".mopt").forEach((x) =>
+                      x.classList.remove("right", "wrong"),
+                    );
+                    b.classList.add(ok ? "right" : "wrong");
+                    if (ok) {
+                      $(".msg", el).textContent = s.note;
+                      log.push({
+                        cmd:
+                          s.options[s.answer] + (s.param ? " " + s.param : ""),
+                        output: s.output,
+                      });
+                      setTimeout(() => {
+                        i++;
+                        draw();
+                        if (i === p.stages.length) fin();
+                      }, 750);
+                    } else {
+                      $(".msg", el).textContent =
+                        "Not the right tool for this step. Think about exactly what you\u2019re asking for.";
+                    }
+                  }),
+              );
+          };
+          draw();
+        },
+
+        CallCards(el, p, fin) {
+          el.classList.add("try");
+          let n = 0;
+          el.innerHTML = `<span class="label">Try it</span><p>${p.instruction}</p><div class="cardstack">${p.items.map((it, i) => `<div class="jcard" data-i="${i}"><p><code>${it.name}</code></p><button data-v="true">Read-only</button><button class="ghost" data-v="false">Changes something</button><div class="verdict"></div></div>`).join("")}</div>`;
+          el.querySelectorAll(".jcard").forEach((card, i) => {
+            const it = p.items[i];
+            card.querySelectorAll("button").forEach(
+              (b) =>
+                (b.onclick = () => {
+                  const ok = (b.dataset.v === "true") === it.isReadOnly,
+                    v = card.querySelector(".verdict");
+                  v.style.display = "block";
+                  v.textContent = (ok ? "Right. " : "Not quite. ") + it.note;
+                  card
+                    .querySelectorAll("button")
+                    .forEach((x) => (x.disabled = true));
+                  if (!card.dataset.counted) {
+                    card.dataset.counted = 1;
+                    n++;
+                    if (n === p.items.length) fin();
+                  }
+                }),
+            );
+          });
+        },
+
+        /* a real typed terminal: every command is evaluated against a small simulated
+   node, wrong commands get a friendly reason why, right ones return real
+   (freshly generated) output. Runs the guided walkthrough, then resets the
+   payment-specific state and leaves the learner to repeat it unaided. */
+        LabTerminal(el, p, fin) {
+          el.classList.add("try");
+          const rhex = (n) => {
+            let s = "";
+            for (let i = 0; i < n; i++)
+              s += Math.floor(Math.random() * 16).toString(16);
+            return s;
+          };
+          const fakeAddr = () => "bcrt1q" + rhex(38),
+            fakeHash = () => rhex(64),
+            fakeTxid = () => rhex(64);
+          const KNOWN = [
+            "getblockchaininfo",
+            "createwallet",
+            "getnewaddress",
+            "generatetoaddress",
+            "sendtoaddress",
+            "getblockcount",
+            "getblockhash",
+            "getblock",
+            "getrawtransaction",
+          ];
+          const S = {
+            nodeStarted: false,
+            verified: false,
+            wallet: false,
+            address: null,
+            height: 0,
+            matured: false,
+            lastTxid: null,
+            lastAmount: null,
+            confirmed: false,
+            confirmedAtHeight: null,
+            lastBlockHash: null,
+            gotCount: false,
+            inspected: false,
+            phase: "guided",
+            done: false,
+            log: [],
+          };
+          const copyBtn = (v) =>
+            ` <button type="button" class="copybtn" data-copy="${v}">copy</button>`;
+
+          const HANDLERS = {
+            getblockchaininfo() {
+              if (!S.nodeStarted)
+                return {
+                  ok: false,
+                  text: "There\u2019s no node running yet to ask. Start one first.",
+                };
+              S.verified = true;
+              return {
+                ok: true,
+                text: `{\n  "chain": "regtest",\n  "blocks": ${S.height}\n}`,
+              };
+            },
+            createwallet() {
+              if (!S.nodeStarted)
+                return {
+                  ok: false,
+                  text: "Start the node first, there\u2019s nothing to talk to yet.",
+                };
+              if (S.wallet)
+                return {
+                  ok: false,
+                  text: "You already made one. bitcoin-cli would grumble about that too.",
+                };
+              S.wallet = true;
+              return { ok: true, text: "wallet created" };
+            },
+            getnewaddress() {
+              if (!S.wallet)
+                return {
+                  ok: false,
+                  text: "No wallet yet, there\u2019s nowhere for an address to belong to. Run createwallet first.",
+                };
+              S.address = fakeAddr();
+              return { ok: true, text: S.address + copyBtn(S.address) };
+            },
+            generatetoaddress(toks) {
+              if (!S.address)
+                return {
+                  ok: false,
+                  text: "Mine to what? Get yourself an address first.",
+                };
+              const nums = toks.filter((t) => /^\d+$/.test(t));
+              if (!nums.length)
+                return {
+                  ok: false,
+                  text: "generatetoaddress needs a block count, how many do you want?",
+                };
+              const n = parseInt(nums[0], 10);
+              if (!S.matured) {
+                if (n < 101)
+                  return {
+                    ok: false,
+                    text: `${n} isn\u2019t enough. The first 100 or so only exist to satisfy a maturity rule before any of it is spendable. Try 101.`,
+                  };
+                S.matured = true;
+              }
+              S.height += n;
+              if (S.lastTxid && !S.confirmed) {
+                S.confirmed = true;
+                S.confirmedAtHeight = S.height;
+              }
+              return {
+                ok: true,
+                text: `${n} block hash${n === 1 ? "" : "es"}`,
+              };
+            },
+            sendtoaddress(toks) {
+              if (!S.matured)
+                return {
+                  ok: false,
+                  text: "You don\u2019t have spendable coins yet. Mine at least 101 blocks first.",
+                };
+              const rest = toks
+                .slice(toks.indexOf("sendtoaddress") + 1)
+                .filter((t) => !t.startsWith("-"));
+              if (!rest.length)
+                return {
+                  ok: false,
+                  text: "sendtoaddress needs an address to pay, who\u2019s getting paid?",
+                };
+              const amt = rest.find((t) => /^\d*\.?\d+$/.test(t));
+              if (!amt)
+                return {
+                  ok: false,
+                  text: "sendtoaddress needs an amount too, how much is this payment for?",
+                };
+              S.lastTxid = fakeTxid();
+              S.lastAmount = amt;
+              S.confirmed = false;
+              S.confirmedAtHeight = null;
+              return { ok: true, text: S.lastTxid + copyBtn(S.lastTxid) };
+            },
+            getblockcount() {
+              if (!S.nodeStarted)
+                return { ok: false, text: "Start the node first." };
+              S.gotCount = true;
+              return { ok: true, text: String(S.height) };
+            },
+            getblockhash(toks) {
+              const nums = toks.filter((t) => /^\d+$/.test(t));
+              if (!nums.length)
+                return {
+                  ok: false,
+                  text: "getblockhash needs a height, which block do you want the hash for?",
+                };
+              if (parseInt(nums[0], 10) !== S.height)
+                return {
+                  ok: false,
+                  text: `That\u2019s not the height this chain is actually at. getblockcount told you ${S.height}.`,
+                };
+              S.lastBlockHash = fakeHash();
+              return {
+                ok: true,
+                text: S.lastBlockHash + copyBtn(S.lastBlockHash),
+              };
+            },
+            getblock(toks) {
+              if (!S.lastBlockHash)
+                return {
+                  ok: false,
+                  text: "Run getblockhash first, you need a real hash to look up.",
+                };
+              if (!toks.includes(S.lastBlockHash))
+                return {
+                  ok: false,
+                  text: "That\u2019s not the hash getblockhash just gave you. Scroll up and copy the real one.",
+                };
+              S.inspected = true;
+              const hasTx = S.confirmed && S.confirmedAtHeight === S.height;
+              return {
+                ok: true,
+                text: `{\n  "height": ${S.height},\n  "tx": [${hasTx ? `\n    "${S.lastTxid}"` : ""}\n  ]\n}`,
+              };
+            },
+            getrawtransaction(toks) {
+              if (!S.lastTxid)
+                return {
+                  ok: false,
+                  text: "There\u2019s no transaction to look up yet.",
+                };
+              if (!toks.includes(S.lastTxid))
+                return {
+                  ok: false,
+                  text: "That\u2019s not the txid from the block. Scroll up and copy the real one.",
+                };
+              if (!toks.includes("true"))
+                return {
+                  ok: false,
+                  text: "Add true at the end, or you\u2019ll just get unreadable raw hex instead of something you can read.",
+                };
+              return {
+                ok: true,
+                text: `{\n  "vout": [\n    { "value": ${S.lastAmount || "0.002"}, "address": "${S.address}" },\n    { "value": 0.0009, "address": "bcrt1qchange..." }\n  ]\n}`,
+              };
+            },
+          };
+
+          function run(raw) {
+            const toks = raw.trim().split(/\s+/).filter(Boolean);
+            if (!toks.length)
+              return { ok: false, text: "Type a command first." };
+            if (toks.includes("bitcoind")) {
+              if (!toks.includes("-regtest"))
+                return {
+                  ok: false,
+                  text: "That\u2019ll try to start on mainnet, and mainnet does not fit on a coffee break. Add -regtest.",
+                };
+              if (S.nodeStarted)
+                return {
+                  ok: false,
+                  text: "It\u2019s already running. No need to start it twice.",
+                };
+              S.nodeStarted = true;
+              return { ok: true, text: "Bitcoin Core starting" };
+            }
+            if (toks.includes("bitcoin-cli")) {
+              if (!toks.includes("-regtest"))
+                return {
+                  ok: false,
+                  text: "Add -regtest, or you\u2019ll be talking to a node that was never there.",
+                };
+              const m = toks.find((t) => KNOWN.includes(t));
+              if (!m)
+                return {
+                  ok: false,
+                  text: "That doesn\u2019t look like a method this node recognises. Check the spelling.",
+                };
+              return HANDLERS[m](toks);
+            }
+            return {
+              ok: false,
+              text: "Commands here start with either bitcoind or bitcoin-cli.",
+            };
+          }
+
+          function guidedTask() {
+            if (!S.nodeStarted)
+              return "Start your node on its own private network.";
+            if (!S.verified)
+              return "Check that it\u2019s actually running, and on the right network.";
+            if (!S.wallet) return "Create a wallet to hold your coins.";
+            if (!S.address)
+              return "Get yourself a receiving address, the one Aarav would pay.";
+            if (!S.matured)
+              return "Mine yourself some starting coins, at least 101 blocks.";
+            if (!S.lastTxid)
+              return "Send yourself a payment, standing in for Aarav\u2019s.";
+            if (!S.confirmed) return "Confirm it. Mine one more block.";
+            if (!S.gotCount) return "Get the current block count.";
+            if (!S.lastBlockHash) return "Get that block\u2019s hash.";
+            if (!S.inspected)
+              return "Inspect the block, and find your transaction\u2019s id inside it.";
+            return "Retrieve and decode it, verbose mode.";
+          }
+
+          function draw() {
+            const task =
+              S.phase === "guided"
+                ? guidedTask()
+                : "Now you\u2019re on your own: send a second payment of 0.0015 BTC, confirm it, then find it again with getblockcount, getblockhash, getblock, and getrawtransaction.";
+            let h = `<span class="label">Try it</span><div class="termbox">${S.log.map((e) => `<div class="tline"><span class="tprompt">$</span>${e.cmd}</div><div class="tout${e.ok ? "" : " terr"}">${e.text}</div>`).join("")}</div>`;
+            if (!S.done)
+              h += `<div class="tasktext">${task}</div><div class="labinput"><input type="text" placeholder="bitcoin-cli -regtest ..." id="labIn"><button data-run>Run</button></div>`;
+            else
+              h += `<div class="done-banner">Both payments found, start to finish, no steps handed to you on the second one.</div>`;
+            el.innerHTML = h;
+            el.querySelectorAll(".copybtn").forEach(
+              (b) =>
+                (b.onclick = () => {
+                  try {
+                    navigator.clipboard.writeText(b.dataset.copy);
+                  } catch (e) {}
+                  b.textContent = "copied";
+                  setTimeout(() => (b.textContent = "copy"), 1200);
+                }),
+            );
+            if (!S.done) {
+              const input = el.querySelector("#labIn"),
+                go = () => {
+                  const v = input.value;
+                  input.value = "";
+                  submit(v);
+                };
+              el.querySelector("[data-run]").onclick = go;
+              input.onkeydown = (e) => {
+                if (e.key === "Enter") go();
+              };
+              input.focus();
+            }
+          }
+
+          function submit(raw) {
+            if (!raw.trim()) return;
+            const esc = (s) =>
+              String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+            const r = run(raw);
+            S.log.push({ cmd: esc(raw), ok: r.ok, text: r.text });
+            if (r.ok && raw.includes("getrawtransaction")) {
+              if (S.phase === "guided") {
+                S.phase = "challenge";
+                S.lastTxid = null;
+                S.lastAmount = null;
+                S.confirmed = false;
+                S.confirmedAtHeight = null;
+                S.lastBlockHash = null;
+                S.gotCount = false;
+                S.inspected = false;
+              } else {
+                S.done = true;
+                fin();
+              }
+            }
+            draw();
+          }
+          draw();
+        },
+      };
+
+      const BLOCKS = {
+        text: (b) => wrap(md(b.md)),
+        aside: (b) => wrap(inl(b.md), "aside"),
+        figure: (b) => {
+          const a = ASSETS[b.asset];
+          const el = document.createElement("figure");
+          el.innerHTML =
+            (/^(https?:|data:)/.test(a)
+              ? `<img src="${a}" alt="${b.caption}" style="max-width:100%">`
+              : a) + `<figcaption>${b.caption}</figcaption>`;
+          return el;
+        },
+        code: (b) => {
+          const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+          return wrap(
+            `<div class="termbox">${b.lines.map((l) => `<div class="tline"><span class="tprompt">$</span>${esc(l.cmd)}</div><div class="tout">${esc(l.out)}</div>`).join("")}</div>`,
+          );
+        },
+        widget: (b) => {
+          const el = wrap("");
+          WIDGETS[b.name](el, b.props || {}, () => done(b.id));
+          return el;
+        },
+        quiz: (b) => {
+          const el = wrap(
+            b.questionIds
+              .map((id) => {
+                const q = QB[id];
+                return `<div class="q"><b>${q.prompt}</b>${q.options.map((t, j) => `<button class="opt" data-q="${id}" data-j="${j}">${t}</button>`).join("")}<div class="msg" id="f-${id}"></div></div>`;
+              })
+              .join(""),
+          );
+          el.querySelectorAll("[data-q]").forEach(
+            (x) =>
+              (x.onclick = () => {
+                const q = QB[x.dataset.q],
+                  ok = +x.dataset.j === q.answer;
+                x.classList.add(ok ? "right" : "wrong");
+                $("#f-" + q.id, el).textContent = ok ? q.right : q.wrong;
+                if (ok) done("q:" + q.id);
+              }),
+          );
+          return el;
+        },
+        reflect: (b) => {
+          const el = wrap(
+            `<div class="try">${md(b.prompt)}<textarea placeholder="${b.placeholder || ""}"></textarea><button data-go>Compare with ours</button><div class="out" style="margin-top:14px"></div></div>`,
+          );
+          $("[data-go]", el).onclick = () => {
+            $(".out", el).innerHTML = `<p>${inl(b.model)}</p>`;
+            done(b.id);
+          };
+          return el;
+        },
+        next: () => {
+          const n = L.next;
+          return wrap(
+            `<span class="label">Next lesson</span><h3>${n.id} ${n.title}</h3><p>${n.teaser}</p>`,
+            "next",
+          );
+        },
+      };
+
+      const errs = [];
+      L.sections.forEach((s) =>
+        s.blocks.forEach((b) => {
+          if (!BLOCKS[b.type])
+            errs.push(s.id + ': unknown block "' + b.type + '"');
+          if (b.type === "widget" && !WIDGETS[b.name])
+            errs.push(s.id + ': unknown widget "' + b.name + '"');
+          if (b.type === "figure" && !ASSETS[b.asset])
+            errs.push(s.id + ': missing asset "' + b.asset + '"');
+          if (b.type === "quiz")
+            b.questionIds.forEach((q) => {
+              if (!QB[q]) errs.push(s.id + ': missing question "' + q + '"');
+            });
+        }),
+      );
+      if (errs.length) {
+        const w = $("#warn");
+        w.style.display = "block";
+        w.innerHTML = errs.join("<br>");
+      }
+
+      $("#head").innerHTML =
+        `<div class="kicker">${L.phase} \u00b7 ${L.module}</div><h1>${L.title}</h1><p class="sub">${L.subtitle}</p><div class="meta">Lesson ${L.id} \u00b7 about ${L.minutes} minutes \u00b7 ${L.level}</div>`;
+      const main = $("#lesson");
+      L.sections.forEach((s, i) => {
+        const sec = document.createElement("section");
+        sec.id = s.id;
+        sec.innerHTML = `<div class="label">${s.label}</div><h2>${s.title}</h2>`;
+        s.blocks.forEach((b) => {
+          if (BLOCKS[b.type]) sec.appendChild(BLOCKS[b.type](b));
+        });
+        main.appendChild(sec);
+      });
+      prog();
+    </script>
+  </body>
+</html>

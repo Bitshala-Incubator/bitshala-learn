@@ -474,3 +474,33 @@ pre {
   font-size: 16px;
   color: var(--mut);
 }
+.labinput {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.labinput input {
+  flex: 1;
+  font:
+    15px ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+.copybtn {
+  font:
+    11px system-ui,
+    sans-serif;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--mut);
+  border-radius: 3px;
+  padding: 2px 8px;
+  margin-left: 8px;
+  cursor: pointer;
+}
