@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Keys — Bitshala Learn 4.1</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 4.1</span><span id="prog"></span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "4.1",
+        "title": "Keys",
+        "subtitle": "You don\u2019t log in to Bitcoin. You prove you can spend.",
+        "phase": "Bitcoin Foundations",
+        "module": "Keys and Addresses",
+        "minutes": 25,
+        "level": "Beginner",
+        "concepts": [
+          "private-key",
+          "public-key",
+          "signature",
+          "elliptic-curve",
+          "secp256k1"
+        ],
+        "next": {
+          "id": "4.2",
+          "title": "Addresses",
+          "teaser": "You understand the cryptographic keys underneath Bitcoin. But when someone wants to be paid, they don\u2019t usually hand over their public key, they give you an address. Next, you\u2019ll take that address apart."
+        },
+        "sections": [
+          {
+            "id": "whatkey",
+            "label": "A gap you\u2019ve been skipping",
+            "title": "Something you\u2019ve been trusting since Lesson 2.1",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Every payment you\u2019ve watched Aarav make has included one quiet detail: his wallet signs the transaction with his key. You read past it every time, a key, fine, whatever that means, moving on.\n\nIt\u2019s time to stop moving on. There is no Bitcoin account with Aarav\u2019s name on it, and no password protecting it. There never was. What proves a payment is his to make is something stranger, and more interesting, than a password."
+              }
+            ]
+          },
+
+          {
+            "id": "twokeys",
+            "label": "Two numbers",
+            "title": "A secret, and a number derived from it",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Bitcoin doesn\u2019t check identity. It checks cryptography. At the center of it sit two things: a **private key**, a secret number generated with enough randomness that nobody could plausibly guess it, and a **public key**, a second number calculated from the private key through a specific mathematical operation.\n\nThe private key is genuinely just that: a number. Not an account, not a login, nothing Bitcoin remembers was \u201coriginally Aarav\u2019s.\u201d Whoever holds it can produce the cryptographic proof needed to spend whatever it controls, which is exactly why one rule matters more than any other here: never hand your real private key to another person, and never paste one into a website. Nothing legitimate ever needs it from you directly."
+              },
+              {
+                "type": "figure",
+                "asset": "lock",
+                "caption": "A secret, turned into proof, turned into a transaction. No password involved."
+              },
+              {
+                "type": "text",
+                "md": "The public key isn\u2019t a second secret, it\u2019s designed to be handed out freely. What makes that safe is that the relationship between the two only really runs one way: easy to calculate the public key from the private key, and, by every method currently known, infeasible to calculate the private key back from the public key. That asymmetry comes from **elliptic-curve cryptography**, specifically a curve named **secp256k1**, though you don\u2019t need the mathematics itself, only the one-way property it gives you."
+              },
+              {
+                "type": "figure",
+                "asset": "derive",
+                "caption": "Forward is a quick calculation. Backward is considered infeasible with any method currently known."
+              }
+            ]
+          },
+
+          {
+            "id": "playground",
+            "label": "Try it",
+            "title": "Watch the pairs form, as many times as you want",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "This is a simulation, not a real key generator, nothing here is an actual Bitcoin key. Press the button a few times and watch what happens, then try the second button."
+              },
+              {
+                "type": "widget",
+                "id": "w-play",
+                "name": "KeyPlayground",
+                "props": {}
+              }
+            ]
+          },
+
+          {
+            "id": "whyreveal",
+            "label": "Why not just publish it",
+            "title": "Because the secret is the authorization",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Say Aarav\u2019s private key controls some bitcoin, and, for whatever reason, he sends it to Meera.\n\nMeera now has the secret. She can likely produce valid authorizations to spend with it. The problem isn\u2019t that she knows Aarav\u2019s name, Bitcoin never asked for that. The problem is simply that she now holds the key, and Bitcoin only ever checks whether the key\u2019s conditions are satisfied, not who originally generated it."
+              }
+            ]
+          },
+
+          {
+            "id": "wouldyoushare",
+            "label": "Try it",
+            "title": "You are Aarav\u2019s wallet. Sort these four things.",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "For each item, decide: safe to hand to someone, or something you\u2019d never share."
+              },
+              {
+                "type": "widget",
+                "id": "w-sort",
+                "name": "ShareOrSecret",
+                "props": {
+                  "items": [
+                    {
+                      "name": "Public key",
+                      "safe": true,
+                      "note": "Designed to be shared. That\u2019s the whole point of it."
+                    },
+                    {
+                      "name": "Bitcoin address",
+                      "safe": true,
+                      "note": "You\u2019ve been handing this out since Lesson 1.2. Nothing has changed."
+                    },
+                    {
+                      "name": "Private key",
+                      "safe": false,
+                      "note": "This is the secret itself. Handing it over hands over control."
+                    },
+                    {
+                      "name": "Seed phrase",
+                      "safe": false,
+                      "note": "Even more sensitive, it can rebuild every key a wallet has. You\u2019ll meet it properly in Lesson 5.2."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "notaddress",
+            "label": "Not the same box",
+            "title": "Private key, public key, address: three different things",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "It\u2019s tempting to lump these together, so it\u2019s worth separating them now, before the next lesson leans on the difference. A private key is the secret. A public key is derived from it. An address is a separate representation used specifically for payments, which you\u2019ll take apart properly in Lesson 4.2.\n\nOne more precision worth having early: it\u2019s common shorthand to say whoever holds the private key \u201cowns\u201d the bitcoin. Technically, Bitcoin doesn\u2019t know what ownership is. It only checks whether a transaction satisfies the spending conditions attached to an output. Holding the key gives you control, which is a more exact word than ownership, and the distinction matters more once you reach spending conditions with more than one key involved."
+              },
+              {
+                "type": "figure",
+                "asset": "threechain",
+                "caption": "Related, derived from each other even, but never interchangeable."
+              }
+            ]
+          },
+
+          {
+            "id": "proveit",
+            "label": "Proof without the secret",
+            "title": "How a node checks this without ever seeing the key",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "When a transaction needs authorizing, the wallet uses the private key to sign that specific transaction, producing a **signature** unique to it, not a fixed stamp reused everywhere. That\u2019s an important detail: a signature over one transaction doesn\u2019t carry over to another, which is part of what stops an old authorization from being replayed somewhere it was never meant to apply.\n\nThe private key itself is never sent anywhere. A node receiving the transaction checks that signature against the spending conditions attached to the output, most simply the public key, with no need to ever see the secret that created it."
+              },
+              {
+                "type": "figure",
+                "asset": "verify",
+                "caption": "The node never asks for the secret. It checks the proof instead."
+              },
+              {
+                "type": "aside",
+                "md": "That\u2019s the whole property this lesson has been building toward: you can prove control without ever revealing the thing that gives you control."
+              }
+            ]
+          },
+
+          {
+            "id": "tracechain",
+            "label": "Try it",
+            "title": "Put the chain in order yourself",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "You\u2019ve now read this sequence twice. Build it a third time, yourself, without it written out in front of you."
+              },
+              {
+                "type": "widget",
+                "id": "w-trace",
+                "name": "TraceChain",
+                "props": {
+                  "steps": [
+                    "Wallet signs the specific transaction with the private key",
+                    "A signature unique to that transaction is attached to it",
+                    "A node checks the signature against the spending conditions",
+                    "The node accepts or rejects the transaction"
+                  ]
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "reverseit",
+            "label": "Try it",
+            "title": "Go on, try to work backwards",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "You\u2019re given a public key. Before you touch anything: do you think this is actually possible? Then try it. This is a conceptual exercise, not a real attack, nothing here is an actual key."
+              },
+              {
+                "type": "widget",
+                "id": "w-reverse",
+                "name": "ReverseAttempt",
+                "props": { "publicKey": "02ab47c9e31f...the public key" }
+              }
+            ]
+          },
+
+          {
+            "id": "code",
+            "label": "Try it",
+            "title": "Read the code, then finish it",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "The whole relationship, written as two lines of **pseudocode**, not real Bitcoin Core function names, just stand-ins for the two steps. Fill in the blanks."
+              },
+              {
+                "type": "widget",
+                "id": "w-code",
+                "name": "CodeFill",
+                "props": {
+                  "options": [
+                    "generateSecret()",
+                    "derivePublicKey(privateKey)",
+                    "sendPrivateKeyToNetwork()"
+                  ]
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "spotpublish",
+            "label": "Try it",
+            "title": "Aarav posts his wallet information. Catch his mistake.",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "He shares four things at once. Tap everything that should never have been posted."
+              },
+              {
+                "type": "widget",
+                "id": "w-spot",
+                "name": "SpotPublish",
+                "props": {
+                  "items": [
+                    { "name": "Bitcoin address", "bad": false },
+                    { "name": "Public key", "bad": false },
+                    { "name": "Private key", "bad": true },
+                    { "name": "Wallet seed phrase", "bad": true }
+                  ]
+                }
+              },
+              {
+                "type": "aside",
+                "md": "Being postable isn\u2019t the same as being invisible, Bitcoin transactions are public by design, but that\u2019s a separate question from what can authorize spending, and one for a later lesson."
+              }
+            ]
+          },
+
+          {
+            "id": "together2",
+            "label": "Putting it together",
+            "title": "One secret, a public proof, and nothing in between leaked",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "The secret stays secret. The proof can be checked publicly. That\u2019s the entire idea this lesson has been circling, now built, sorted, traced, and said back in your own words."
+              }
+            ]
+          },
+
+          {
+            "id": "tensecond",
+            "label": "Try it",
+            "title": "The 10-second test, no multiple choice",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Three blanks. No options to pick from this time, just type the word."
+              },
+              {
+                "type": "widget",
+                "id": "w-blanks",
+                "name": "FillBlanks",
+                "props": {
+                  "items": [
+                    {
+                      "prompt": "The private key should be __________.",
+                      "answers": ["secret", "kept secret"]
+                    },
+                    {
+                      "prompt": "The public key is derived from the __________.",
+                      "answers": ["private key"]
+                    },
+                    {
+                      "prompt": "A private key is used to create a cryptographic __________.",
+                      "answers": ["signature", "authorization", "authorisation"]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "final2",
+            "label": "Final challenge",
+            "title": "Explain it without the word \u201cpassword\u201d",
+            "blocks": [
+              {
+                "type": "reflect",
+                "id": "r-final",
+                "prompt": "A friend tells you: \u201cBitcoin is just like an online bank. Your wallet has a password, and the server checks it.\u201d Correct them in two or three sentences: what the private key is, what the public key is, and how a node can verify authorization without ever receiving the private key.",
+                "placeholder": "Write it as you\u2019d actually say it out loud.",
+                "model": "Not quite, there\u2019s no server and no password. A Bitcoin wallet holds a private key, a secret that stays on your device, and uses it to create a signature authorizing a payment. Anyone can verify that signature using the corresponding public key, so the network can confirm you\u2019re authorized without the private key ever being sent anywhere."
+              }
+            ]
+          },
+
+          {
+            "id": "end5",
+            "label": "Next",
+            "title": "What you actually hand someone to get paid",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "You now understand the secret underneath every payment you\u2019ve made in this course. But notice: you\u2019ve never actually handed anyone a public key directly. Back in Lesson 1.2, you shared an address.\n\nNext, you\u2019ll take that address apart and see exactly where it comes from."
+              },
+              { "type": "next" }
+            ]
+          }
+        ]
+      }
+    </script>
+
+    <script>
+      const AMK = (id) =>
+        `<marker id="${id}" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0 0L7 3.5L0 7Z" fill="currentColor"/>
+    </marker>`;
+
+      const ABOX = (x, y, w, h, r = 8) =>
+        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" style="fill:var(--soft)" stroke="currentColor" stroke-width="1.3"/>`;
+
+      const ASSETS = {
+        lock: `<svg viewBox="0 0 470 110" fill="none" stroke="currentColor" stroke-width="1.3" role="img" aria-label="Private key creates cryptographic proof used in a transaction">
+      ${["Private key", "Cryptographic proof", "Transaction"]
+        .map((l, i) => {
+          const x = 10 + i * 155;
+          const w = 130;
+          const y = 30;
+          const h = 48;
+
+          return (
+            ABOX(x, y, w, h, 6) +
+            `<text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" stroke="none" fill="currentColor" font-size="${l === "Cryptographic proof" ? 10 : 12}">${l}</text>` +
+            (i < 2
+              ? `<path d="M${x + w + 2} ${y + h / 2}H${x + 149}" marker-end="url(#lkA)"/>`
+              : "")
+          );
+        })
+        .join("")}
+      <defs>${AMK("lkA")}</defs>
+    </svg>`,
+
+        derive: `<svg viewBox="0 0 460 150" fill="none" stroke="currentColor" stroke-width="1.3" role="img" aria-label="A public key is derived from a private key, but the reverse is computationally infeasible">
+      ${ABOX(25, 40, 155, 60)}
+      <text x="102.5" y="75" text-anchor="middle" stroke="none" fill="currentColor" font-size="13">Private key</text>
+
+      ${ABOX(280, 40, 155, 60)}
+      <text x="357.5" y="75" text-anchor="middle" stroke="none" fill="currentColor" font-size="13">Public key</text>
+
+      <path d="M180 55H270" marker-end="url(#dvA)"/>
+      <path d="M280 90H190" stroke-dasharray="4 4" marker-end="url(#dvA)"/>
+
+      <path d="M222 82l12 12M234 82l-12 12" stroke="var(--acc)" stroke-width="1.6"/>
+      <defs>${AMK("dvA")}</defs>
+    </svg>`,
+
+        threechain: `<svg viewBox="0 0 520 110" fill="none" stroke="currentColor" stroke-width="1.3" role="img" aria-label="Private key, public key, and address">
+      ${["Private key", "Public key", "Address"]
+        .map((l, i) => {
+          const x = 10 + i * 170;
+          const w = 145;
+          const y = 30;
+          const h = 48;
+
+          return (
+            ABOX(x, y, w, h, 6) +
+            `<text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" stroke="none" fill="currentColor" font-size="12">${l}</text>` +
+            (i < 2
+              ? `<path d="M${x + w + 2} ${y + h / 2}H${x + 164}" marker-end="url(#tcA)"/>`
+              : "")
+          );
+        })
+        .join("")}
+      <defs>${AMK("tcA")}</defs>
+    </svg>`,
+
+        verify: `<svg viewBox="0 0 600 130" fill="none" stroke="currentColor" stroke-width="1.3" role="img" aria-label="A private key creates a signature, which a node checks against the transaction spending conditions">
+      ${[
+        { title: "Private key", size: 11 },
+        { title: "Signature", size: 11 },
+        { title: "Transaction", size: 10.5 },
+        { title: "Node checks", sub: "spending conditions", size: 10.5 },
+      ]
+        .map((item, i) => {
+          const x = 8 + i * 150;
+          const w = 125;
+          const y = 30;
+          const h = 54;
+
+          return (
+            ABOX(x, y, w, h, 6) +
+            (item.sub
+              ? `<text x="${x + w / 2}" y="${y + 22}" text-anchor="middle" stroke="none" fill="currentColor" font-size="${item.size}">${item.title}</text>
+                 <text x="${x + w / 2}" y="${y + 37}" text-anchor="middle" stroke="none" fill="var(--mut)" font-size="9">${item.sub}</text>`
+              : `<text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" stroke="none" fill="currentColor" font-size="${item.size}">${item.title}</text>`) +
+            (i < 3
+              ? `<path d="M${x + w + 2} ${y + h / 2}H${x + 145}" marker-end="url(#vfA)"/>`
+              : "")
+          );
+        })
+        .join("")}
+      <defs>${AMK("vfA")}</defs>
+    </svg>`,
+      };
+    </script>
+
+    <script>
+      const $ = (s, r = document) => r.querySelector(s);
+      const L = JSON.parse($("#lesson-data").textContent);
+      const KEY = "bitshala-learn:" + L.id;
+      let P = {};
+      try {
+        P = JSON.parse(localStorage.getItem(KEY) || "{}");
+      } catch (e) {}
+      const inl = (s) =>
+        s
+          .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+          .replace(/\*(.+?)\*/g, "<i>$1</i>")
+          .replace(/`(.+?)`/g, "<code>$1</code>");
+      const md = (s) =>
+        s
+          .split("\n\n")
+          .map((p) => `<p>${inl(p)}</p>`)
+          .join("");
+      const wrap = (h, c = "") => {
+        const d = document.createElement("div");
+        d.className = "blk " + c;
+        d.innerHTML = h;
+        return d;
+      };
+      const ACT = ["widget", "choice", "reflect"];
+      const total = () =>
+        L.sections
+          .flatMap((s) => s.blocks)
+          .reduce((n, b) => n + (ACT.includes(b.type) ? 1 : 0), 0);
+      function prog() {
+        const n = Object.keys(P).length,
+          t = total();
+        $("#prog").textContent = n + " of " + t + " activities";
+        $("#bar").style.width = (n / t) * 100 + "%";
+      }
+      function done(id) {
+        if (P[id]) return;
+        P[id] = 1;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(P));
+        } catch (e) {}
+        prog();
+      }
+
+      const rhex = (n) => {
+        let s = "";
+        for (let i = 0; i < n; i++)
+          s += Math.floor(Math.random() * 16).toString(16);
+        return s;
+      };
+
+      const WIDGETS = {
+        KeyPlayground(el, p, fin) {
+          el.classList.add("try");
+          let n = 0,
+            fired = false,
+            last = null;
+          el.innerHTML = `<span class="label">Try it</span><div id="pairs"></div>
+  <button data-go>Generate Example</button><button class="ghost" data-again disabled>Use that same private key again</button>
+  <div class="msg" id="kp"></div>`;
+          const addLine = (pair) =>
+            $("#pairs", el).insertAdjacentHTML(
+              "afterbegin",
+              `<div class="pairline"><b>private</b>${pair.priv}</div><div class="pairline"><b>public</b>${pair.pub}</div>`,
+            );
+          $("[data-go]", el).onclick = () => {
+            n++;
+            last = {
+              priv: rhex(8) + "\u2026" + rhex(4),
+              pub: "02" + rhex(8) + "\u2026" + rhex(4),
+            };
+            addLine(last);
+            $("[data-again]", el).disabled = false;
+            $("#kp", el).textContent = "";
+            if (n >= 3 && !fired) {
+              fired = true;
+              fin();
+            }
+          };
+          $("[data-again]", el).onclick = () => {
+            if (!last) return;
+            addLine(last);
+            $("#kp", el).textContent =
+              "Same private key, same public key, every time. Derivation isn\u2019t random, it\u2019s a fixed calculation.";
+          };
+        },
+
+        ShareOrSecret(el, p, fin) {
+          el.classList.add("try");
+          let n = 0;
+          el.innerHTML =
+            `<span class="label">Try it</span>` +
+            p.items
+              .map(
+                (it, i) =>
+                  `<div class="sortrow" data-i="${i}"><span class="name">${it.name}</span><span class="choices"><button data-v="true">Share</button><button class="ghost" data-v="false">Secret</button></span></div><div class="msg" id="sm${i}"></div>`,
+              )
+              .join("");
+          p.items.forEach((it, i) => {
+            const row = $(`[data-i="${i}"]`, el);
+            row.querySelectorAll("button").forEach(
+              (b) =>
+                (b.onclick = () => {
+                  const ok = (b.dataset.v === "true") === it.safe;
+                  row
+                    .querySelectorAll("button")
+                    .forEach((x) => (x.disabled = true));
+                  $("#sm" + i, el).textContent =
+                    (ok ? "Right. " : "Not quite. ") + it.note;
+                  if (!row.dataset.counted) {
+                    row.dataset.counted = 1;
+                    n++;
+                    if (n === p.items.length) fin();
+                  }
+                }),
+            );
+          });
+        },
+
+        /* asks for a prediction before any attempt, then three buttons that all lead
+   to the same honest dead end, explained without claiming it as a historical
+   absolute */
+        ReverseAttempt(el, p, fin) {
+          el.classList.add("try");
+          let tried = 0,
+            predicted = null;
+          const drawPredict = () => {
+            el.innerHTML = `<span class="label">Try it</span><div class="pairline"><b>public</b>${p.publicKey}</div>
+  <p>Before you try: do you think this is actually possible?</p>
+  <button data-p="yes">Yes, I think I can</button><button class="ghost" data-p="no">No, I don\u2019t think so</button>`;
+            el.querySelectorAll("[data-p]").forEach(
+              (b) =>
+                (b.onclick = () => {
+                  predicted = b.dataset.p;
+                  drawAttempt();
+                }),
+            );
+          };
+          const drawAttempt = () => {
+            el.innerHTML = `<span class="label">Try it</span><div class="pairline"><b>public</b>${p.publicKey}</div>
+  <p style="font-style:italic;color:var(--mut)">You predicted: ${predicted === "yes" ? "yes, it\u2019s possible" : "no, it isn\u2019t"}. Let\u2019s see.</p>
+  <div class="msg" id="rv"></div>
+  <button data-v="manual">Try manually</button><button data-v="calc">Run calculation</button><button class="ghost" data-v="give">Give up</button>`;
+            el.querySelectorAll("[data-v]").forEach(
+              (b) =>
+                (b.onclick = () => {
+                  if (b.dataset.v === "give") {
+                    $("#rv", el).textContent =
+                      "Your instinct was " +
+                      (predicted === "no" ? "right" : "worth revisiting") +
+                      ". Recovering a private key from a public key is considered computationally infeasible with any method currently known, not because anyone forbids it, because nobody has found a way to do it in a useful amount of time. That\u2019s the entire security model.";
+                    if (!tried) {
+                      tried = 1;
+                      fin();
+                    }
+                    return;
+                  }
+                  tried++;
+                  const msgs = {
+                    manual:
+                      "You stare at the digits for a while. Nothing. They don\u2019t rearrange themselves into an answer.",
+                    calc: "The calculation runs. And runs. It will keep running longer than you have patience for, this lifetime included.",
+                  };
+                  $("#rv", el).textContent = msgs[b.dataset.v];
+                  if (tried === 1) fin();
+                }),
+            );
+          };
+          drawPredict();
+        },
+        TraceChain(el, p, fin) {
+          el.classList.add("try");
+          let picked = [],
+            used = new Set(),
+            fired = false;
+          const order = p.steps.map((_, i) => i);
+          for (let i = order.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [order[i], order[j]] = [order[j], order[i]];
+          }
+          const draw = () => {
+            el.innerHTML = `<span class="label">Try it</span>
+  <ol>${picked.map((i) => `<li>${p.steps[i]}</li>`).join("")}</ol>
+  <div class="tilegrid">${order.map((i) => `<button class="tile${used.has(i) ? " sel" : ""}" data-i="${i}" ${used.has(i) ? "disabled" : ""}>${p.steps[i]}</button>`).join("")}</div>
+  ${picked.length === p.steps.length ? '<button class="ghost" data-reset>Start over</button>' : ""}
+  <div class="msg" id="tc"></div>`;
+            el.querySelectorAll(".tile").forEach(
+              (b) =>
+                (b.onclick = () => {
+                  const i = +b.dataset.i;
+                  used.add(i);
+                  picked.push(i);
+                  draw();
+                  if (picked.length === p.steps.length) {
+                    const ok = picked.every((v, idx) => v === idx);
+                    $("#tc", el).textContent = ok
+                      ? "That\u2019s the order it actually happens in."
+                      : "Not quite the order. Tap Start over and try again.";
+                    if (ok && !fired) {
+                      fired = true;
+                      fin();
+                    }
+                  }
+                }),
+            );
+            const r = $("[data-reset]", el);
+            if (r)
+              r.onclick = () => {
+                picked = [];
+                used = new Set();
+                draw();
+              };
+          };
+          draw();
+        },
+        CodeFill(el, p, fin) {
+          el.classList.add("try");
+          const picked = [null, null];
+          const draw = () => {
+            el.innerHTML = `<span class="label">Try it</span>
+  <div class="codebox">const privateKey = <span class="hole" id="h0">${picked[0] || "______"}</span>;\n\nconst publicKey = <span class="hole" id="h1">${picked[1] || "______"}</span>(privateKey);</div>
+  <p>Blank 1:</p><div class="tilegrid">${p.options.map((o) => `<button class="tile${o === picked[0] ? " sel" : ""}" data-slot="0" data-v="${o}">${o}</button>`).join("")}</div>
+  <p>Blank 2:</p><div class="tilegrid">${p.options.map((o) => `<button class="tile${o === picked[1] ? " sel" : ""}" data-slot="1" data-v="${o}">${o}</button>`).join("")}</div>
+  <div class="msg" id="cf"></div>`;
+            el.querySelectorAll(".tile").forEach(
+              (b) =>
+                (b.onclick = () => {
+                  const slot = +b.dataset.slot;
+                  picked[slot] = b.dataset.v;
+                  check();
+                }),
+            );
+          };
+          function check() {
+            draw();
+            if (picked[0] && picked[1]) {
+              const ok =
+                picked[0] === "generateSecret()" &&
+                picked[1] === "derivePublicKey(privateKey)";
+              $("#cf", el).textContent = ok
+                ? "Right. Notice there\u2019s no step anywhere that sends the private key to the network."
+                : "Not quite that pairing. Think about which function makes the secret, and which one only reads it.";
+              if (ok) fin();
+            }
+          }
+          draw();
+        },
+
+        SpotPublish(el, p, fin) {
+          el.classList.add("try");
+          const sel = new Set();
+          let done2 = false;
+          const draw = () => {
+            el.innerHTML = `<span class="label">Try it</span><div class="tilegrid">${p.items.map((it, i) => `<button class="tile${sel.has(i) ? " sel" : ""}" data-i="${i}">${it.name}</button>`).join("")}</div><button data-check>Check</button><div class="msg" id="sp"></div>`;
+            el.querySelectorAll(".tile").forEach(
+              (b) =>
+                (b.onclick = () => {
+                  const i = +b.dataset.i;
+                  sel.has(i) ? sel.delete(i) : sel.add(i);
+                  draw();
+                }),
+            );
+            $("[data-check]", el).onclick = () => {
+              const ok = p.items.every((it, i) => sel.has(i) === it.bad);
+              el.querySelectorAll(".tile").forEach((b, i) =>
+                b.classList.add(p.items[i].bad ? "wrong" : "right"),
+              );
+              $("#sp", el).textContent = ok
+                ? "Exactly those two, and only those two."
+                : "Not quite, look again at which of these is a secret, and which is just information.";
+              if (ok && !done2) {
+                done2 = true;
+                fin();
+              }
+            };
+          };
+          draw();
+        },
+        FillBlanks(el, p, fin) {
+          el.classList.add("try");
+          let n = 0;
+          el.innerHTML =
+            `<span class="label">Try it</span>` +
+            p.items
+              .map(
+                (it, i) =>
+                  `<div class="fillrow"><label>${it.prompt.replace("__________", '<span class="blank"></span>')}</label><br><input type="text" id="fb${i}" placeholder="type it"><button data-i="${i}">Check</button><span class="msg" id="fm${i}"></span></div>`,
+              )
+              .join("");
+          p.items.forEach((it, i) => {
+            $('[data-i="' + i + '"]', el).onclick = () => {
+              const v = $("#fb" + i, el)
+                .value.trim()
+                .toLowerCase();
+              const ok = it.answers.some(
+                (a) => v === a.toLowerCase() || v.includes(a.toLowerCase()),
+              );
+              $("#fm" + i, el).textContent = ok
+                ? " right"
+                : " not quite, try again";
+              $("#fm" + i, el).style.fontStyle = "italic";
+              if (ok) {
+                $("#fb" + i, el).disabled = true;
+                if (!$("#fb" + i, el).dataset.counted) {
+                  $("#fb" + i, el).dataset.counted = 1;
+                  n++;
+                  if (n === p.items.length) fin();
+                }
+              }
+            };
+          });
+        },
+      };
+
+      const BLOCKS = {
+        text: (b) => wrap(md(b.md)),
+        aside: (b) => wrap(inl(b.md), "aside"),
+        figure: (b) => {
+          const a = ASSETS[b.asset];
+          const el = document.createElement("figure");
+          el.innerHTML =
+            (/^(https?:|data:)/.test(a)
+              ? `<img src="${a}" alt="${b.caption}" style="max-width:100%">`
+              : a) + `<figcaption>${b.caption}</figcaption>`;
+          return el;
+        },
+        widget: (b) => {
+          const el = wrap("");
+          WIDGETS[b.name](el, b.props || {}, () => done(b.id));
+          return el;
+        },
+        reflect: (b) => {
+          const el = wrap(
+            `<div class="try">${md(b.prompt)}<textarea placeholder="${b.placeholder || ""}"></textarea><button data-go>Compare with ours</button><div class="out" style="margin-top:14px"></div></div>`,
+          );
+          $("[data-go]", el).onclick = () => {
+            $(".out", el).innerHTML = `<p>${inl(b.model)}</p>`;
+            done(b.id);
+          };
+          return el;
+        },
+        next: () => {
+          const n = L.next;
+          return wrap(
+            `<span class="label">Next lesson</span><h3>${n.id} ${n.title}</h3><p>${n.teaser}</p>`,
+            "next",
+          );
+        },
+      };
+
+      const errs = [];
+      L.sections.forEach((s) =>
+        s.blocks.forEach((b) => {
+          if (!BLOCKS[b.type])
+            errs.push(s.id + ': unknown block "' + b.type + '"');
+          if (b.type === "widget" && !WIDGETS[b.name])
+            errs.push(s.id + ': unknown widget "' + b.name + '"');
+          if (b.type === "figure" && !ASSETS[b.asset])
+            errs.push(s.id + ': missing asset "' + b.asset + '"');
+        }),
+      );
+      if (errs.length) {
+        const w = $("#warn");
+        w.style.display = "block";
+        w.innerHTML = errs.join("<br>");
+      }
+
+      $("#head").innerHTML =
+        `<div class="kicker">${L.phase} \u00b7 ${L.module}</div><h1>${L.title}</h1><p class="sub">${L.subtitle}</p><div class="meta">Lesson ${L.id} \u00b7 about ${L.minutes} minutes \u00b7 ${L.level}</div>`;
+      const main = $("#lesson");
+      L.sections.forEach((s, i) => {
+        const sec = document.createElement("section");
+        sec.id = s.id;
+        sec.innerHTML = `<div class="label">${s.label}</div><h2>${s.title}</h2>`;
+        s.blocks.forEach((b) => {
+          if (BLOCKS[b.type]) sec.appendChild(BLOCKS[b.type](b));
+        });
+        main.appendChild(sec);
+      });
+      prog();
+    </script>
+  </body>
+</html>

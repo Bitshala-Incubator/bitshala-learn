@@ -917,7 +917,7 @@
         next: () => {
           const n = L.next;
           return wrap(
-            `<span class="label">Next lesson</span><h3>${n.id} ${n.title}</h3><p>${n.teaser}</p>`,
+            `<span class="label">Next lesson</span><h3>${n.id} ${n.title}</h3><p>${n.teaser}</p><a class="next-link" href="../../4.Lesson/4.1-keys/">Start lesson ${n.id} →</a>`,
             "next",
           );
         },
