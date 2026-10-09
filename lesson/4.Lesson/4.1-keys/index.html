@@ -7,6 +7,8 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
     <title>Keys — Bitshala Learn 4.1</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
   </head>
   <body>
     <nav>
@@ -362,80 +364,95 @@
 
     <script>
       const AMK = (id) =>
-        `<marker id="${id}" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="currentColor"/></marker>`;
+        `<marker id="${id}" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0 0L7 3.5L0 7Z" fill="currentColor"/>
+    </marker>`;
+
       const ABOX = (x, y, w, h, r = 8) =>
-        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" style="fill:var(--soft)" stroke-width="1.3"/>`;
+        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" style="fill:var(--soft)" stroke="currentColor" stroke-width="1.3"/>`;
 
       const ASSETS = {
-        lock: `<svg viewBox="0 0 400 110" fill="none" stroke="currentColor" stroke-width="1.3">
- ${["Private key", "Cryptographic proof", "Transaction"]
-   .map((l, i) => {
-     const x = 10 + i * 120,
-       w = 100,
-       y = 30,
-       h = 48;
-     return (
-       ABOX(x, y, w, h, 6) +
-       `<text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" stroke="none" font-size="10.5">${l}</text>` +
-       (i < 2
-         ? `<path d="M${x + w} ${y + h / 2}h20" marker-end="url(#lkA)"/>`
-         : "")
-     );
-   })
-   .join("")}
- <defs>${AMK("lkA")}</defs></svg>`,
+        lock: `<svg viewBox="0 0 470 110" fill="none" stroke="currentColor" stroke-width="1.3" role="img" aria-label="Private key creates cryptographic proof used in a transaction">
+      ${["Private key", "Cryptographic proof", "Transaction"]
+        .map((l, i) => {
+          const x = 10 + i * 155;
+          const w = 130;
+          const y = 30;
+          const h = 48;
 
-        derive: `<svg viewBox="0 0 460 150" fill="none" stroke="currentColor" stroke-width="1.3">
- ${ABOX(40, 40, 150, 60)}<text x="115" y="75" text-anchor="middle" stroke="none" font-size="13">Private key</text>
- ${ABOX(270, 40, 150, 60)}<text x="345" y="75" text-anchor="middle" stroke="none" font-size="13">Public key</text>
- <path d="M190 55h78" marker-end="url(#dvA)"/>
- <path d="M270 90h-78" stroke-dasharray="4 4" marker-end="url(#dvA)"/>
- <path d="M224 82l12 12M236 82l-12 12" stroke="var(--acc)" stroke-width="1.6"/>
- <defs>${AMK("dvA")}</defs></svg>`,
+          return (
+            ABOX(x, y, w, h, 6) +
+            `<text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" stroke="none" fill="currentColor" font-size="${l === "Cryptographic proof" ? 10 : 12}">${l}</text>` +
+            (i < 2
+              ? `<path d="M${x + w + 2} ${y + h / 2}H${x + 149}" marker-end="url(#lkA)"/>`
+              : "")
+          );
+        })
+        .join("")}
+      <defs>${AMK("lkA")}</defs>
+    </svg>`,
 
-        threechain: `<svg viewBox="0 0 490 110" fill="none" stroke="currentColor" stroke-width="1.3">
- ${["Private key", "Public key", "Address"]
-   .map((l, i) => {
-     const x = 10 + i * 160,
-       w = 140,
-       y = 30,
-       h = 48;
-     return (
-       ABOX(x, y, w, h, 6) +
-       `<text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" stroke="none" font-size="12">${l}</text>` +
-       (i < 2
-         ? `<path d="M${x + w} ${y + h / 2}h20" marker-end="url(#tcA)"/>`
-         : "")
-     );
-   })
-   .join("")}
- <defs>${AMK("tcA")}</defs></svg>`,
+        derive: `<svg viewBox="0 0 460 150" fill="none" stroke="currentColor" stroke-width="1.3" role="img" aria-label="A public key is derived from a private key, but the reverse is computationally infeasible">
+      ${ABOX(25, 40, 155, 60)}
+      <text x="102.5" y="75" text-anchor="middle" stroke="none" fill="currentColor" font-size="13">Private key</text>
 
-        verify: `<svg viewBox="0 0 480 120" fill="none" stroke="currentColor" stroke-width="1.3">
- ${[
-   "Private key",
-   "Signature",
-   "Transaction",
-   "Node checks|spending conditions",
- ]
-   .map((l, i) => {
-     const x = 10 + i * 118,
-       w = 100,
-       y = 30,
-       h = 50;
-     const lines = l.split("|");
-     return (
-       ABOX(x, y, w, h, 6) +
-       (lines.length > 1
-         ? `<text x="${x + w / 2}" y="${y + h / 2}" text-anchor="middle" stroke="none" font-size="9.5">${lines[0]}</text><text x="${x + w / 2}" y="${y + h / 2 + 13}" text-anchor="middle" stroke="none" font-size="8.5" fill="var(--mut)">${lines[1]}</text>`
-         : `<text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" stroke="none" font-size="10.5">${l}</text>`) +
-       (i < 3
-         ? `<path d="M${x + w} ${y + h / 2}h18" marker-end="url(#vfA)"/>`
-         : "")
-     );
-   })
-   .join("")}
- <defs>${AMK("vfA")}</defs></svg>`,
+      ${ABOX(280, 40, 155, 60)}
+      <text x="357.5" y="75" text-anchor="middle" stroke="none" fill="currentColor" font-size="13">Public key</text>
+
+      <path d="M180 55H270" marker-end="url(#dvA)"/>
+      <path d="M280 90H190" stroke-dasharray="4 4" marker-end="url(#dvA)"/>
+
+      <path d="M222 82l12 12M234 82l-12 12" stroke="var(--acc)" stroke-width="1.6"/>
+      <defs>${AMK("dvA")}</defs>
+    </svg>`,
+
+        threechain: `<svg viewBox="0 0 520 110" fill="none" stroke="currentColor" stroke-width="1.3" role="img" aria-label="Private key, public key, and address">
+      ${["Private key", "Public key", "Address"]
+        .map((l, i) => {
+          const x = 10 + i * 170;
+          const w = 145;
+          const y = 30;
+          const h = 48;
+
+          return (
+            ABOX(x, y, w, h, 6) +
+            `<text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" stroke="none" fill="currentColor" font-size="12">${l}</text>` +
+            (i < 2
+              ? `<path d="M${x + w + 2} ${y + h / 2}H${x + 164}" marker-end="url(#tcA)"/>`
+              : "")
+          );
+        })
+        .join("")}
+      <defs>${AMK("tcA")}</defs>
+    </svg>`,
+
+        verify: `<svg viewBox="0 0 600 130" fill="none" stroke="currentColor" stroke-width="1.3" role="img" aria-label="A private key creates a signature, which a node checks against the transaction spending conditions">
+      ${[
+        { title: "Private key", size: 11 },
+        { title: "Signature", size: 11 },
+        { title: "Transaction", size: 10.5 },
+        { title: "Node checks", sub: "spending conditions", size: 10.5 },
+      ]
+        .map((item, i) => {
+          const x = 8 + i * 150;
+          const w = 125;
+          const y = 30;
+          const h = 54;
+
+          return (
+            ABOX(x, y, w, h, 6) +
+            (item.sub
+              ? `<text x="${x + w / 2}" y="${y + 22}" text-anchor="middle" stroke="none" fill="currentColor" font-size="${item.size}">${item.title}</text>
+                 <text x="${x + w / 2}" y="${y + 37}" text-anchor="middle" stroke="none" fill="var(--mut)" font-size="9">${item.sub}</text>`
+              : `<text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" stroke="none" fill="currentColor" font-size="${item.size}">${item.title}</text>`) +
+            (i < 3
+              ? `<path d="M${x + w + 2} ${y + h / 2}H${x + 145}" marker-end="url(#vfA)"/>`
+              : "")
+          );
+        })
+        .join("")}
+      <defs>${AMK("vfA")}</defs>
+    </svg>`,
       };
     </script>
 
@@ -491,10 +508,6 @@
       };
 
       const WIDGETS = {
-        /* repeatable generator: each click makes a fresh, unrelated-looking pair, so
-   different-in/different-out emerges from repetition. A second button reruns
-   the SAME last private key and shows it lands on the exact same public key
-   every time, the half of the story a single "generate" button can't show. */
         KeyPlayground(el, p, fin) {
           el.classList.add("try");
           let n = 0,
@@ -530,8 +543,6 @@
           };
         },
 
-        /* sort each item into safe / secret with its own pair of buttons, same shape
-   as earlier lessons' judgment cards, applied here to key material */
         ShareOrSecret(el, p, fin) {
           el.classList.add("try");
           let n = 0;
