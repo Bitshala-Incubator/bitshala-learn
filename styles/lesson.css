@@ -504,3 +504,114 @@ pre {
   margin-left: 8px;
   cursor: pointer;
 }
+.pairline {
+  font:
+    14px ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+  border-bottom: 1px solid var(--line);
+  padding: 8px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.pairline b {
+  font-weight: 600;
+  color: var(--mut);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  width: 68px;
+}
+.tilegrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+.tile {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px 14px;
+  text-align: left;
+  background: transparent;
+  color: var(--ink);
+  font:
+    15px ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+  cursor: pointer;
+}
+.tile.sel {
+  border-color: var(--acc);
+  background: var(--soft);
+}
+.tile.right {
+  border-color: var(--ink);
+  background: var(--soft);
+}
+.tile.wrong {
+  border-color: var(--acc);
+  opacity: 0.55;
+}
+.sortrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+.sortrow .name {
+  font:
+    15px ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+}
+.sortrow .choices button {
+  margin: 0 0 0 6px;
+}
+.blank {
+  display: inline-block;
+  width: 150px;
+  border-bottom: 2px solid var(--ink);
+  margin: 0 4px;
+}
+.codebox {
+  background: var(--ink);
+  color: var(--bg);
+  font:
+    14px/1.7 ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+  border-radius: 6px;
+  padding: 16px 18px;
+  margin: 12px 0;
+  white-space: pre-wrap;
+}
+.codebox .hole {
+  border-bottom: 2px dashed var(--acc);
+  padding: 0 4px;
+}
+.fillrow {
+  margin: 14px 0;
+}
+.fillrow input {
+  font:
+    17px Charter,
+    Georgia,
+    serif;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 8px 12px;
+  width: 220px;
+  margin-right: 8px;
+}
