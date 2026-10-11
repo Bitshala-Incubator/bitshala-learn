@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Addresses — Bitshala Learn 4.2</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+  </head>
+  <body class="lesson-42">
+    <nav>
+      <span>Bitshala Learn · Lesson 4.2</span><span id="prog"></span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "4.2",
+        "title": "Addresses",
+        "subtitle": "Meera sent an address Aarav\u2019s wallet doesn\u2019t quite recognise.",
+        "phase": "Bitcoin Foundations",
+        "module": "Keys and Addresses",
+        "minutes": 28,
+        "level": "Beginner",
+        "concepts": [
+          "p2pk",
+          "p2pkh",
+          "p2sh",
+          "p2wpkh",
+          "p2wsh",
+          "bech32",
+          "bech32m",
+          "checksum-validation"
+        ],
+        "next": {
+          "id": "5.1",
+          "title": "Deterministic Wallets",
+          "teaser": "You now understand what a Bitcoin address represents, and how different formats describe different payment destinations. But there\u2019s another question worth asking: how does a wallet generate so many addresses without making you back up every key individually? Coming up: seed material, key derivation, and how a single starting secret can be used to derive a whole family of keys and addresses, kept organised."
+        },
+        "sections": [
+          {
+            "id": "unfamiliar",
+            "label": "The problem",
+            "title": "Meera sends an address. Aarav doesn\u2019t recognise the shape.",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Meera owes Aarav for a job he finished last week. She opens her wallet, copies her receiving address, and sends it over.\n\nAarav looks at it and hesitates. It\u2019s not the shape he expected, not what showed up back in Lesson 1.2 when his own wallet gave him an address to share. Before he pastes it anywhere, he wants to actually understand what he\u2019s looking at, not just assume it\u2019s fine because it looks address-shaped."
+              }
+            ]
+          },
+
+          {
+            "id": "fourlayers",
+            "label": "Four different things",
+            "title": "Key, address, and script aren\u2019t three words for one idea",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "It\u2019s easy to blur private key, public key, address, and script together, especially after Lesson 4.1 left off right at the edge of this. They\u2019re not four flavours of the same thing, they\u2019re different kinds of thing entirely.\n\nA private key and a public key are cryptographic values, numbers with a mathematical relationship. An address is a piece of text, an encoding, meant to be typed, copied, and read by software. A script is executable logic, the actual rule a Bitcoin node runs to decide whether a spend is allowed. An address doesn\u2019t replace a script, it\u2019s a convenient, shareable way of pointing at one."
+              },
+              {
+                "type": "aside",
+                "md": "One thing addresses are never allowed to contain, under any format: your private key. Not encoded, not hinted at, never."
+              }
+            ]
+          },
+
+          {
+            "id": "p2pk3",
+            "label": "The oldest pattern",
+            "title": "P2PK: paying straight to a public key",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "**Pay-to-Public-Key**, P2PK, puts someone\u2019s actual public key directly in the locking script. Spending just means signing with the matching private key, no hashing, no extra encoding step.\n\nIt\u2019s mostly historical now, familiar from Bitcoin\u2019s earliest blocks. It isn\u2019t something you\u2019d be handed as a shareable address today, it\u2019s a script pattern, not a modern address format."
+              }
+            ]
+          },
+
+          {
+            "id": "p2pkh3",
+            "label": "The long-standing default",
+            "title": "P2PKH: Base58Check, starting with 1",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "**Pay-to-Public-Key-Hash**, P2PKH, is the pattern behind addresses that commonly start with **1** on mainnet. The locking script holds a hash of a public key, not the key itself. To spend, the wallet reveals the actual public key and a signature together, and the script checks both.\n\nThat **1** isn\u2019t decoration. It\u2019s part of how **Base58Check** encoding works: a version byte, baked into the encoding before the hash, tells software which network and script type this address belongs to, with its own checksum for catching typos."
+              }
+            ]
+          },
+
+          {
+            "id": "p2sh3",
+            "label": "Paying to a rule, not a key",
+            "title": "P2SH: Base58Check, starting with 3",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "**Pay-to-Script-Hash**, P2SH, addresses commonly start with **3**. Instead of hashing a public key, P2SH hashes an entire spending script, which could require two signatures out of three, a time lock, nearly any rule Bitcoin supports.\n\nWhoever pays you never needs to see or understand that rule. They pay the hash. You\u2019re the one who reveals the real script and proves you satisfy it, when you spend."
+              },
+              {
+                "type": "figure",
+                "asset": "layers",
+                "caption": "Same shape of idea, different version byte: 1 for a key\u2019s hash, 3 for a script\u2019s hash."
+              }
+            ]
+          },
+
+          {
+            "id": "followpayment",
+            "label": "Try it",
+            "title": "Follow one payment, step by step",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "This example follows a P2PKH payment specifically. It is not a universal process for every Bitcoin address. Notice, too, as you go: an address is never itself a transaction or a spending script. It\u2019s a convenient way to communicate the information needed to construct a payment output. Put these steps in the order they actually happen."
+              },
+              {
+                "type": "widget",
+                "id": "w-follow",
+                "name": "FollowPayment",
+                "props": {
+                  "steps": [
+                    "The recipient\u2019s wallet derives a public key and hashes it to get a public-key hash",
+                    "The recipient\u2019s wallet encodes that hash, with version information and a checksum, into a P2PKH address",
+                    "The recipient shares that address with the sender",
+                    "The sender\u2019s wallet decodes the address and checks it\u2019s valid for the intended network",
+                    "The sender\u2019s wallet uses the decoded information to construct a P2PKH output script",
+                    "Later, when the recipient spends it, their wallet provides the public key and signature that script requires"
+                  ]
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "segwitv0",
+            "label": "The real trap",
+            "title": "bc1q isn\u2019t one thing, it\u2019s two",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Native SegWit addresses use **Bech32** encoding and commonly start with **bc1q** on mainnet. Here\u2019s the part worth slowing down for: **that prefix alone doesn\u2019t distinguish P2WPKH from P2WSH.**\n\n**P2WPKH** uses a 20-byte public-key hash in its witness program. **P2WSH** uses a 32-byte script hash. Their standard Bech32 encodings therefore come out different lengths as a side effect, but length is a rough heuristic, not the actual check. A wallet should decode the address and inspect its witness version and program directly, rather than rely on length alone.\n\nA familiar-looking prefix is a useful clue. It is never proof that an address is valid, or that it represents the spending conditions you expect."
+              }
+            ]
+          },
+
+          {
+            "id": "choosepattern",
+            "label": "Try it",
+            "title": "Choose the spending pattern, and justify it",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Three short scenarios. Pick the right pattern, then pick the reason that actually explains it, not just a plausible-sounding one."
+              },
+              {
+                "type": "widget",
+                "id": "w-choose",
+                "name": "ChoosePattern",
+                "props": {
+                  "scenarios": [
+                    {
+                      "text": "Meera wants to pay a specific public key directly, the way the very earliest Bitcoin transactions did.",
+                      "patterns": ["P2PK", "P2PKH", "P2SH"],
+                      "answerPattern": "P2PK",
+                      "justifications": [
+                        "Pays straight to a public key, no hashing step at all",
+                        "Pays to the hash of a public key",
+                        "Pays to the hash of an entire script"
+                      ],
+                      "answerJust": 0
+                    },
+                    {
+                      "text": "Aarav wants a normal payment into his everyday wallet, to the hash of his key, not the key itself.",
+                      "patterns": ["P2PK", "P2PKH", "P2SH"],
+                      "answerPattern": "P2PKH",
+                      "justifications": [
+                        "Pays straight to a public key",
+                        "Pays to the hash of a public key, the long-standing default",
+                        "Pays to the hash of an entire script"
+                      ],
+                      "answerJust": 1
+                    },
+                    {
+                      "text": "A business wants a payment that needs two signatures out of three different keys, without the payer having to understand that rule.",
+                      "patterns": ["P2PK", "P2PKH", "P2SH"],
+                      "answerPattern": "P2SH",
+                      "justifications": [
+                        "Pays straight to a public key",
+                        "Pays to the hash of a public key",
+                        "Pays to the hash of an entire script, hiding the complexity from the payer"
+                      ],
+                      "answerJust": 2
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+
+          {
+            "id": "taproot3",
+            "label": "A new output key, a fixed checksum",
+            "title": "Taproot: bc1p, and why it needed Bech32m",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Addresses starting with **bc1p** are Taproot, witness version 1, and here\u2019s a genuine architectural difference, not just another prefix: a Taproot address encodes an actual public key, the Taproot output key, not a hash of one. Every format before it, P2PKH, P2SH, P2WPKH, P2WSH, encodes a hash. Taproot doesn\u2019t.\n\nIt also uses a different encoding, **Bech32m**, not plain Bech32. The reason is specific: Bech32\u2019s checksum, it turned out, has a narrow blind spot, certain patterns of inserted characters right after the separator can produce a different string that still passes the checksum as valid. The risk for existing SegWit v0 addresses was judged low enough not to redo everything retroactively, but Taproot was a clean, new format, so its designers corrected the checksum constant before launch. That correction is Bech32m."
+              },
+              {
+                "type": "figure",
+                "asset": "witness",
+                "caption": "Same bc1 start, a different character right after it, a different checksum underneath."
+              }
+            ]
+          },
+
+          {
+            "id": "clueproof",
+            "label": "The thesis",
+            "title": "A prefix is a clue. It is never proof.",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Everything so far has been about reading prefixes: 1, 3, bc1q, bc1p. Reading them well tells you what an address is probably claiming to be. It tells you nothing about whether the string is actually correct, uncorrupted, or safe to pay.\n\nThat distinction is the rest of this lesson."
+              }
+            ]
+          },
+
+          {
+            "id": "debugwallet",
+            "label": "Try it",
+            "title": "Debug Aarav\u2019s wallet",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "His wallet software has a bug: it treats every address starting with **bc1** as SegWit v0, full stop. That includes Taproot addresses, which also start with bc1. Find the fix, and run it against real test cases."
+              },
+              {
+                "type": "widget",
+                "id": "w-debug",
+                "name": "DebugWallet",
+                "props": {}
+              }
+            ]
+          },
+
+          {
+            "id": "investigate",
+            "label": "Try it",
+            "title": "Investigate an address error",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Meera read her address out loud. What Aarav\u2019s wallet is showing him doesn\u2019t quite match what he wrote down. One character is different."
+              },
+              {
+                "type": "widget",
+                "id": "w-invest",
+                "name": "InvestigateError",
+                "props": {}
+              },
+              {
+                "type": "aside",
+                "md": "Never guess the correction and send anyway. A single changed character is exactly what a checksum exists to catch, and the \u201ccorrected\u201d address you guess could belong to someone else entirely, possibly someone who\u2019s counting on exactly this mistake."
+              }
+            ]
+          },
+
+          {
+            "id": "finalreview",
+            "label": "Final assessment",
+            "title": "Wallet review: four addresses, one afternoon",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "You\u2019re reviewing Aarav\u2019s wallet activity. Four addresses came through. Classify each one, including when the honest answer is that the prefix alone can\u2019t tell you."
+              },
+              {
+                "type": "widget",
+                "id": "w-review",
+                "name": "WalletReview",
+                "props": {
+                  "items": [
+                    {
+                      "display": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                      "note": "A real, widely cited mainnet address.",
+                      "answer": 0,
+                      "explain": "Starts with 1, Base58Check, mainnet, P2PKH. Well-formed as far as its shape goes."
+                    },
+                    {
+                      "display": "mxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                      "note": "Illustrative shape only.",
+                      "answer": 1,
+                      "explain": "Starts with m, that\u2019s testnet\u2019s P2PKH prefix, not mainnet\u2019s. Same script type, wrong network, treating it as mainnet funds would be a real mistake."
+                    },
+                    {
+                      "display": "bc1pxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                      "note": "Illustrative shape only.",
+                      "answer": 2,
+                      "explain": "bc1p, witness v1, Taproot, Bech32m, mainnet."
+                    },
+                    {
+                      "display": "bc1qxy2kgdyWjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+                      "note": "Looks like an ordinary bc1q address, one character has actually been altered from a well-formed one.",
+                      "answer": 3,
+                      "explain": "The prefix alone can\u2019t confirm this. It looks plausible, which is exactly the danger, only checksum validation, which this exercise doesn\u2019t perform, could actually confirm or reject it."
+                    }
+                  ],
+                  "options": [
+                    "P2PKH, mainnet",
+                    "P2PKH, but testnet, not mainnet",
+                    "Taproot (Bech32m), mainnet",
+                    "Cannot be confirmed from the prefix alone"
+                  ]
+                }
+              },
+              {
+                "type": "reflect",
+                "id": "r-final3",
+                "prompt": "Before any of these addresses should actually be trusted, what should the wallet software check that reading the prefix cannot tell you? Name at least two things.",
+                "placeholder": "Write it as you\u2019d actually explain it to Aarav.",
+                "model": "At minimum: whether the checksum embedded in the address is actually valid for that exact string, since a single altered character should fail it. And whether the network byte or prefix matches the network the wallet is actually operating on, mainnet funds shouldn\u2019t be sent to what reads as a testnet address, or the reverse. The prefix narrows down the type. Only real validation confirms the string itself is correct."
+              }
+            ]
+          },
+
+          {
+            "id": "wrap2",
+            "label": "Where this leaves you",
+            "title": "The shape was never the whole story",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav can now read Meera\u2019s address properly: what its prefix claims, what that claim does and doesn\u2019t prove, and what his wallet owes him before he trusts it. That\u2019s the actual skill, not memorising which digit means what."
+              },
+              { "type": "next" }
+            ]
+          }
+        ]
+      }
+    </script>
+
+    <script>
+      const AMK = (id) =>
+        `<marker id="${id}" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="currentColor"/></marker>`;
+      const ABOX = (x, y, w, h, r = 8) =>
+        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" style="fill:var(--soft)" stroke-width="1.3"/>`;
+
+      const ASSETS = {
+        layers: `<svg viewBox="0 0 460 110" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${["Key or script", "HASH160", "Address (1 or 3\u2026)"]
+   .map((l, i) => {
+     const x = 10 + i * 150,
+       w = 130,
+       y = 30,
+       h = 48;
+     return (
+       ABOX(x, y, w, h, 6) +
+       `<text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" stroke="none" font-size="11">${l}</text>` +
+       (i < 2
+         ? `<path d="M${x + w} ${y + h / 2}h20" marker-end="url(#lyA)"/>`
+         : "")
+     );
+   })
+   .join("")}
+ <defs>${AMK("lyA")}</defs></svg>`,
+
+        witness: `<svg viewBox="0 0 440 150" fill="none" stroke="currentColor" stroke-width="1.3">
+ ${ABOX(150, 10, 140, 40, 6)}<text x="220" y="34" text-anchor="middle" stroke="none" font-size="13">bc1\u2026</text>
+ <path d="M190 50L90 95" marker-end="url(#wtA)"/><path d="M250 50L350 95" marker-end="url(#wtA)"/>
+ ${ABOX(20, 95, 140, 45, 6)}<text x="90" y="113" text-anchor="middle" stroke="none" font-size="11">q \u2192 v0</text><text x="90" y="129" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">Bech32</text>
+ ${ABOX(280, 95, 140, 45, 6)}<text x="350" y="113" text-anchor="middle" stroke="none" font-size="11">p \u2192 v1, Taproot</text><text x="350" y="129" text-anchor="middle" stroke="none" font-size="10" fill="var(--mut)">Bech32m</text>
+ <defs>${AMK("wtA")}</defs></svg>`,
+      };
+    </script>
+
+    <script>
+      const $ = (s, r = document) => r.querySelector(s);
+      const L = JSON.parse($("#lesson-data").textContent);
+      const KEY = "bitshala-learn:" + L.id;
+      let P = {};
+      try {
+        P = JSON.parse(localStorage.getItem(KEY) || "{}");
+      } catch (e) {}
+      const inl = (s) =>
+        s
+          .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+          .replace(/\*(.+?)\*/g, "<i>$1</i>")
+          .replace(/`(.+?)`/g, "<code>$1</code>");
+      const md = (s) =>
+        s
+          .split("\n\n")
+          .map((p) => `<p>${inl(p)}</p>`)
+          .join("");
+      const wrap = (h, c = "") => {
+        const d = document.createElement("div");
+        d.className = "blk " + c;
+        d.innerHTML = h;
+        return d;
+      };
+      const ACT = ["widget", "choice", "reflect"];
+      const total = () =>
+        L.sections
+          .flatMap((s) => s.blocks)
+          .reduce((n, b) => n + (ACT.includes(b.type) ? 1 : 0), 0);
+      function prog() {
+        const n = Object.keys(P).length,
+          t = total();
+        $("#prog").textContent = n + " of " + t + " activities";
+        $("#bar").style.width = (n / t) * 100 + "%";
+      }
+      function done(id) {
+        if (P[id]) return;
+        P[id] = 1;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(P));
+        } catch (e) {}
+        prog();
+      }
+
+      function classify(address, bc1Rule) {
+        if (address.startsWith("1")) return "P2PKH (mainnet)";
+        if (address.startsWith("m") || address.startsWith("n"))
+          return "P2PKH (testnet)";
+        if (address.startsWith("3")) return "P2SH (mainnet)";
+        return bc1Rule(address);
+      }
+      const BUGGY_RULE = (a) =>
+        a.startsWith("bc1") ? "SegWit v0 (Bech32)" : "Unknown";
+      const FIXED_RULE = (a) => {
+        if (a.startsWith("bc1p")) return "Taproot (Bech32m)";
+        if (a.startsWith("bc1q")) return "SegWit v0 (Bech32)";
+        return "Unknown";
+      };
+      const TESTCASES = [
+        {
+          addr: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+          expect: "P2PKH (mainnet)",
+        },
+        { addr: "3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", expect: "P2SH (mainnet)" },
+        {
+          addr: "bc1qxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          expect: "SegWit v0 (Bech32)",
+        },
+        {
+          addr: "bc1pxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          expect: "Taproot (Bech32m)",
+        },
+        { addr: "zzz987notarealaddress", expect: "Unknown" },
+      ];
+
+      const WIDGETS = {
+        FollowPayment(el, p, fin) {
+          el.classList.add("try");
+          let picked = [],
+            used = new Set(),
+            fired = false;
+          const draw = () => {
+            el.innerHTML = `<span class="label">Try it</span>
+  <ol class="orderlist">${picked.map((i) => `<li>${p.steps[i]}</li>`).join("")}</ol>
+  <div class="tilegrid">${p.order.map((i) => `<button class="tile${used.has(i) ? " sel" : ""}" data-i="${i}" ${used.has(i) ? "disabled" : ""}>${p.steps[i]}</button>`).join("")}</div>
+  ${picked.length === p.steps.length ? '<button class="ghost" data-reset>Start over</button>' : ""}
+  <div class="msg" id="fp"></div>`;
+            el.querySelectorAll(".tile").forEach(
+              (b) =>
+                (b.onclick = () => {
+                  const i = +b.dataset.i;
+                  used.add(i);
+                  picked.push(i);
+                  draw();
+                  if (picked.length === p.steps.length) {
+                    const ok = picked.every((v, idx) => v === idx);
+                    $("#fp", el).textContent = ok
+                      ? "That\u2019s the order, for this P2PKH example specifically."
+                      : "Not quite the order. Start over and try again.";
+                    if (ok && !fired) {
+                      fired = true;
+                      fin();
+                    }
+                  }
+                }),
+            );
+            const r = $("[data-reset]", el);
+            if (r)
+              r.onclick = () => {
+                picked = [];
+                used = new Set();
+                draw();
+              };
+          };
+          p.order = p.steps.map((_, i) => i);
+          for (let i = p.order.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [p.order[i], p.order[j]] = [p.order[j], p.order[i]];
+          }
+          draw();
+        },
+
+        ChoosePattern(el, p, fin) {
+          el.classList.add("try");
+          let i = 0,
+            stage = 1,
+            pat = null,
+            fired = false;
+          const draw = () => {
+            const s = p.scenarios[i];
+            if (!s) {
+              el.innerHTML = `<span class="label">Try it</span><div class="msg" style="font-style:italic">All three, pattern and reasoning both.</div>`;
+              return;
+            }
+            let h = `<span class="label">Try it</span><p>${s.text}</p>`;
+            if (stage === 1) {
+              h += `<div class="tilegrid">${s.patterns.map((pt) => `<button class="tile" data-p="${pt}">${pt}</button>`).join("")}</div><div class="msg" id="cp"></div>`;
+            } else {
+              h += `<p style="font-style:italic;color:var(--mut)">You picked ${pat}. Why?</p><div class="tilegrid">${s.justifications.map((j, ji) => `<button class="opt" data-j="${ji}">${j}</button>`).join("")}</div><div class="msg" id="cp"></div>`;
+            }
+            el.innerHTML = h;
+            if (stage === 1)
+              el.querySelectorAll("[data-p]").forEach(
+                (b) =>
+                  (b.onclick = () => {
+                    const ok = b.dataset.p === s.answerPattern;
+                    el.querySelectorAll("[data-p]").forEach((x) =>
+                      x.classList.remove("right", "wrong"),
+                    );
+                    b.classList.add(ok ? "right" : "wrong");
+                    if (ok) {
+                      pat = b.dataset.p;
+                      setTimeout(() => {
+                        stage = 2;
+                        draw();
+                      }, 500);
+                    } else {
+                      $("#cp", el).textContent =
+                        "Not that pattern. Look again at what\u2019s actually being paid.";
+                    }
+                  }),
+              );
+            else
+              el.querySelectorAll("[data-j]").forEach(
+                (b) =>
+                  (b.onclick = () => {
+                    const ok = +b.dataset.j === s.answerJust;
+                    el.querySelectorAll("[data-j]").forEach((x) =>
+                      x.classList.remove("right", "wrong"),
+                    );
+                    b.classList.add(ok ? "right" : "wrong");
+                    if (ok) {
+                      $("#cp", el).textContent =
+                        "Right, pattern and reason both.";
+                      setTimeout(() => {
+                        i++;
+                        stage = 1;
+                        pat = null;
+                        draw();
+                        if (i === p.scenarios.length && !fired) {
+                          fired = true;
+                          fin();
+                        }
+                      }, 650);
+                    } else {
+                      $("#cp", el).textContent =
+                        "That\u2019s a true statement about one of these patterns, just not this one.";
+                    }
+                  }),
+              );
+          };
+          draw();
+        },
+
+        DebugWallet(el, p, fin) {
+          el.classList.add("try");
+          let picked = null,
+            fired = false;
+          const ORIGBUG =
+            "// the buggy line lived here: if (address.startsWith(&#39;bc1&#39;)) return &#39;SegWit v0&#39;;";
+          const options = [
+            {
+              label: "Check for bc1p specifically, before falling back to bc1q",
+              ok: true,
+              rule: FIXED_RULE,
+            },
+            {
+              label: "Just delete the bc1 check entirely",
+              ok: false,
+              rule: (a) => "Unknown",
+            },
+            {
+              label: "Change bc1 to BC1 (uppercase), nothing else",
+              ok: false,
+              rule: (a) =>
+                a.startsWith("BC1") ? "SegWit v0 (Bech32)" : "Unknown",
+            },
+          ];
+          const draw = () => {
+            el.innerHTML = `<span class="label">Try it</span>
+  <div class="codebox">function classifyBc1(address) {
+  <span class="hole">${picked !== null ? options[picked].label : ORIGBUG}</span>
+}</div>
+  <p>Pick the real fix:</p>
+  <div class="tilegrid">${options.map((o, i) => `<button class="tile${picked === i ? " sel" : ""}" data-i="${i}">${o.label}</button>`).join("")}</div>
+  <button data-run ${picked === null ? "disabled" : ""}>Run tests</button>
+  <div id="dresults"></div>`;
+            el.querySelectorAll("[data-i]").forEach(
+              (b) =>
+                (b.onclick = () => {
+                  picked = +b.dataset.i;
+                  draw();
+                }),
+            );
+            $("[data-run]", el).onclick = () => {
+              const rule = options[picked].rule;
+              const res = TESTCASES.map((tc) => ({
+                addr: tc.addr,
+                expect: tc.expect,
+                got: classify(tc.addr, rule),
+                pass: classify(tc.addr, rule) === tc.expect,
+              }));
+              $("#dresults", el).innerHTML =
+                res
+                  .map(
+                    (r) =>
+                      `<div class="testline">${r.addr}<span class="status">expected ${r.expect}, got ${r.got}${r.pass ? ", matches" : ", does not match"}</span></div>`,
+                  )
+                  .join("") +
+                `<p class="msg">${res.every((r) => r.pass) ? "All five pass. And notice, even passing all five only means the prefixes are read correctly, not that any of these strings are genuinely valid addresses." : "Not all five pass. Check which bc1 case broke."}</p>`;
+              if (res.every((r) => r.pass) && !fired) {
+                fired = true;
+                fin();
+              }
+            };
+          };
+          draw();
+        },
+
+        /* side-by-side diff of a valid vs single-character-altered address; the only
+   "correct" action is reject, both guessing options are deliberately wrong */
+        InvestigateError(el, p, fin) {
+          el.classList.add("try");
+          let fired = false;
+          const said = "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh";
+          const got = "bc1qxy2kgdyWjrsqtzq2n0yrf2493p83kkfjhx0wlh";
+          el.innerHTML = `<span class="label">Try it</span>
+  <div class="diffline">Meera read out: ${said}</div>
+  <div class="diffline">Aarav wrote down: ${got.replace("W", '<span class="flag">W</span>')}</div>
+  <p>What should Aarav\u2019s wallet do?</p>
+  <div class="tilegrid">
+   <button class="opt" data-v="accept">Accept it, one character is close enough</button>
+   <button class="opt" data-v="guess">Quietly correct the W back to a lowercase letter and proceed</button>
+   <button class="opt" data-v="reject">Reject it, and ask Meera to resend or verify it another way</button>
+  </div><div class="msg" id="ie"></div>`;
+          el.querySelectorAll(".opt").forEach(
+            (b) =>
+              (b.onclick = () => {
+                const ok = b.dataset.v === "reject";
+                el.querySelectorAll(".opt").forEach((x) =>
+                  x.classList.remove("right", "wrong"),
+                );
+                b.classList.add(ok ? "right" : "wrong");
+                $("#ie", el).textContent = ok
+                  ? "Right. A single altered character is exactly what a checksum exists to catch, and reject is the only safe response."
+                  : "Not that one. A single changed character could just as easily point at someone else\u2019s address entirely, including an attacker who is counting on exactly this guess.";
+                if (ok && !fired) {
+                  fired = true;
+                  fin();
+                }
+              }),
+          );
+        },
+        WalletReview(el, p, fin) {
+          el.classList.add("try");
+          let i = 0,
+            fired = false;
+          const solved = [];
+          const draw = () => {
+            const c = p.items[i];
+            let h = `<span class="label">Try it</span>`;
+            if (solved.length)
+              h += solved
+                .map((s) => `<div class="pairline"><b>reviewed</b>${s}</div>`)
+                .join("");
+            if (c) {
+              h += `<div class="pairline"><b>address</b>${c.display}</div><span class="note-illustrative">${c.note}</span>
+   <div class="tilegrid">${p.options.map((o, oi) => `<button class="tile" data-v="${oi}">${o}</button>`).join("")}</div><div class="msg" id="wr"></div>`;
+            } else
+              h += `<div class="msg" style="font-style:italic">Four reviewed, including the one that honestly couldn\u2019t be confirmed from its prefix.</div>`;
+            el.innerHTML = h;
+            if (c)
+              el.querySelectorAll(".tile").forEach(
+                (b) =>
+                  (b.onclick = () => {
+                    const ok = +b.dataset.v === c.answer;
+                    el.querySelectorAll(".tile").forEach((x) =>
+                      x.classList.remove("right", "wrong"),
+                    );
+                    b.classList.add(ok ? "right" : "wrong");
+                    $("#wr", el).textContent =
+                      (ok ? "Right. " : "Not quite. ") + c.explain;
+                    if (ok) {
+                      setTimeout(() => {
+                        solved.push(p.options[c.answer]);
+                        i++;
+                        draw();
+                        if (i === p.items.length && !fired) {
+                          fired = true;
+                          fin();
+                        }
+                      }, 700);
+                    }
+                  }),
+              );
+          };
+          draw();
+        },
+      };
+
+      const BLOCKS = {
+        text: (b) => wrap(md(b.md)),
+        aside: (b) => wrap(inl(b.md), "aside"),
+        figure: (b) => {
+          const a = ASSETS[b.asset];
+          const el = document.createElement("figure");
+          el.innerHTML =
+            (/^(https?:|data:)/.test(a)
+              ? `<img src="${a}" alt="${b.caption}" style="max-width:100%">`
+              : a) + `<figcaption>${b.caption}</figcaption>`;
+          return el;
+        },
+        widget: (b) => {
+          const el = wrap("");
+          WIDGETS[b.name](el, b.props || {}, () => done(b.id));
+          return el;
+        },
+        reflect: (b) => {
+          const el = wrap(
+            `<div class="try">${md(b.prompt)}<textarea placeholder="${b.placeholder || ""}"></textarea><button data-go>Compare with ours</button><div class="out" style="margin-top:14px"></div></div>`,
+          );
+          $("[data-go]", el).onclick = () => {
+            $(".out", el).innerHTML = `<p>${inl(b.model)}</p>`;
+            done(b.id);
+          };
+          return el;
+        },
+        next: () => {
+          const n = L.next;
+          return wrap(
+            `<span class="label">Next lesson</span><h3>${n.id} ${n.title}</h3><p>${n.teaser}</p>`,
+            "next",
+          );
+        },
+      };
+
+      const errs = [];
+      L.sections.forEach((s) =>
+        s.blocks.forEach((b) => {
+          if (!BLOCKS[b.type])
+            errs.push(s.id + ': unknown block "' + b.type + '"');
+          if (b.type === "widget" && !WIDGETS[b.name])
+            errs.push(s.id + ': unknown widget "' + b.name + '"');
+          if (b.type === "figure" && !ASSETS[b.asset])
+            errs.push(s.id + ': missing asset "' + b.asset + '"');
+        }),
+      );
+      if (errs.length) {
+        const w = $("#warn");
+        w.style.display = "block";
+        w.innerHTML = errs.join("<br>");
+      }
+
+      $("#head").innerHTML =
+        `<div class="kicker">${L.phase} \u00b7 ${L.module}</div><h1>${L.title}</h1><p class="sub">${L.subtitle}</p><div class="meta">Lesson ${L.id} \u00b7 about ${L.minutes} minutes \u00b7 ${L.level}</div>`;
+      const main = $("#lesson");
+      L.sections.forEach((s, i) => {
+        const sec = document.createElement("section");
+        sec.id = s.id;
+        sec.innerHTML = `<div class="label">${s.label}</div><h2>${s.title}</h2>`;
+        s.blocks.forEach((b) => {
+          if (BLOCKS[b.type]) sec.appendChild(BLOCKS[b.type](b));
+        });
+        main.appendChild(sec);
+      });
+      prog();
+    </script>
+  </body>
+</html>
