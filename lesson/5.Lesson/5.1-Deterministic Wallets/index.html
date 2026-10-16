@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Deterministic Wallets — Bitshala Learn 5.1</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 5.1</span
+      ><span id="prog">Loading cryptography library…</span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+     
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "5.1",
+        "title": "Deterministic Wallets",
+        "subtitle": "One seed, repeatable rules, a whole hierarchy of keys.",
+        "phase": "Bitcoin Foundations",
+        "module": "Module 5",
+        "minutes": 35,
+        "level": "Beginner",
+        "next": {
+          "id": "5.2",
+          "title": "Seed Phrases and Wallet Recovery",
+          "teaser": "Investigate how mnemonic phrases become seed material, how derivation paths affect recovery, and why restoring the correct words may not immediately show the addresses you expect."
+        },
+        "sections": [
+          {
+            "id": "restore",
+            "label": "The question",
+            "title": "Aarav restores his wallet, and wonders where all the keys went",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav sets up his wallet on a new computer. He enters his recovery material and watches hundreds of addresses reappear — the same ones he had before.\n\nHe turns to Meera. “If my wallet has hundreds of addresses, where are all those keys actually stored? Is it creating them randomly every time I open it?”\n\nMeera doesn’t answer directly. “Don’t take my word for it. Let’s use the same derivation rules real wallets use, run them ourselves, and inspect the output.”"
+              }
+            ]
+          },
+          {
+            "id": "notrandom",
+            "label": "Not random at all",
+            "title": "One seed, the same hierarchy, every single time",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "A deterministic wallet isn’t improvising. It starts from a **seed** and applies a repeatable algorithm. Feed the same seed through the same rules twice, and you get the same keys in the same order.\n\nThe seed itself isn’t a private key. BIP32 processes it into a **master extended key**, which contains a master private key and a **chain code**. The chain code is additional data used when deriving descendants. From there, child keys branch off along specific derivation paths."
+              },
+              {
+                "type": "figure",
+                "asset": "hierarchy",
+                "caption": "One seed in, a hierarchy of keys out — the same inputs and rules produce the same tree."
+              }
+            ]
+          },
+          {
+            "id": "vector1",
+            "label": "Mission 1 of 5 · Investigate the standard",
+            "title": "Find the rule before you trust the output",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Before running anything, find where this behaviour is specified: the <a href=\"https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki\" target=\"_blank\" rel=\"noopener\">BIP32 specification</a>. Near the end, it publishes test vectors: known seeds paired with the exact extended keys they must produce. A correct implementation should match them."
+              },
+              {
+                "type": "text",
+                "md": "Test vector 1 uses this public test seed: `000102030405060708090a0b0c0d0e0f`"
+              },
+              {
+                "type": "text",
+                "md": "The expected master extended private key is shown in full below. This is a published test vector, not a secret and not connected to a real wallet. Never use a test vector or lesson seed to protect funds."
+              },
+              {
+                "type": "widget",
+                "id": "w-vector",
+                "name": "TestVector",
+                "props": {}
+              }
+            ]
+          },
+          {
+            "id": "buildtrace",
+            "label": "Missions 2–3 of 5 · Code lab",
+            "title": "Derive the master key, then a child, then your own",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "**Mission 2.** Now run actual BIP32 derivation using the published test seed. The lab below is a real console: you type each command yourself and it runs against the `@scure/bip32` implementation in your browser, computing real extended keys and public keys rather than look-alike strings. If you want the exact line, you can find it in the <a href=\"https://www.npmjs.com/package/@scure/bip32\" target=\"_blank\" rel=\"noopener\">@scure/bip32 documentation</a>, which names the class and its methods. Try a path, then type it again to compare the result."
+              },
+              {
+                "type": "widget",
+                "id": "w-trace",
+                "name": "DeriveTrace",
+                "props": {}
+              },
+              {
+                "type": "text",
+                "md": "**Mission 3.** You've seen the derivation run. Now write the key lines yourself, with nothing pre-filled. This is a small code-completion challenge: use the trusted BIP32 library rather than implementing cryptography from scratch."
+              },
+              {
+                "type": "widget",
+                "id": "w-code",
+                "name": "CodingChallenge",
+                "props": {}
+              }
+            ]
+          },
+          {
+            "id": "watchonly",
+            "label": "Mission 4 of 5 · Watch-only wallets",
+            "title": "Can you derive a key without the private key?",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Meera poses a different problem. A monitoring app needs to generate receiving public keys, but it must never touch the wallet’s private keys. Can an extended **public** key alone do that?\n\nFor non-hardened descendants, yes. An extended public key carries a public key and chain code, which are enough for BIP32 public derivation. Hardened children are different: deriving one requires the parent’s private key. This is a deliberate boundary."
+              },
+              {
+                "type": "table",
+                "headers": ["Operation", "Extended public key alone?"],
+                "rows": [
+                  [
+                    "Derive a non-hardened child public key",
+                    "Yes, below the xpub’s node"
+                  ],
+                  ["Derive a hardened child", "No"],
+                  ["Sign a Bitcoin transaction", "No"]
+                ]
+              },
+              {
+                "type": "widget",
+                "id": "w-watch",
+                "name": "WatchOnly",
+                "props": {}
+              },
+              {
+                "type": "aside",
+                "md": "An extended public key is not a private key, but it is still sensitive. Sharing one can reveal addresses in that branch and link them together. Don’t publish it casually."
+              }
+            ]
+          },
+          {
+            "id": "bigpicture",
+            "label": "Mission 5 of 5 · One last check, then the bigger picture",
+            "title": "Does an independent implementation agree with this page?",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "So far every derivation in this lesson has run inside this page, using one library. Mission 1 was about trusting a published spec instead of a guess — the same instinct applies here: that result is worth double-checking against a second, independently-written implementation that other people in the Bitcoin community actually rely on, the same way you'd want two different odometers to agree before trusting a car's mileage."
+              },
+              {
+                "type": "widget",
+                "id": "w-extverify",
+                "name": "ExternalVerify",
+                "props": {}
+              },
+              {
+                "type": "aside",
+                "md": "<a href=\"https://iancoleman.io/bip39/\" target=\"_blank\" rel=\"noopener\">iancoleman.io/bip39</a> is a long-standing, open-source reference tool many Bitcoin developers use to sanity-check derivation by hand. It runs entirely in your browser — nothing is sent anywhere — but as a rule, never type a real mnemonic or seed into any website, including this one. If you ever use a tool like this with funds that matter, download its source from GitHub and run it offline, disconnected from the internet."
+              },
+              {
+                "type": "text",
+                "md": "With that double-checked, zoom out. Aarav keeps seeing BIP32, BIP39, and BIP44 in wallet recovery instructions, as if they were interchangeable. They're related, but each answers a different question. <a href=\"https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki\" target=\"_blank\" rel=\"noopener\">BIP39</a> defines how a mnemonic phrase and optional passphrase become seed bytes. <a href=\"https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki\" target=\"_blank\" rel=\"noopener\">BIP32</a> defines the master key and child-key derivation — everything you just ran. <a href=\"https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki\" target=\"_blank\" rel=\"noopener\">BIP44</a> defines a convention for organising keys by purpose, coin type, account, change branch, and address index — a path convention, not a replacement for BIP32."
+              },
+              {
+                "type": "figure",
+                "asset": "chain",
+                "caption": "A common arrangement, not a universal one. Wallets can use other standards and paths."
+              },
+              {
+                "type": "text",
+                "md": "Two more places worth knowing, for when you want a second opinion on something BIP32-related: <a href=\"https://learnmeabitcoin.com/technical/keys/hd-wallets/derivation/\" target=\"_blank\" rel=\"noopener\">learnmeabitcoin.com</a> walks through derivation with live, editable examples, and the <a href=\"https://github.com/bitcoin/bips\" target=\"_blank\" rel=\"noopener\">bitcoin/bips</a> repository is the source of truth this entire lesson has been checked against."
+              }
+            ]
+          },
+          {
+            "id": "report",
+            "label": "Final challenge",
+            "title": "Write it up like a developer would",
+            "blocks": [
+              {
+                "type": "reflect",
+                "id": "r-report",
+                "prompt": "Write a short investigation report for Aarav. Explain how the seed becomes a master extended key, how the derivation path changes a child key, why an xpub can derive non-hardened descendants but cannot sign, why it was worth checking the result against a second implementation, and the distinct roles of BIP32, BIP39, and BIP44.",
+                "placeholder": "Explain it in your own words.",
+                "model": "BIP32 processes the seed into a master extended key: a private key plus a chain code. Each child path selects a particular derivation sequence, so the same seed and path reproduce the same result, while a different path normally produces a different child. An xpub can derive non-hardened public descendants but cannot derive hardened children or sign because it has no private key. Checking the result against a second, independently-written implementation (not just trusting this page) is what actually earns confidence that the derivation is correct, not just self-consistent. BIP39 converts a mnemonic and optional passphrase into seed bytes, BIP32 defines the key hierarchy, and BIP44 describes a common path convention for organising it."
+              }
+            ]
+          },
+          {
+            "id": "wrapup",
+            "label": "Where this leaves you",
+            "title": "The hierarchy was never a mystery, just unexplained",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav can now answer his own question. The wallet does not need to invent every key again. It can recreate the same hierarchy from the same seed and derivation rules — which is why recovery material works. In practice, recovery also depends on the wallet’s path, script type, and discovery rules."
+              },
+              { "type": "next" }
+            ]
+          }
+        ]
+      }
+    </script>
+    <script type="module">
+      const $ = (s, r = document) => r.querySelector(s);
+      let HDKey;
+      try {
+        ({ HDKey } =
+          await import("https://cdn.jsdelivr.net/npm/@scure/bip32@2.2.0/+esm"));
+      } catch (err) {
+        const warn = $("#warn");
+        warn.style.display = "block";
+        warn.innerHTML =
+          "<b>The cryptography library did not load.</b> The live BIP32 labs on this page need it, and it could not be fetched (often a network block or an ad-blocker). Try reloading, or disabling any script blocker for this page, then reload again.";
+        $("#prog").textContent = "Library failed to load";
+        throw err;
+      }
+      const L = JSON.parse($("#lesson-data").textContent);
+      const TEST_SEED = "000102030405060708090a0b0c0d0e0f";
+      const EXPECTED_XPRV =
+        "xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi";
+      const EXPECTED_XPUB =
+        "xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8";
+      const hexToBytes = (s) =>
+        Uint8Array.from(s.match(/.{2}/g).map((x) => parseInt(x, 16)));
+      const bytesToHex = (b) =>
+        Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
+      const root = () => HDKey.fromMasterSeed(hexToBytes(TEST_SEED));
+      const validPath = (path) => {
+        const p = path.trim();
+        if (p === "m") return true;
+        if (!/^m(\/(?:0|[1-9]\d*)'?)+$/.test(p)) return false;
+        return p
+          .slice(2)
+          .split("/")
+          .every((part) => {
+            const n = Number(part.replace(/'$/, ""));
+            return Number.isSafeInteger(n) && n >= 0 && n < 2147483648;
+          });
+      };
+      const hasHardened = (path) =>
+        path.trim() !== "m" &&
+        path
+          .trim()
+          .slice(2)
+          .split("/")
+          .some((x) => x.endsWith("'"));
+      const escapeHTML = (s) =>
+        String(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      const inline = (s) =>
+        s
+          .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+          .replace(/\*(.+?)\*/g, "<i>$1</i>")
+          .replace(/`(.+?)`/g, "<code>$1</code>");
+      const md = (s) =>
+        s
+          .split("\n\n")
+          .map((p) => `<p>${inline(p)}</p>`)
+          .join("");
+      const wrap = (h, c = "") => {
+        const d = document.createElement("div");
+        d.className = "blk " + c;
+        d.innerHTML = h;
+        return d;
+      };
+      const ASSETS = {
+        hierarchy: `<svg viewBox="0 0 440 190" fill="none" stroke="currentColor" stroke-width="1.3"><defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="currentColor"/></marker></defs><rect x="170" y="15" width="100" height="40" rx="6" fill="var(--soft)"/><text x="220" y="39" text-anchor="middle" stroke="none">Seed bytes</text><path d="M220 55v20" marker-end="url(#ar)"/><rect x="140" y="80" width="160" height="45" rx="6" fill="var(--soft)"/><text x="220" y="99" text-anchor="middle" stroke="none">Master extended key</text><text x="220" y="115" text-anchor="middle" stroke="none" font-size="9">private key + chain code</text><path d="M220 125L145 160M220 125L315 160" marker-end="url(#ar)"/><rect x="90" y="160" width="110" height="25" rx="6" fill="var(--soft)"/><text x="145" y="177" text-anchor="middle" stroke="none">Child 0</text><rect x="260" y="160" width="110" height="25" rx="6" fill="var(--soft)"/><text x="315" y="177" text-anchor="middle" stroke="none">Child 1</text></svg>`,
+        chain: `<svg viewBox="0 0 490 100" fill="none" stroke="currentColor" stroke-width="1.2"><defs><marker id="ar2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs>${[
+          "Mnemonic",
+          "BIP39 seed",
+          "BIP32 hierarchy",
+          "Wallet path",
+          "Public keys",
+        ]
+          .map((l, i) => {
+            let x = 5 + i * 98;
+            return `<rect x="${x}" y="25" width="84" height="40" rx="5" fill="var(--soft)"/><text x="${x + 42}" y="48" text-anchor="middle" stroke="none" font-size="9">${l}</text>${i < 4 ? `<path d="M${x + 84} 45h12" marker-end="url(#ar2)"/>` : ""}`;
+          })
+          .join("")}</svg>`,
+      };
+      const ACT = ["widget", "reflect"];
+      let P = {};
+      const KEY = "bitshala-learn:" + L.id;
+      try {
+        P = JSON.parse(localStorage.getItem(KEY) || "{}");
+      } catch {}
+      const total = () =>
+        L.sections.flatMap((s) => s.blocks).filter((b) => ACT.includes(b.type))
+          .length;
+      function prog() {
+        const n = Object.keys(P).length,
+          t = total();
+        $("#prog").textContent = `${n} of ${t} activities`;
+        $("#bar").style.width = (n / t) * 100 + "%";
+      }
+      function done(id) {
+        if (P[id]) return;
+        P[id] = 1;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(P));
+        } catch {}
+        prog();
+      }
+      function terminalLine(cmd, out, err = false) {
+        return `<div class="tline"><span class="tprompt">$</span>${escapeHTML(cmd)}</div><div class="tout${err ? " terr" : ""}">${escapeHTML(out)}</div>`;
+      }
+      const WIDGETS = {
+        TestVector(el, fin) {
+          el.classList.add("try");
+          el.innerHTML = `<span class="label">Test-vector check</span><p>Seed: <code>${TEST_SEED}</code></p><p>Derive the master keys for this seed yourself, then paste both results below. Open <a href="https://iancoleman.io/bip39/" target="_blank" rel="noopener">iancoleman.io/bip39</a>, paste the seed into the <b>BIP39 Seed</b> field, and copy the master extended private key (starts with <code>xprv</code>) and master extended public key (starts with <code>xpub</code>).</p><div class="labinput"><input data-xprv autocomplete="off" spellcheck="false" placeholder="xprv… (master extended private key)" aria-label="Master extended private key"></div><div class="labinput"><input data-xpub autocomplete="off" spellcheck="false" placeholder="xpub… (master extended public key)" aria-label="Master extended public key"><button data-check>Compare</button></div><div class="msg" data-result></div><p class="small">This seed is public test data. Never use it for a real wallet.</p>`;
+          $("[data-check]", el).onclick = () => {
+            const x = $("[data-result]", el);
+            const xprv = $("[data-xprv]", el).value.trim();
+            const xpub = $("[data-xpub]", el).value.trim();
+            if (!xprv || !xpub) {
+              x.textContent = "Paste both the xprv and the xpub before comparing.";
+              return;
+            }
+            const bad = [
+              xprv !== EXPECTED_XPRV && "xprv",
+              xpub !== EXPECTED_XPUB && "xpub",
+            ].filter(Boolean);
+            if (bad.length === 0) {
+              x.textContent =
+                "Verified: both extended keys match the published BIP32 test vector 1 exactly. Mission 1 of 5 done — keep scrolling for the live derivation lab.";
+              fin();
+            } else {
+              x.textContent = `Not a match: ${bad.join(" and ")} differs from the published test vector. Check that you derived from the seed at the master node (m) and copied the whole value.`;
+            }
+          };
+        },
+        CodingChallenge(el, fin) {
+          el.classList.add("try");
+          el.innerHTML = `<span class="label">Coding challenge · complete the missing lines</span>
+  <p>Complete each line by typing only the expression in the input field. The code around each field is already provided, so you do not need to remove or replace any dashes.</p>
+  <p class="small">Available helpers: <code>hexToBytes(hexString)</code>, <code>HDKey.fromMasterSeed(seedBytes)</code>, and <code>master.publicExtendedKey</code>. The expected value is stored in <code>EXPECTED_XPUB</code>.</p>
+  <div class="code-exercise" style="display:grid;gap:14px;margin:16px 0">
+   <label style="display:block">1. Convert the test seed to bytes
+    <div style="font:14px/1.6 ui-monospace,Menlo,Consolas,monospace;margin-top:6px">const seed =</div>
+    <input data-answer="seed" autocomplete="off" spellcheck="false" placeholder='Type expression, e.g. hexToBytes("...")' style="box-sizing:border-box;width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;font:14px ui-monospace,Menlo,Consolas,monospace;margin-top:5px">
+    <div style="font:14px/1.6 ui-monospace,Menlo,Consolas,monospace">;</div>
+   </label>
+   <label style="display:block">2. Derive the master extended key
+    <div style="font:14px/1.6 ui-monospace,Menlo,Consolas,monospace;margin-top:6px">const master =</div>
+    <input data-answer="master" autocomplete="off" spellcheck="false" placeholder="Type the derivation expression" style="box-sizing:border-box;width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;font:14px ui-monospace,Menlo,Consolas,monospace;margin-top:5px">
+    <div style="font:14px/1.6 ui-monospace,Menlo,Consolas,monospace">;</div>
+   </label>
+   <label style="display:block">3. Read the master extended public key
+    <div style="font:14px/1.6 ui-monospace,Menlo,Consolas,monospace;margin-top:6px">const actualXpub =</div>
+    <input data-answer="xpub" autocomplete="off" spellcheck="false" placeholder="Type the property expression" style="box-sizing:border-box;width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;font:14px ui-monospace,Menlo,Consolas,monospace;margin-top:5px">
+    <div style="font:14px/1.6 ui-monospace,Menlo,Consolas,monospace">;</div>
+   </label>
+  </div>
+  <p class="small">After these lines, the program compares <code>actualXpub</code> with <code>EXPECTED_XPUB</code>.</p>
+  <button data-run-code>Check my code</button><button class="ghost" data-show-hint>Show hint</button><div class="msg" data-hint></div><div class="msg" data-code-result aria-live="polite"></div>`;
+          $("[data-show-hint]", el).onclick = () => {
+            $("[data-hint]", el).textContent =
+              "1. Call hexToBytes with the test seed string. 2. Call HDKey.fromMasterSeed(seed). 3. Read master.publicExtendedKey.";
+          };
+          $("[data-run-code]", el).onclick = () => {
+            const seedExpr = $('[data-answer="seed"]', el)
+              .value.trim()
+              .replace(/;\s*$/, "");
+            const masterExpr = $('[data-answer="master"]', el)
+              .value.trim()
+              .replace(/;\s*$/, "");
+            const xpubExpr = $('[data-answer="xpub"]', el)
+              .value.trim()
+              .replace(/;\s*$/, "");
+            const result = $("[data-code-result]", el);
+            const seedOK =
+              /^hexToBytes\(\s*['"]000102030405060708090a0b0c0d0e0f['"]\s*\)$/.test(
+                seedExpr,
+              );
+            const masterOK = /^HDKey\.fromMasterSeed\(\s*seed\s*\)$/.test(
+              masterExpr,
+            );
+            const xpubOK = /^master\.publicExtendedKey$/.test(xpubExpr);
+            if (!(seedOK && masterOK && xpubOK)) {
+              result.textContent =
+                "Not quite yet. Fill each field with only its expression. Check the spelling, parentheses, seed value, and variable names.";
+              return;
+            }
+            try {
+              const seed = hexToBytes("000102030405060708090a0b0c0d0e0f");
+              const master = HDKey.fromMasterSeed(seed);
+              const actualXpub = master.publicExtendedKey;
+              if (actualXpub === EXPECTED_XPUB) {
+                result.innerHTML =
+                  "Correct! All three expressions are right, and the derived master xpub matches the official BIP32 test vector exactly. Missions 2–3 of 5 done — next up: watch-only wallets.";
+                fin();
+              } else
+                result.textContent =
+                  "The derived xpub did not match the expected value. Check the seed and the property you read.";
+            } catch (error) {
+              result.textContent = "Could not derive the key: " + error.message;
+            }
+          };
+        },
+        DeriveTrace(el, fin) {
+          el.classList.add("try");
+          let stage = 0,
+            master = null,
+            baseChild = null,
+            chosenPath = "",
+            logs = [];
+          const seed = hexToBytes(TEST_SEED);
+          const pathRe = /derive\(\s*(["'`])((?:(?!\1).)*)\1\s*\)/;
+          const runCmd = (cmd) =>
+            new Function("HDKey", "seed", "master", `return (${cmd})`)(
+              HDKey,
+              seed,
+              master,
+            );
+          const looksLikeNode = (r) =>
+            r &&
+            typeof r.derive === "function" &&
+            typeof r.publicExtendedKey === "string";
+          const draw = () => {
+            let h =
+              '<span class="label">Live BIP32 lab</span><p class="small">This is a real console. Type the actual JavaScript line yourself — nothing here runs until you type it and press Run.</p>';
+            if (logs.length)
+              h += `<div class="termbox">${logs.map((x) => terminalLine(x.cmd, x.out, x.err)).join("")}</div>`;
+            if (stage === 0)
+              h += `<p>1. <code>seed</code> already holds the published test seed as bytes. Check the docs for the static method that turns a seed into a master key, then call it.</p><div class="labinput"><input id="cmd" placeholder="Type your expression here" aria-label="Command to derive the master key" autocomplete="off" spellcheck="false"><button data-run>Run</button></div><div class="msg" id="cmdmsg"></div>`;
+            if (stage === 1)
+              h += `<p>The master key is in <code>master</code>. Type the command to derive the hardened child at <code>m/0'</code>.</p><div class="labinput"><input id="cmd" placeholder="master.derive(&quot;...&quot;)" aria-label="Command to derive the hardened child" autocomplete="off" spellcheck="false"><button data-run>Run</button></div><div class="msg" id="cmdmsg"></div>`;
+            if (stage === 2)
+              h += `<p>Now derive a child along a path of your own choosing, anything valid, such as <code>m/1'</code>, <code>m/0/1</code>, or <code>m/44'/0'/0'</code>. Type the full command using <code>master</code>.</p><div class="labinput"><input id="cmd" placeholder="master.derive(&quot;...&quot;)" aria-label="Command to derive your chosen path" autocomplete="off" spellcheck="false"><button data-run>Run</button></div><div class="msg" id="cmdmsg"></div>`;
+            if (stage === 3)
+              h += `<p>Type that exact same command again — same path, run a second time.</p><div class="labinput"><input id="cmd" placeholder='master.derive("${escapeHTML(chosenPath)}")' aria-label="Repeat the same command" autocomplete="off" spellcheck="false"><button data-run>Run</button></div><div class="msg" id="cmdmsg"></div>`;
+            if (stage === 4)
+              h += `<p>Compare the full extended public keys for your chosen path and the repeated path.</p><div class="termbox">${terminalLine("first.publicExtendedKey", baseChild.publicExtendedKey)}${terminalLine("second.publicExtendedKey", master.derive(chosenPath).publicExtendedKey)}</div><p class="msg">Same seed + same path = same derived key, typed and run twice. This comparison was computed by BIP32.</p>`;
+            el.innerHTML = h;
+            if (stage < 4) {
+              const go = () => {
+                const cmd = $("#cmd", el).value.trim();
+                const m = $("#cmdmsg", el);
+                if (!cmd) {
+                  m.textContent = "Type a command first.";
+                  return;
+                }
+                if (stage === 0) {
+                  let r;
+                  try {
+                    r = runCmd(cmd);
+                  } catch (e) {
+                    m.textContent = "That line threw an error: " + e.message;
+                    return;
+                  }
+                  if (!looksLikeNode(r)) {
+                    m.textContent =
+                      "That didn't produce a master key. Try: HDKey.fromMasterSeed(seed)";
+                    return;
+                  }
+                  master = r;
+                  logs.push({
+                    cmd,
+                    out: `Master public key: ${bytesToHex(r.publicKey)}\nChain code: ${bytesToHex(r.chainCode)}\nMaster xpub: ${r.publicExtendedKey}`,
+                  });
+                  stage = 1;
+                  draw();
+                  return;
+                }
+                const pm = pathRe.exec(cmd);
+                if (!/master\s*\.\s*derive\s*\(/.test(cmd) || !pm) {
+                  m.textContent =
+                    'Type a command that calls master.derive("...") with a path in quotes.';
+                  return;
+                }
+                const path = pm[2];
+                if (stage === 1 && path !== "m/0'") {
+                  m.textContent =
+                    "This step specifically wants m/0'. Try: master.derive(\"m/0'\")";
+                  return;
+                }
+                if (stage === 2 && (!validPath(path) || path === "m")) {
+                  m.textContent =
+                    "Enter a valid child path such as m/1 or m/1 prime. Indices must be below 2³¹.";
+                  return;
+                }
+                if (stage === 3 && path !== chosenPath) {
+                  m.textContent = `Type the exact same path as before: ${chosenPath}`;
+                  return;
+                }
+                let r;
+                try {
+                  r = runCmd(cmd);
+                } catch (e) {
+                  m.textContent = "Derivation failed: " + e.message;
+                  return;
+                }
+                logs.push({
+                  cmd,
+                  out: `Public key: ${bytesToHex(r.publicKey)}\nChain code: ${bytesToHex(r.chainCode)}\nExtended public key: ${r.publicExtendedKey}`,
+                });
+                if (stage === 1) {
+                  stage = 2;
+                  draw();
+                  return;
+                }
+                if (stage === 2) {
+                  baseChild = r;
+                  chosenPath = path;
+                  stage = 3;
+                  draw();
+                  return;
+                }
+                if (stage === 3) {
+                  const same =
+                    bytesToHex(baseChild.publicKey) ===
+                      bytesToHex(r.publicKey) &&
+                    baseChild.publicExtendedKey === r.publicExtendedKey;
+                  if (same) {
+                    stage = 4;
+                    draw();
+                    fin();
+                  } else {
+                    m.textContent = "Mismatch — investigate before continuing.";
+                  }
+                }
+              };
+              $("[data-run]", el).onclick = go;
+              $("#cmd", el).onkeydown = (e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  go();
+                }
+              };
+            }
+          };
+          draw();
+        },
+        WatchOnly(el, fin) {
+          el.classList.add("try");
+          let stage = 0;
+          const r = root(),
+            watch = HDKey.fromExtendedKey(r.publicExtendedKey);
+          const draw = () => {
+            let h = '<span class="label">Watch-only experiment</span>';
+            if (stage === 0)
+              h += `<p>Start from the master xpub. This object contains no private key.</p><div class="termbox">${terminalLine("watch = HDKey.fromExtendedKey(master.publicExtendedKey)", `Private key present: ${watch.privateKey !== null}\nMaster xpub: ${watch.publicExtendedKey}`)}</div><button data-start>Try non-hardened derivation</button>`;
+            if (stage === 1)
+              h += `<p>Choose a path containing only non-hardened indices. Every component must be non-hardened because this xpub is at the master node.</p><div class="labinput"><input id="wpath" placeholder="e.g. m/0" aria-label="Non-hardened path"><button data-nh>Derive from xpub</button></div><div class="msg" id="wmsg"></div>`;
+            if (stage === 2)
+              h += `<p>Now test a hardened path from the same xpub, such as <code>m/0'</code>.</p><div class="labinput"><input id="hpath" placeholder="e.g. m/0'" aria-label="Hardened path"><button data-h>Try hardened derivation</button></div><div class="msg" id="hmsg"></div>`;
+            if (stage === 3)
+              h += `<p>Why did the hardened derivation fail?</p><button class="ghost" data-finish>Show explanation</button><div class="msg" id="finalmsg"></div>`;
+            el.innerHTML = h;
+            if (stage === 0)
+              $("[data-start]", el).onclick = () => {
+                stage = 1;
+                draw();
+              };
+            if (stage === 1)
+              $("[data-nh]", el).onclick = () => {
+                const v = $("#wpath", el).value.trim(),
+                  m = $("#wmsg", el);
+                if (!validPath(v) || v === "m" || hasHardened(v)) {
+                  m.textContent =
+                    "Use a child path with no hardened components, for example m/0 or m/0/1.";
+                  return;
+                }
+                try {
+                  const pub = watch.derive(v),
+                    priv = r.derive(v);
+                  const same =
+                    bytesToHex(pub.publicKey) === bytesToHex(priv.publicKey);
+                  m.innerHTML = `${same ? "Match verified" : "Mismatch"}: public key from xpub = <code>${bytesToHex(pub.publicKey)}</code><br>Public key from private hierarchy = <code>${bytesToHex(priv.publicKey)}</code><br>Private key present in watch-only object: <b>${pub.privateKey !== null}</b>`;
+                  if (same) {
+                    stage = 2;
+                    setTimeout(draw, 900);
+                  }
+                } catch (e) {
+                  m.textContent = "Derivation failed: " + e.message;
+                }
+              };
+            if (stage === 2)
+              $("[data-h]", el).onclick = () => {
+                const v = $("#hpath", el).value.trim(),
+                  m = $("#hmsg", el);
+                if (!validPath(v) || v === "m" || !hasHardened(v)) {
+                  m.textContent =
+                    "Enter a valid hardened child path such as m/0'.";
+                  return;
+                }
+                try {
+                  watch.derive(v);
+                  m.textContent =
+                    "Unexpected success. Do not proceed; investigate the implementation.";
+                } catch (e) {
+                  m.textContent =
+                    "Expected failure: an xpub cannot derive hardened descendants. " +
+                    e.message;
+                  stage = 3;
+                  setTimeout(draw, 900);
+                }
+              };
+            if (stage === 3)
+              $("[data-finish]", el).onclick = () => {
+                $("#finalmsg", el).textContent =
+                  "Hardened derivation uses the parent private key in its derivation input. The xpub only has public key data and a chain code, so it cannot compute that child. It also cannot sign transactions. Mission 4 of 5 done — one more mission, then the report.";
+                fin();
+              };
+          };
+          draw();
+        },
+        ExternalVerify(el, fin) {
+          el.classList.add("try");
+          let copied = false;
+          const draw = () => {
+            el.innerHTML = `<span class="label">Cross-check against an independent tool</span>
+   <p>1. Open <a href="https://iancoleman.io/bip39/" target="_blank" rel="noopener">iancoleman.io/bip39</a> in a new tab.</p>
+   <p>2. Copy the test seed below, scroll down on that page to the <b>BIP39 Seed</b> field, and paste it in there — overwriting whatever is already in it. This field recomputes the <b>BIP32 Root Key</b> the moment you paste.</p>
+   <div class="labinput"><input id="seedcopy" readonly value="${TEST_SEED}" aria-label="Test seed to copy"><button data-copy>${copied ? "Copied" : "Copy seed"}</button></div>
+   <p>3. Copy the <b>BIP32 Root Key</b> that site now shows, and paste it below.</p>
+   <div class="labinput"><input id="extresult" placeholder="Paste the BIP32 Root Key from iancoleman.io" aria-label="BIP32 root key from the external tool"><button data-check>Compare</button></div>
+   <div class="msg" data-result></div>
+   <p class="small">This is the same published test seed from Mission 1 — public test data, safe to paste anywhere for this exercise. Never paste a real mnemonic or seed into any website, this one included. For real funds, run a tool like this from a downloaded copy, offline.</p>`;
+            $("[data-copy]", el).onclick = async () => {
+              try {
+                await navigator.clipboard.writeText(TEST_SEED);
+                copied = true;
+              } catch {
+                $("#seedcopy", el).select();
+              }
+              draw();
+            };
+            $("[data-check]", el).onclick = () => {
+              const v = $("#extresult", el).value.trim();
+              const x = $("[data-result]", el);
+              if (!v) {
+                x.textContent =
+                  "Paste the root key the other tool computed, then compare.";
+                return;
+              }
+              if (v === EXPECTED_XPRV) {
+                x.textContent =
+                  "Match: iancoleman.io's independently-written implementation computed the exact same master extended key as the library running in this page. Two separate codebases, same seed, same result. Mission 5 of 5 done — that's all five. Scroll down to write up what you found.";
+                fin();
+              } else
+                x.textContent =
+                  "That doesn't match what this page computed. Double-check you pasted the seed into the BIP39 Seed field (not the mnemonic box), and that you copied the whole BIP32 Root Key.";
+            };
+          };
+          draw();
+        },
+      };
+      const BLOCKS = {
+        text: (b) => wrap(md(b.md)),
+        aside: (b) => wrap(inline(b.md), "aside"),
+        figure: (b) => {
+          const el = document.createElement("figure");
+          el.innerHTML =
+            ASSETS[b.asset] + `<figcaption>${b.caption}</figcaption>`;
+          return el;
+        },
+        table: (b) => {
+          const el = document.createElement("div");
+          el.className = "blk";
+          el.innerHTML = `<table class="vtable"><thead><tr>${b.headers.map((x) => `<th>${x}</th>`).join("")}</tr></thead><tbody>${b.rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+          return el;
+        },
+        widget: (b) => {
+          const el = wrap("");
+          WIDGETS[b.name](el, () => done(b.id));
+          return el;
+        },
+        reflect: (b) => {
+          const el = wrap(
+            `<div class="try"><span class="label">Write your report</span><p>${b.prompt}</p><textarea placeholder="${b.placeholder}"></textarea><button data-go>Compare with an example</button><div class="out"></div></div>`,
+          );
+          $("[data-go]", el).onclick = () => {
+            $(".out", el).innerHTML =
+              `<p>${b.model}</p><p class="small">Use this as a comparison, not something you need to copy word for word.</p>`;
+            done(b.id);
+          };
+          return el;
+        },
+        next: () => {
+          const n = L.next;
+          return wrap(
+            `<div class="label">Next lesson</div><h3>${n.id} ${n.title}</h3><p>${n.teaser}</p>`,
+            "next",
+          );
+        },
+      };
+      $("#head").innerHTML =
+        `<div class="kicker">${L.phase} · ${L.module}</div><h1>${L.title}</h1><p class="sub">${L.subtitle}</p><div class="meta">Lesson ${L.id} · about ${L.minutes} minutes · ${L.level}</div>`;
+      const main = $("#lesson");
+      L.sections.forEach((s) => {
+        const sec = document.createElement("section");
+        sec.id = s.id;
+        sec.innerHTML = `<div class="label">${s.label}</div><h2>${s.title}</h2>`;
+        s.blocks.forEach((b) => {
+          if (BLOCKS[b.type]) sec.appendChild(BLOCKS[b.type](b));
+        });
+        main.appendChild(sec);
+      });
+      prog();
+    </script>
+  </body>
+</html>
