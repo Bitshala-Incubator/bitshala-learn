@@ -20,7 +20,8 @@
       <header id="head"></header>
       <div id="warn"></div>
       <main id="lesson"></main>
-     
+    </div>
+
     <script type="application/json" id="lesson-data">
       {
         "id": "5.1",
@@ -333,7 +334,8 @@
             const xprv = $("[data-xprv]", el).value.trim();
             const xpub = $("[data-xpub]", el).value.trim();
             if (!xprv || !xpub) {
-              x.textContent = "Paste both the xprv and the xpub before comparing.";
+              x.textContent =
+                "Paste both the xprv and the xpub before comparing.";
               return;
             }
             const bad = [
