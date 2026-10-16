@@ -951,6 +951,24 @@ button:disabled {
   opacity: 0.7;
   font-style: italic;
 }
+.wordgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+  margin: 12px 0 16px;
+}
+.wordgrid span {
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font:
+    14px ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+  overflow-wrap: anywhere;
+}
 .termbox {
   background: var(--ink);
   color: var(--bg);
