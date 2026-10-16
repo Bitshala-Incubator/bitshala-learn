@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Seed Phrases and Wallet Recovery, Bitshala Learn 5.2</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 5.2</span
+      ><span id="prog">Loading cryptography libraries…</span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "5.2",
+        "title": "Seed Phrases and Wallet Recovery",
+        "subtitle": "Twelve words, one passphrase, and the whole wallet behind them.",
+        "phase": "Bitcoin Foundations",
+        "module": "Module 5",
+        "minutes": 35,
+        "level": "Beginner",
+        "next": {
+          "id": "6.1",
+          "title": "Transaction Structure",
+          "teaser": "A seed gives you keys. The next lesson is about what those keys actually sign: pull apart a real, already-broadcast transaction and find its inputs, outputs, outpoints, scripts, and witness data for yourself."
+        },
+        "sections": [
+          {
+            "id": "restore",
+            "label": "The question",
+            "title": "Aarav finds the slip of paper again",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav digs an old slip of paper out of a drawer. Twelve words, written in his own handwriting, from the day he first set up a wallet. He hasn’t opened that wallet in over a year.\n\n“Last lesson you showed me how a seed becomes a whole tree of keys,” he says to Meera. “But this is just... words. English words. How do twelve words turn into the seed bytes you showed me?”\n\nMeera shrugs. “Don’t take my word for it. Let’s turn those exact words into a seed ourselves, and watch where it leads, including the part where ‘correct words’ doesn’t always mean ‘wallet shows your funds.’”"
+              }
+            ]
+          },
+          {
+            "id": "whatawordis",
+            "label": "Not a password",
+            "title": "A mnemonic is an encoding, not a secret code",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "A BIP39 mnemonic isn’t some arbitrary password. Every word comes from a fixed, published list of 2048 words, and each one is really just a label for a number. Behind the scenes, the wallet generated some random **entropy** (somewhere between 128 and 256 bits), tacked on a short **checksum** of that entropy, then sliced the whole thing into 11-bit chunks. Each chunk is just a number between 0 and 2047, and that number picks a word off the list. Twelve words encode 128 bits of entropy plus a 4-bit checksum. The words are simply a way for a human to write down and later retype that entropy without a typo slipping through unnoticed. They are not the seed, and they are not a password."
+              },
+              {
+                "type": "figure",
+                "asset": "wordindex",
+                "caption": "A word isn’t secret or clever on its own. It’s just a friendly label for an 11-bit number."
+              },
+              {
+                "type": "text",
+                "md": "You can also add an optional **passphrase** on top, sometimes called a ‘25th word.’ The mnemonic and the passphrase get combined through PBKDF2-HMAC-SHA512, run for 2048 rounds, which stretches them into a 64-byte **seed**. That seed is exactly what Lesson 5.1’s `HDKey.fromMasterSeed` expects."
+              },
+              {
+                "type": "figure",
+                "asset": "seedflow",
+                "caption": "Entropy and a checksum become words. Words, plus an optional passphrase, become the seed BIP32 already knows how to use."
+              }
+            ]
+          },
+          {
+            "id": "vector1",
+            "label": "Mission 1 of 4 · Investigate the standard",
+            "title": "Find the rule before you trust twelve words",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "The encoding rules live in the <a href=\"https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki\" target=\"_blank\" rel=\"noopener\">BIP39 specification</a>. The BIP text itself doesn’t ship a full test-vector table the way BIP32’s does. The vectors the whole ecosystem actually tests against live in a companion reference repository, <a href=\"https://github.com/trezor/python-mnemonic/blob/master/vectors.json\" target=\"_blank\" rel=\"noopener\">trezor/python-mnemonic</a>, maintained by one of the BIP’s original authors and used across wallet implementations."
+              },
+              {
+                "type": "text",
+                "md": "The most-quoted line in that file uses all-zero entropy. The resulting mnemonic is famous enough that you’ll probably recognise it: `abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about`, with the passphrase `TREZOR` (that word isn’t special to the protocol, it’s simply the passphrase the reference vectors happened to settle on). Published test data, zero value, safe to read and type anywhere. Just never reuse a phrase like this one for anything real."
+              },
+              {
+                "type": "text",
+                "md": "Want to know the exact line to type? You can find it in the <a href=\"https://www.npmjs.com/package/@scure/bip39\" target=\"_blank\" rel=\"noopener\">@scure/bip39 documentation</a>. Look for the function that checks a mnemonic against its own checksum, then call it with the `mnemonic` and `wordlist` variables already sitting in scope."
+              },
+              {
+                "type": "widget",
+                "id": "w-mnemonic",
+                "name": "MnemonicCheck",
+                "props": {}
+              }
+            ]
+          },
+          {
+            "id": "buildtrace",
+            "label": "Mission 2 of 4 · The missing link",
+            "title": "Turn these words into the key you already know how to build",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Last lesson, you fed raw seed bytes into `HDKey.fromMasterSeed` and watched a whole hierarchy fall out of it. That part doesn't need re-learning here. What's missing is the step before it: turning these twelve words into the seed bytes in the first place. Below is a real console. `mnemonic` and `passphrase` are already loaded with the published test values above, so you won't need to retype them. The <a href=\"https://www.npmjs.com/package/@scure/bip39\" target=\"_blank\" rel=\"noopener\">@scure/bip39 docs</a> name the function for turning a mnemonic and passphrase into a seed; the <a href=\"https://www.npmjs.com/package/@scure/bip32\" target=\"_blank\" rel=\"noopener\">@scure/bip32 docs</a> cover the rest, the part you already used in Lesson 5.1."
+              },
+              {
+                "type": "widget",
+                "id": "w-console",
+                "name": "SeedConsole",
+                "props": {}
+              }
+            ]
+          },
+          {
+            "id": "gaplimit",
+            "label": "Mission 3 of 4 · The gap problem",
+            "title": "Can the words be exactly right, and the wallet still show nothing?",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Here’s the scenario Aarav actually ran into. Years before this slip of paper went into a drawer, his old wallet app generated a fresh receiving address every so often: `m/44'/0'/0'/0/0`, then `/1`, then `/2`, and so on. Most wallet software stops scanning once it sees a run of addresses in a row that have never been used. That habit is usually called the **gap limit**. It’s a practical convention wallet software adopts, not a rule BIP32 itself enforces."
+              },
+              {
+                "type": "table",
+                "headers": ["Claim", "True?"],
+                "rows": [
+                  [
+                    "BIP32 refuses to derive an address past some index",
+                    "False. There is no such ceiling in the derivation math"
+                  ],
+                  [
+                    "A wallet app may stop *scanning* past a run of unused addresses",
+                    "True. That’s a scanning heuristic some wallets use, not a protocol limit"
+                  ],
+                  [
+                    "Restoring the exact same words with the exact same path always finds the exact same keys",
+                    "True. Determinism doesn’t care how far down the path you go"
+                  ]
+                ]
+              },
+              {
+                "type": "figure",
+                "asset": "scanlimit",
+                "caption": "A wallet’s scan can stop early. The keys past that point still exist. Nothing was ever lost, just not looked at."
+              },
+              {
+                "type": "widget",
+                "id": "w-gap",
+                "name": "GapHunt",
+                "props": {}
+              }
+            ]
+          },
+          {
+            "id": "bigpicture",
+            "label": "Mission 4 of 4 · The other trap",
+            "title": "What if the path itself is the wrong one?",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "There's a second, completely unrelated reason correct words can show an empty wallet: the **derivation path**. The same words, through the same BIP39 and BIP32 math, produce an entirely different set of keys the moment the path changes. `m/44'/0'/0'/0/0` and `m/0'/0'/0'` are both perfectly valid paths from the same seed, yet they share not a single key between them. Try it yourself below."
+              },
+              {
+                "type": "widget",
+                "id": "w-pathtrap",
+                "name": "PathTrap",
+                "props": {}
+              },
+              {
+                "type": "figure",
+                "asset": "pathbranch",
+                "caption": "One seed, two different paths, two completely unrelated sets of keys. Both correct, both from the same twelve words."
+              }
+            ]
+          },
+          {
+            "id": "report",
+            "label": "Final challenge",
+            "title": "Write it up like a developer would",
+            "blocks": [
+              {
+                "type": "reflect",
+                "id": "r-report",
+                "prompt": "Write a short investigation report for Aarav. Explain what a BIP39 mnemonic actually encodes and why it isn't the seed itself, what the optional passphrase changes, how the mnemonic and passphrase become the 64-byte seed BIP32 uses, and the two distinct, real reasons the words can be completely correct while a wallet still shows no funds, one about scanning depth, one about the derivation path.",
+                "placeholder": "Explain it in your own words.",
+                "model": "A BIP39 mnemonic encodes randomly generated entropy plus a checksum, as words from a fixed 2048-word list. It's a human-transcribable, typo-detecting encoding of that entropy, not the seed and not a password. The mnemonic, combined with an optional passphrase through PBKDF2-HMAC-SHA512 (2048 rounds), stretches into the 64-byte seed that BIP32's fromMasterSeed expects, the same way last lesson's raw test seed did. Correct words can still show an empty wallet for two unrelated reasons: the wallet software's scan only checked a limited run of addresses past the last used one (a scanning convention, not a BIP32 rule), or the wallet used a different derivation path than the one that originally created the funded addresses, same seed, different branch of the tree, no shared keys at all."
+              }
+            ]
+          },
+          {
+            "id": "wrapup",
+            "label": "Where this leaves you",
+            "title": "Twelve words were never magic, just an encoding with rules",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav folds the slip of paper back up, a little less mysterious than it was an hour ago. It isn’t a password, and it isn’t the seed. It’s a checksum-protected encoding of the entropy that produces the seed, which produces the hierarchy from Lesson 5.1. If his old wallet ever looks empty after a correct restore, he now knows exactly where to look first: how far the scan went, and which path it used."
+              },
+              { "type": "next" }
+            ]
+          }
+        ]
+      }
+    </script>
+    <script type="module">
+      const $ = (s, r = document) => r.querySelector(s);
+      let HDKey, bip39, wordlist;
+      try {
+        [{ HDKey }, bip39, { wordlist }] = await Promise.all([
+          import("https://cdn.jsdelivr.net/npm/@scure/bip32@2.2.0/+esm"),
+          import("https://cdn.jsdelivr.net/npm/@scure/bip39@2.3.0/+esm"),
+          import("https://cdn.jsdelivr.net/npm/@scure/bip39@2.3.0/wordlists/english.js/+esm"),
+        ]);
+      } catch (err) {
+        const warn = $("#warn");
+        warn.style.display = "block";
+        warn.innerHTML =
+          "<b>The cryptography libraries did not load.</b> The live labs on this page need them, and they could not be fetched (often a network block or an ad-blocker). Try reloading, or disabling any script blocker for this page, then reload again.";
+        $("#prog").textContent = "Libraries failed to load";
+        throw err;
+      }
+      const L = JSON.parse($("#lesson-data").textContent);
+      const TEST_MNEMONIC =
+        "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about";
+      const TEST_PASSPHRASE = "TREZOR";
+      const EXPECTED_SEED_HEX =
+        "c55257c360c07c72029aebc1b53c05ed0362ada38ead3e3e9efa3708e53495531f09a6987599d18264c1e1c92f2cf141630c7a3c4ab7c81b2f001698e7463b04";
+      const EXPECTED_XPRV =
+        "xprv9s21ZrQH143K3h3fDYiay8mocZ3afhfULfb5GX8kCBdno77K4HiA15Tg23wpbeF1pLfs1c5SPmYHrEpTuuRhxMwvKDwqdKiGJS9XFKzUsAF";
+      const bytesToHex = (b) =>
+        Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
+      const validPath = (path) => {
+        const p = path.trim();
+        if (p === "m") return true;
+        if (!/^m(\/(?:0|[1-9]\d*)'?)+$/.test(p)) return false;
+        return p
+          .slice(2)
+          .split("/")
+          .every((part) => {
+            const n = Number(part.replace(/'$/, ""));
+            return Number.isSafeInteger(n) && n >= 0 && n < 2147483648;
+          });
+      };
+      const escapeHTML = (s) =>
+        String(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      const inline = (s) =>
+        s
+          .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+          .replace(/\*(.+?)\*/g, "<i>$1</i>")
+          .replace(/`(.+?)`/g, "<code>$1</code>");
+      const md = (s) =>
+        s
+          .split("\n\n")
+          .map((p) => `<p>${inline(p)}</p>`)
+          .join("");
+      const wrap = (h, c = "") => {
+        const d = document.createElement("div");
+        d.className = "blk " + c;
+        d.innerHTML = h;
+        return d;
+      };
+      const ASSETS = {
+        wordindex: `<svg viewBox="0 0 480 110" fill="none" stroke="currentColor" stroke-width="1.2"><defs><marker id="arW" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs><rect x="10" y="30" width="120" height="44" rx="6" fill="var(--soft)"/><text x="70" y="48" text-anchor="middle" stroke="none" font-size="11">11 bits</text><text x="70" y="64" text-anchor="middle" stroke="none" font-size="9">from the entropy</text><path d="M130 52h26" marker-end="url(#arW)"/><rect x="166" y="30" width="130" height="44" rx="6" fill="var(--soft)"/><text x="231" y="48" text-anchor="middle" stroke="none" font-size="11">Index 0 to 2047</text><text x="231" y="64" text-anchor="middle" stroke="none" font-size="9">just a number</text><path d="M296 52h26" marker-end="url(#arW)"/><rect x="332" y="30" width="138" height="44" rx="6" fill="var(--soft)"/><text x="401" y="48" text-anchor="middle" stroke="none" font-size="11">One word</text><text x="401" y="64" text-anchor="middle" stroke="none" font-size="8.5">from the published list</text></svg>`,
+        seedflow: `<svg viewBox="0 0 490 170" fill="none" stroke="currentColor" stroke-width="1.3"><defs><marker id="ar3" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="currentColor"/></marker></defs><rect x="10" y="20" width="150" height="40" rx="6" fill="var(--soft)"/><text x="85" y="44" text-anchor="middle" stroke="none" font-size="11">Entropy + checksum</text><path d="M160 40h28" marker-end="url(#ar3)"/><rect x="190" y="20" width="100" height="40" rx="6" fill="var(--soft)"/><text x="240" y="44" text-anchor="middle" stroke="none" font-size="12">12 words</text><path d="M240 60v38" marker-end="url(#ar3)"/><rect x="10" y="108" width="150" height="40" rx="6" fill="var(--soft)"/><text x="85" y="132" text-anchor="middle" stroke="none" font-size="11">+ passphrase</text><path d="M160 128h28" marker-end="url(#ar3)"/><rect x="190" y="100" width="150" height="56" rx="6" fill="var(--soft)"/><text x="265" y="124" text-anchor="middle" stroke="none" font-size="10">PBKDF2-HMAC-SHA512</text><text x="265" y="140" text-anchor="middle" stroke="none" font-size="9">2048 rounds</text><path d="M340 128h22" marker-end="url(#ar3)"/><rect x="364" y="100" width="116" height="56" rx="6" fill="var(--soft)"/><text x="422" y="122" text-anchor="middle" stroke="none" font-size="11">64-byte seed</text><text x="422" y="138" text-anchor="middle" stroke="none" font-size="9">ready for BIP32</text></svg>`,
+        scanlimit: `<svg viewBox="0 0 480 130" fill="none" stroke="currentColor" stroke-width="1.1"><rect x="10" y="20" width="36" height="36" rx="4" fill="var(--soft)"/><text x="28" y="43" text-anchor="middle" stroke="none" font-size="10">0</text><rect x="54" y="20" width="36" height="36" rx="4" fill="var(--soft)"/><text x="72" y="43" text-anchor="middle" stroke="none" font-size="10">1</text><rect x="98" y="20" width="36" height="36" rx="4" fill="var(--soft)"/><text x="116" y="43" text-anchor="middle" stroke="none" font-size="10">2</text><text x="160" y="43" text-anchor="middle" stroke="none" font-size="14">...</text><rect x="190" y="20" width="36" height="36" rx="4" fill="var(--soft)"/><text x="208" y="43" text-anchor="middle" stroke="none" font-size="10">20</text><line x1="240" y1="8" x2="240" y2="70" stroke-dasharray="4 4"/><text x="240" y="90" text-anchor="middle" stroke="none" font-size="10">a typical wallet's scan</text><text x="240" y="104" text-anchor="middle" stroke="none" font-size="10">usually stops about here</text><text x="285" y="43" text-anchor="middle" stroke="none" font-size="14">...</text><rect x="320" y="20" width="56" height="36" rx="4" fill="var(--soft)"/><text x="348" y="43" text-anchor="middle" stroke="none" font-size="10">27</text><text x="348" y="90" text-anchor="middle" stroke="none" font-size="10">still a real,</text><text x="348" y="104" text-anchor="middle" stroke="none" font-size="10">valid key</text></svg>`,
+        pathbranch: `<svg viewBox="0 0 460 170" fill="none" stroke="currentColor" stroke-width="1.2"><defs><marker id="ar4" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs><rect x="175" y="10" width="110" height="36" rx="6" fill="var(--soft)"/><text x="230" y="33" text-anchor="middle" stroke="none" font-size="11">Same seed</text><path d="M230 46L110 95M230 46L350 95" marker-end="url(#ar4)"/><rect x="40" y="95" width="140" height="34" rx="6" fill="var(--soft)"/><text x="110" y="116" text-anchor="middle" stroke="none" font-size="10">m/44'/0'/0'/0/0</text><rect x="280" y="95" width="140" height="34" rx="6" fill="var(--soft)"/><text x="350" y="116" text-anchor="middle" stroke="none" font-size="10">m/0'/0'/0'</text><path d="M110 129v15M350 129v15" marker-end="url(#ar4)"/><text x="110" y="160" text-anchor="middle" stroke="none" font-size="10">Key set A</text><text x="350" y="160" text-anchor="middle" stroke="none" font-size="10">Key set B, unrelated</text></svg>`,
+      };
+      const ACT = ["widget", "reflect"];
+      let P = {};
+      const KEY = "bitshala-learn:" + L.id;
+      try {
+        P = JSON.parse(localStorage.getItem(KEY) || "{}");
+      } catch {}
+      const total = () =>
+        L.sections.flatMap((s) => s.blocks).filter((b) => ACT.includes(b.type))
+          .length;
+      function prog() {
+        const n = Object.keys(P).length,
+          t = total();
+        $("#prog").textContent = `${n} of ${t} activities`;
+        $("#bar").style.width = (n / t) * 100 + "%";
+      }
+      function done(id) {
+        if (P[id]) return;
+        P[id] = 1;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(P));
+        } catch {}
+        prog();
+      }
+      function terminalLine(cmd, out, err = false) {
+        return `<div class="tline"><span class="tprompt">$</span>${escapeHTML(cmd)}</div><div class="tout${err ? " terr" : ""}">${escapeHTML(out)}</div>`;
+      }
+      const WIDGETS = {
+        MnemonicCheck(el, fin) {
+          el.classList.add("try");
+          let stage = 0;
+          const words = TEST_MNEMONIC.split(" ");
+          const tampered = [...words.slice(0, -1), "zoo"].join(" ");
+          const runCmd = (cmd) =>
+            new Function(
+              "bip39",
+              "wordlist",
+              "mnemonic",
+              "tampered",
+              `return (${cmd})`,
+            )(bip39, wordlist, TEST_MNEMONIC, tampered);
+          const logs = [];
+          const draw = () => {
+            let h = `<span class="label">Checksum console</span><div class="wordgrid">${words.map((w) => `<span>${w}</span>`).join("")}</div><p class="small">A real console. <code>mnemonic</code> holds the twelve words above; <code>tampered</code> holds the same words with the last one swapped for <code>"zoo"</code>. Type the line yourself and press Run.</p>`;
+            if (logs.length)
+              h += `<div class="termbox">${logs.map((x) => terminalLine(x.cmd, x.out)).join("")}</div>`;
+            if (stage === 0)
+              h += `<p>1. Check whether the real words pass BIP39's checksum, using <code>mnemonic</code>.</p><div class="labinput"><input id="cmd" placeholder="Type your expression here" aria-label="Command to validate the real mnemonic" autocomplete="off" spellcheck="false"><button data-run>Run</button></div><div class="msg" id="cmdmsg"></div>`;
+            if (stage === 1)
+              h += `<p>2. Now check the tampered version, using <code>tampered</code>, same words, last one swapped.</p><div class="labinput"><input id="cmd" placeholder="Type your expression here" aria-label="Command to validate the tampered mnemonic" autocomplete="off" spellcheck="false"><button data-run>Run</button></div><div class="msg" id="cmdmsg"></div>`;
+            if (stage === 2)
+              h += `<p class="msg">The checksum caught a single swapped word, which is the whole point of appending one. Mission 1 of 4 done. Next, turn these words into an actual seed yourself.</p>`;
+            el.innerHTML = h;
+            if (stage < 2) {
+              const go = () => {
+                const cmd = $("#cmd", el).value.trim();
+                const m = $("#cmdmsg", el);
+                if (!cmd) {
+                  m.textContent = "Type a command first.";
+                  return;
+                }
+                if (!/validateMnemonic\s*\(/.test(cmd)) {
+                  m.textContent = "Call bip39.validateMnemonic(..., wordlist).";
+                  return;
+                }
+                let r;
+                try {
+                  r = runCmd(cmd);
+                } catch (e) {
+                  m.textContent = "That line threw an error: " + e.message;
+                  return;
+                }
+                if (stage === 0) {
+                  if (!/\bmnemonic\b/.test(cmd) || /\btampered\b/.test(cmd)) {
+                    m.textContent =
+                      "This step wants the real mnemonic variable: bip39.validateMnemonic(mnemonic, wordlist)";
+                    return;
+                  }
+                  if (r !== true) {
+                    m.textContent =
+                      "That returned false for the real published mnemonic, which should be valid. Check the library loaded correctly.";
+                    return;
+                  }
+                  logs.push({ cmd, out: String(r) });
+                  stage = 1;
+                  draw();
+                  return;
+                }
+                if (stage === 1) {
+                  if (!/\btampered\b/.test(cmd)) {
+                    m.textContent =
+                      "This step wants the tampered variable: bip39.validateMnemonic(tampered, wordlist)";
+                    return;
+                  }
+                  if (r !== false) {
+                    m.textContent =
+                      "That returned true for a mnemonic with a swapped word, but the checksum should have caught it. Check the command.";
+                    return;
+                  }
+                  logs.push({
+                    cmd,
+                    out: String(r) + "  ← checksum catches the swapped word",
+                  });
+                  stage = 2;
+                  draw();
+                  fin();
+                  return;
+                }
+              };
+              $("[data-run]", el).onclick = go;
+              $("#cmd", el).onkeydown = (e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  go();
+                }
+              };
+            }
+          };
+          draw();
+        },
+        SeedConsole(el, fin) {
+          el.classList.add("try");
+          let stage = 0,
+            seed = null,
+            master = null;
+          const runCmd = (cmd) =>
+            new Function(
+              "bip39",
+              "wordlist",
+              "mnemonic",
+              "passphrase",
+              "HDKey",
+              "seed",
+              "master",
+              `return (${cmd})`,
+            )(
+              bip39,
+              wordlist,
+              TEST_MNEMONIC,
+              TEST_PASSPHRASE,
+              HDKey,
+              seed,
+              master,
+            );
+          const draw = () => {
+            let h =
+              '<span class="label">Live BIP39 console</span><p class="small">A real console. <code>mnemonic</code> and <code>passphrase</code> already hold the published test values. Type the line yourself and press Run.</p>';
+            if (stage > 0)
+              h += `<div class="termbox">${stage >= 1 ? terminalLine("bip39.mnemonicToSeedSync(mnemonic, passphrase)", bytesToHex(seed)) : ""}${stage >= 2 ? terminalLine("HDKey.fromMasterSeed(seed).privateExtendedKey", master.privateExtendedKey) : ""}</div>`;
+            if (stage === 0)
+              h += `<p>1. Turn <code>mnemonic</code> and <code>passphrase</code> into a 64-byte seed. Check the @scure/bip39 docs for the function name.</p><div class="labinput"><input id="cmd" placeholder="Type your expression here" aria-label="Command to derive the seed" autocomplete="off" spellcheck="false"><button data-run>Run</button></div><div class="msg" id="cmdmsg"></div>`;
+            if (stage === 1)
+              h += `<p>2. <code>seed</code> is set. Feed it into the exact same function you used last lesson.</p><div class="labinput"><input id="cmd" placeholder="Type your expression here" aria-label="Command to derive the master key" autocomplete="off" spellcheck="false"><button data-run>Run</button></div><div class="msg" id="cmdmsg"></div>`;
+            if (stage === 2)
+              h += `<p class="msg">Both values match the published reference vector for these exact words. The seed step is new; everything after it is the BIP32 machinery from last lesson, unchanged. Mission 2 of 4 done. Next, the gap problem.</p>`;
+            el.innerHTML = h;
+            if (stage < 2) {
+              const go = () => {
+                const cmd = $("#cmd", el).value.trim();
+                const m = $("#cmdmsg", el);
+                if (!cmd) {
+                  m.textContent = "Type a command first.";
+                  return;
+                }
+                let r;
+                try {
+                  r = runCmd(cmd);
+                } catch (e) {
+                  m.textContent = "That line threw an error: " + e.message;
+                  return;
+                }
+                if (stage === 0) {
+                  if (
+                    !(r instanceof Uint8Array) ||
+                    bytesToHex(r) !== EXPECTED_SEED_HEX
+                  ) {
+                    m.textContent =
+                      "That should produce the published 64-byte seed. Try: bip39.mnemonicToSeedSync(mnemonic, passphrase)";
+                    return;
+                  }
+                  seed = r;
+                  stage = 1;
+                  draw();
+                  return;
+                }
+                if (stage === 1) {
+                  if (!r || r.privateExtendedKey !== EXPECTED_XPRV) {
+                    m.textContent =
+                      "That should produce the published master key. Try: HDKey.fromMasterSeed(seed)";
+                    return;
+                  }
+                  master = r;
+                  stage = 2;
+                  draw();
+                  fin();
+                  return;
+                }
+              };
+              $("[data-run]", el).onclick = go;
+              $("#cmd", el).onkeydown = (e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  go();
+                }
+              };
+            }
+          };
+          draw();
+        },
+        GapHunt(el, fin) {
+          el.classList.add("try");
+          let stage = 0,
+            seen = [];
+          const seed = bip39.mnemonicToSeedSync(TEST_MNEMONIC, TEST_PASSPHRASE);
+          const master = HDKey.fromMasterSeed(seed);
+          const pathRe = /derive\(\s*(["'`])((?:(?!\1).)*)\1\s*\)/;
+          const draw = () => {
+            let h =
+              '<span class="label">Derive past where a wallet might stop looking</span>';
+            if (seen.length)
+              h += `<div class="termbox">${seen.map((x) => terminalLine(x.cmd, x.out)).join("")}</div>`;
+            if (stage === 0)
+              h += `<p>1. Derive the first receiving address key: <code>m/44'/0'/0'/0/0</code>.</p><div class="labinput"><input id="cmd" placeholder="master.derive(&quot;...&quot;)" aria-label="Derive index 0" autocomplete="off" spellcheck="false"><button data-run>Run</button></div><div class="msg" id="cmdmsg"></div>`;
+            if (stage === 1)
+              h += `<p>2. Now derive index 1 the same way: <code>m/44'/0'/0'/0/1</code>. It should be a completely different key.</p><div class="labinput"><input id="cmd" placeholder="master.derive(&quot;...&quot;)" aria-label="Derive index 1" autocomplete="off" spellcheck="false"><button data-run>Run</button></div><div class="msg" id="cmdmsg"></div>`;
+            if (stage === 2)
+              h += `<p>3. Most wallets default to scanning only a limited run of addresses past the last one they've seen used, often around 20. Pick any index of your own choosing that's <b>20 or higher</b>, and derive it the same way. Nothing in BIP32 stops you.</p><div class="labinput"><input id="cmd" placeholder="master.derive(&quot;...&quot;)" aria-label="Derive a high index" autocomplete="off" spellcheck="false"><button data-run>Run</button></div><div class="msg" id="cmdmsg"></div>`;
+            if (stage === 3)
+              h += `<p class="msg">That key derived exactly as cleanly as index 0 or 1. BIP32 doesn't know or care how far down the branch you go. If Aarav's funds had sat at an index past where his old wallet's scan stopped, a correct restore with the correct words would still have shown nothing. Mission 3 of 4 done. One more mission, then the report.</p>`;
+            el.innerHTML = h;
+            if (stage < 3) {
+              const go = () => {
+                const cmd = $("#cmd", el).value.trim();
+                const m = $("#cmdmsg", el);
+                if (!cmd) {
+                  m.textContent = "Type a command first.";
+                  return;
+                }
+                const pm = pathRe.exec(cmd);
+                if (!/master\s*\.\s*derive\s*\(/.test(cmd) || !pm) {
+                  m.textContent =
+                    'Call master.derive("...") with a path in quotes.';
+                  return;
+                }
+                const path = pm[2];
+                if (!validPath(path) || path === "m") {
+                  m.textContent = "That path is not valid BIP32 syntax.";
+                  return;
+                }
+                const idxMatch = /\/(\d+)$/.exec(path);
+                const idx = idxMatch ? Number(idxMatch[1]) : null;
+                if (stage === 0 && path !== "m/44'/0'/0'/0/0") {
+                  m.textContent =
+                    "This step specifically wants index 0: master.derive(\"m/44'/0'/0'/0/0\")";
+                  return;
+                }
+                if (stage === 1 && path !== "m/44'/0'/0'/0/1") {
+                  m.textContent =
+                    "This step specifically wants index 1: master.derive(\"m/44'/0'/0'/0/1\")";
+                  return;
+                }
+                if (stage === 2 && !(idx !== null && idx >= 20)) {
+                  m.textContent =
+                    "Pick an index of 20 or higher for this step.";
+                  return;
+                }
+                let r;
+                try {
+                  r = new Function("master", `return (${cmd})`)(master);
+                } catch (e) {
+                  m.textContent = "Derivation failed: " + e.message;
+                  return;
+                }
+                seen.push({
+                  cmd,
+                  out: `Public key: ${bytesToHex(r.publicKey)}`,
+                });
+                stage++;
+                draw();
+                if (stage === 3) fin();
+              };
+              $("[data-run]", el).onclick = go;
+              $("#cmd", el).onkeydown = (e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  go();
+                }
+              };
+            }
+          };
+          draw();
+        },
+        PathTrap(el, fin) {
+          el.classList.add("try");
+          let stage = 0;
+          const logs = [];
+          let firstHex = "";
+          const seed = bip39.mnemonicToSeedSync(TEST_MNEMONIC, TEST_PASSPHRASE);
+          const master = HDKey.fromMasterSeed(seed);
+          const pathRe = /derive\(\s*(["'`])((?:(?!\1).)*)\1\s*\)/;
+          const draw = () => {
+            let h =
+              '<span class="label">Same seed, different path</span><p class="small">A real console. <code>master</code> already holds the same master key from this lesson\'s seed. Derive two different paths from it and compare the public keys they produce.</p>';
+            if (logs.length)
+              h += `<div class="termbox">${logs.map((x) => terminalLine(x.cmd, x.out)).join("")}</div>`;
+            if (stage === 0)
+              h += `<p>1. Derive the key at <code>m/44'/0'/0'/0/0</code> and read its public key.</p><div class="labinput"><input id="cmd" placeholder="master.derive(&quot;...&quot;).publicKey" aria-label="Command to derive the first path" autocomplete="off" spellcheck="false"><button data-run>Run</button></div><div class="msg" id="cmdmsg"></div>`;
+            if (stage === 1)
+              h += `<p>2. Now derive a completely different path, <code>m/0'/0'/0'</code>, from that exact same master key.</p><div class="labinput"><input id="cmd" placeholder="master.derive(&quot;...&quot;).publicKey" aria-label="Command to derive the second path" autocomplete="off" spellcheck="false"><button data-run>Run</button></div><div class="msg" id="cmdmsg"></div>`;
+            if (stage === 2)
+              h += `<p class="msg">Same seed, same master key, two completely unrelated public keys. Nothing is broken if a wallet shows empty after a correct restore. It might just be reading a different, equally valid branch of the same tree. Mission 4 of 4 done. That's everything this lesson has for you to run yourself. On to the report.</p>`;
+            el.innerHTML = h;
+            if (stage < 2) {
+              const go = () => {
+                const cmd = $("#cmd", el).value.trim();
+                const m = $("#cmdmsg", el);
+                if (!cmd) {
+                  m.textContent = "Type a command first.";
+                  return;
+                }
+                if (!/master\s*\.\s*derive\s*\(/.test(cmd)) {
+                  m.textContent =
+                    'Call master.derive("...") with a path in quotes.';
+                  return;
+                }
+                if (!/\.publicKey\s*$/.test(cmd)) {
+                  m.textContent =
+                    "Read .publicKey at the end of the expression.";
+                  return;
+                }
+                const pm = pathRe.exec(cmd);
+                if (!pm) {
+                  m.textContent = "Put the path in quotes inside derive(...).";
+                  return;
+                }
+                const path = pm[2];
+                if (stage === 0 && path !== "m/44'/0'/0'/0/0") {
+                  m.textContent =
+                    "This step specifically wants master.derive(\"m/44'/0'/0'/0/0\").publicKey";
+                  return;
+                }
+                if (stage === 1 && path !== "m/0'/0'/0'") {
+                  m.textContent =
+                    "This step specifically wants master.derive(\"m/0'/0'/0'\").publicKey";
+                  return;
+                }
+                let r;
+                try {
+                  r = new Function("master", `return (${cmd})`)(master);
+                } catch (e) {
+                  m.textContent = "That line threw an error: " + e.message;
+                  return;
+                }
+                if (!(r instanceof Uint8Array)) {
+                  m.textContent =
+                    "That should return a public key as bytes. Make sure the expression ends in .publicKey";
+                  return;
+                }
+                const hex = bytesToHex(r);
+                if (stage === 0) {
+                  firstHex = hex;
+                  logs.push({ cmd, out: hex });
+                  stage = 1;
+                  draw();
+                  return;
+                }
+                if (stage === 1) {
+                  if (hex === firstHex) {
+                    m.textContent =
+                      "That matched the first path exactly, which should never happen for two different paths. Check what you typed.";
+                    return;
+                  }
+                  logs.push({
+                    cmd,
+                    out: hex + "  (nothing like the first key)",
+                  });
+                  stage = 2;
+                  draw();
+                  fin();
+                  return;
+                }
+              };
+              $("[data-run]", el).onclick = go;
+              $("#cmd", el).onkeydown = (e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  go();
+                }
+              };
+            }
+          };
+          draw();
+        },
+      };
+      const BLOCKS = {
+        text: (b) => wrap(md(b.md)),
+        aside: (b) => wrap(inline(b.md), "aside"),
+        figure: (b) => {
+          const el = document.createElement("figure");
+          el.innerHTML =
+            ASSETS[b.asset] + `<figcaption>${b.caption}</figcaption>`;
+          return el;
+        },
+        table: (b) => {
+          const el = document.createElement("div");
+          el.className = "blk";
+          el.innerHTML = `<table class="vtable"><thead><tr>${b.headers.map((x) => `<th>${x}</th>`).join("")}</tr></thead><tbody>${b.rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+          return el;
+        },
+        widget: (b) => {
+          const el = wrap("");
+          WIDGETS[b.name](el, () => done(b.id));
+          return el;
+        },
+        reflect: (b) => {
+          const el = wrap(
+            `<div class="try"><span class="label">Write your report</span><p>${b.prompt}</p><textarea placeholder="${b.placeholder}"></textarea><button data-go>Compare with an example</button><div class="out"></div></div>`,
+          );
+          $("[data-go]", el).onclick = () => {
+            $(".out", el).innerHTML =
+              `<p>${b.model}</p><p class="small">Use this as a comparison, not something you need to copy word for word.</p>`;
+            done(b.id);
+          };
+          return el;
+        },
+        next: () => {
+          const n = L.next;
+          return wrap(
+            `<div class="label">Next lesson</div><h3>${n.id} ${n.title}</h3><p>${n.teaser}</p>`,
+            "next",
+          );
+        },
+      };
+      $("#head").innerHTML =
+        `<div class="kicker">${L.phase} · ${L.module}</div><h1>${L.title}</h1><p class="sub">${L.subtitle}</p><div class="meta">Lesson ${L.id} · about ${L.minutes} minutes · ${L.level}</div>`;
+      const main = $("#lesson");
+      L.sections.forEach((s) => {
+        const sec = document.createElement("section");
+        sec.id = s.id;
+        sec.innerHTML = `<div class="label">${s.label}</div><h2>${s.title}</h2>`;
+        s.blocks.forEach((b) => {
+          if (BLOCKS[b.type]) sec.appendChild(BLOCKS[b.type](b));
+        });
+        main.appendChild(sec);
+      });
+      prog();
+    </script>
+  </body>
+</html>
