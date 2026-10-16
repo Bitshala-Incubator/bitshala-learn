@@ -112,7 +112,10 @@ button.ghost {
 .msg {
   min-height: 1.7em;
   font-style: italic;
-  margin-top: 8px;
+  font-size: 15px;
+  margin-top: 10px;
+  color: var(--mut);
+  overflow-wrap: anywhere;
 }
 table {
   border-collapse: collapse;
@@ -158,9 +161,9 @@ th {
 }
 textarea {
   width: 100%;
-  min-height: 96px;
+  min-height: 110px;
   font:
-    18px/1.5 Charter,
+    17px/1.5 Charter,
     Georgia,
     serif;
   background: transparent;
@@ -478,9 +481,11 @@ pre {
   display: flex;
   gap: 8px;
   margin-top: 6px;
+  flex-wrap: wrap;
 }
 .labinput input {
   flex: 1;
+  min-width: 180px;
   font:
     15px ui-monospace,
     Menlo,
@@ -526,32 +531,27 @@ pre {
 }
 .tilegrid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 10px;
-  margin: 14px 0;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 9px;
+  margin: 12px 0;
 }
 .tile {
   min-width: 0;
   border: 1px solid var(--line);
   border-radius: 6px;
-  padding: 12px 14px;
+  padding: 12px;
   text-align: left;
   background: transparent;
   color: var(--ink);
   font:
-    15px ui-monospace,
-    Menlo,
-    Consolas,
-    monospace;
+    14px/1.45 system-ui,
+    sans-serif;
   overflow-wrap: anywhere;
   cursor: pointer;
 }
-.tile.sel {
-  border-color: var(--acc);
-  background: var(--soft);
-}
+.tile.sel,
 .tile.right {
-  border-color: var(--ink);
+  border-color: var(--acc);
   background: var(--soft);
 }
 .tile.wrong {
@@ -932,5 +932,99 @@ pre {
     nav {
       padding: 0.8rem 1rem;
     }
+  }
+}
+
+textarea:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+#bar {
+  transition: width 0.2s;
+}
+.labinput input::placeholder {
+  color: var(--mut);
+  opacity: 0.7;
+  font-style: italic;
+}
+.termbox {
+  background: var(--ink);
+  color: var(--bg);
+  font:
+    13px/1.6 ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin: 12px 0;
+  overflow-wrap: anywhere;
+}
+.tline {
+  margin: 4px 0;
+}
+.tprompt {
+  color: var(--acc);
+  margin-right: 8px;
+}
+.tout {
+  white-space: pre-wrap;
+  margin: 2px 0 12px;
+  opacity: 0.9;
+}
+.tout.terr {
+  color: #e98b70;
+}
+.vtable {
+  width: 100%;
+  border-collapse: collapse;
+  font:
+    14px system-ui,
+    sans-serif;
+  margin: 16px 0;
+}
+.vtable th,
+.vtable td {
+  border: 1px solid var(--line);
+  padding: 8px 10px;
+  text-align: left;
+}
+.vtable th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--mut);
+  background: var(--soft);
+}
+.small {
+  font:
+    13px/1.5 system-ui,
+    sans-serif;
+  color: var(--mut);
+}
+code {
+  font-size: 0.88em;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 480px) {
+  body {
+    font-size: 18px;
+  }
+  .wrap {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .try {
+    padding: 16px;
+  }
+  .labinput input {
+    min-width: 100%;
+  }
+  h2 {
+    font-size: 27px;
   }
 }
