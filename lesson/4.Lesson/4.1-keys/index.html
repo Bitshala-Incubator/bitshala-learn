@@ -106,7 +106,7 @@
             "blocks": [
               {
                 "type": "text",
-                "md": "Say Aarav\u2019s private key controls some bitcoin, and, for whatever reason, he sends it to Meera.\n\nMeera now has the secret. She can likely produce valid authorizations to spend with it. The problem isn\u2019t that she knows Aarav\u2019s name, Bitcoin never asked for that. The problem is simply that she now holds the key, and Bitcoin only ever checks whether the key\u2019s conditions are satisfied, not who originally generated it."
+                "md": "Say Aarav\u2019s private key controls some bitcoin, and, for whatever reason, he sends it to Meera.\n\nMeera now has the secret. She can produce valid authorizations to spend with it. The problem isn\u2019t that she knows Aarav\u2019s name, Bitcoin never asked for that. The problem is simply that she now holds the key, and Bitcoin only ever checks whether the key\u2019s conditions are satisfied, not who originally generated it."
               }
             ]
           },
@@ -148,6 +148,10 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "aside",
+                "md": "Being postable isn’t the same as being invisible. Bitcoin transactions are public by design, but that’s a separate question from what can authorize spending, and one for a later lesson."
               }
             ]
           },
@@ -197,7 +201,7 @@
             "blocks": [
               {
                 "type": "text",
-                "md": "You\u2019ve now read this sequence twice. Build it a third time, yourself, without it written out in front of you."
+                "md": "You\u2019ve now seen this sequence described and drawn. Build it yourself, without it written out in front of you."
               },
               {
                 "type": "widget",
@@ -249,39 +253,10 @@
                 "props": {
                   "options": [
                     "generateSecret()",
-                    "derivePublicKey(privateKey)",
+                    "derivePublicKey",
                     "sendPrivateKeyToNetwork()"
                   ]
                 }
-              }
-            ]
-          },
-
-          {
-            "id": "spotpublish",
-            "label": "Try it",
-            "title": "Aarav posts his wallet information. Catch his mistake.",
-            "blocks": [
-              {
-                "type": "text",
-                "md": "He shares four things at once. Tap everything that should never have been posted."
-              },
-              {
-                "type": "widget",
-                "id": "w-spot",
-                "name": "SpotPublish",
-                "props": {
-                  "items": [
-                    { "name": "Bitcoin address", "bad": false },
-                    { "name": "Public key", "bad": false },
-                    { "name": "Private key", "bad": true },
-                    { "name": "Wallet seed phrase", "bad": true }
-                  ]
-                }
-              },
-              {
-                "type": "aside",
-                "md": "Being postable isn\u2019t the same as being invisible, Bitcoin transactions are public by design, but that\u2019s a separate question from what can authorize spending, and one for a later lesson."
               }
             ]
           },
@@ -694,7 +669,7 @@
             if (picked[0] && picked[1]) {
               const ok =
                 picked[0] === "generateSecret()" &&
-                picked[1] === "derivePublicKey(privateKey)";
+                picked[1] === "derivePublicKey";
               $("#cf", el).textContent = ok
                 ? "Right. Notice there\u2019s no step anywhere that sends the private key to the network."
                 : "Not quite that pairing. Think about which function makes the secret, and which one only reads it.";
@@ -837,5 +812,6 @@
       });
       prog();
     </script>
+    <script type="module" src="../../navigation.js"></script>
   </body>
 </html>

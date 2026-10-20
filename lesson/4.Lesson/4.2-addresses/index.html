@@ -93,7 +93,7 @@
             "blocks": [
               {
                 "type": "text",
-                "md": "**Pay-to-Public-Key-Hash**, P2PKH, is the pattern behind addresses that commonly start with **1** on mainnet. The locking script holds a hash of a public key, not the key itself. To spend, the wallet reveals the actual public key and a signature together, and the script checks both.\n\nThat **1** isn\u2019t decoration. It\u2019s part of how **Base58Check** encoding works: a version byte, baked into the encoding before the hash, tells software which network and script type this address belongs to, with its own checksum for catching typos."
+                "md": "**Pay-to-Public-Key-Hash**, P2PKH, is the pattern behind addresses that commonly start with **1** on mainnet. The locking script holds a hash of a public key, not the key itself. To spend, the wallet reveals the actual public key and a signature together, and the script checks both.\n\nThat **1** isn\u2019t decoration. It\u2019s part of how **Base58Check** encoding works: a version byte is added in front of the hash, and the whole payload gets a checksum. Together they tell software which network and script type this address belongs to, and the checksum catches typos."
               }
             ]
           },
@@ -149,7 +149,7 @@
             "blocks": [
               {
                 "type": "text",
-                "md": "Native SegWit addresses use **Bech32** encoding and commonly start with **bc1q** on mainnet. Here\u2019s the part worth slowing down for: **that prefix alone doesn\u2019t distinguish P2WPKH from P2WSH.**\n\n**P2WPKH** uses a 20-byte public-key hash in its witness program. **P2WSH** uses a 32-byte script hash. Their standard Bech32 encodings therefore come out different lengths as a side effect, but length is a rough heuristic, not the actual check. A wallet should decode the address and inspect its witness version and program directly, rather than rely on length alone.\n\nA familiar-looking prefix is a useful clue. It is never proof that an address is valid, or that it represents the spending conditions you expect."
+                "md": "Native SegWit addresses use **Bech32** encoding and commonly start with **bc1q** on mainnet. Here\u2019s the part worth slowing down for: **that prefix alone doesn\u2019t distinguish P2WPKH from P2WSH.**\n\n**P2WPKH** uses a 20-byte public-key hash in its witness program. **P2WSH** uses a 32-byte script hash. Their standard Bech32 encodings therefore come out different lengths as a side effect, but length is a rough heuristic, not the actual check. A wallet should decode the address and inspect its witness version and program directly, rather than rely on length alone."
               }
             ]
           },
@@ -215,7 +215,7 @@
             "blocks": [
               {
                 "type": "text",
-                "md": "Addresses starting with **bc1p** are Taproot, witness version 1, and here\u2019s a genuine architectural difference, not just another prefix: a Taproot address encodes an actual public key, the Taproot output key, not a hash of one. Every format before it, P2PKH, P2SH, P2WPKH, P2WSH, encodes a hash. Taproot doesn\u2019t.\n\nIt also uses a different encoding, **Bech32m**, not plain Bech32. The reason is specific: Bech32\u2019s checksum, it turned out, has a narrow blind spot, certain patterns of inserted characters right after the separator can produce a different string that still passes the checksum as valid. The risk for existing SegWit v0 addresses was judged low enough not to redo everything retroactively, but Taproot was a clean, new format, so its designers corrected the checksum constant before launch. That correction is Bech32m."
+                "md": "Addresses starting with **bc1p** are Taproot, witness version 1, and here\u2019s a genuine architectural difference, not just another prefix: a Taproot address encodes an actual public key, the Taproot output key, not a hash of one. Every address format before it, P2PKH, P2SH, P2WPKH, P2WSH, encodes a hash. Taproot doesn\u2019t.\n\nIt also uses a different encoding, **Bech32m**, not plain Bech32. The reason is specific: Bech32\u2019s checksum, it turned out, has a narrow blind spot. Certain edits near the end of a string can produce a different string that still passes the checksum as valid. The risk for existing SegWit v0 addresses was judged low enough not to redo everything retroactively, but Taproot was a clean, new format, so its designers corrected the checksum constant before launch. That correction is Bech32m."
               },
               {
                 "type": "figure",
@@ -262,7 +262,7 @@
             "blocks": [
               {
                 "type": "text",
-                "md": "Meera read her address out loud. What Aarav\u2019s wallet is showing him doesn\u2019t quite match what he wrote down. One character is different."
+                "md": "Meera read her address out loud, and Aarav wrote it down. Now the two versions don\u2019t quite match, and one character is different."
               },
               {
                 "type": "widget",
@@ -792,5 +792,6 @@
       });
       prog();
     </script>
+    <script type="module" src="../../navigation.js"></script>
   </body>
 </html>

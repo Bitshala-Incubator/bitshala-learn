@@ -145,13 +145,13 @@
                 "name": "BuildPayment",
                 "props": {
                   "recipient": "you",
-                  "target": 0.002,
+                  "target": 0.001,
                   "fee": 0.0001,
                   "utxos": [
                     { "id": "A", "amt": 0.001 },
                     { "id": "B", "amt": 0.003 }
                   ],
-                  "outputChoices": [0.003, 0.002, 0.0009]
+                  "outputChoices": [0.003, 0.0019, 0.001]
                 }
               }
             ]
@@ -270,14 +270,14 @@
               {
                 "type": "quiz",
                 "id": "qz-1",
-                "questionIds": ["q-utxo", "q-output", "q-txblock"]
+                "questionIds": ["q-utxo", "q-output", "q-doublespend"]
               },
               {
                 "type": "reflect",
                 "id": "r-explain",
-                "prompt": "A friend asks: “What actually happens to a 0.003 BTC UTXO when Aarav uses it to send 0.002 BTC to someone?” Answer in two or three sentences, using the words input, output, and change.",
+                "prompt": "A friend asks: “What actually happens to a 0.003 BTC UTXO when Aarav uses it to send 0.001 BTC to someone?” Answer in two or three sentences, using the words input, output, and change.",
                 "placeholder": "Write it as you’d actually say it out loud.",
-                "model": "The 0.003 BTC UTXO becomes the input to a new transaction. That transaction creates two outputs: 0.002 BTC to the recipient, and the remainder, minus the fee, back to Aarav as change. The original UTXO is now spent and can never be used as an input again."
+                "model": "The 0.003 BTC UTXO becomes the input to a new transaction. That transaction creates two outputs: 0.001 BTC to the recipient, and 0.0019 BTC back to Aarav as change. The leftover 0.0001 BTC is the fee for the miner. The original UTXO is now spent and can never be used as an input again."
               }
             ]
           },
@@ -329,18 +329,18 @@
           "wrong": "Not quite. Think about what happens to the part of the UTXO Aarav isn’t sending away."
         },
         {
-          "id": "q-txblock",
-          "concept": "transaction-vs-block",
-          "prompt": "What’s the real difference between a transaction and a block?",
+          "id": "q-doublespend",
+          "concept": "utxo",
+          "prompt": "Aarav uses the same 0.003 BTC UTXO as the input to two transactions, one paying you and one paying Meera. What happens?",
           "options": [
-            "There is no difference, they’re the same thing",
-            "A transaction describes one transfer; a block is a container holding many transactions",
-            "A block is created by a wallet; a transaction is created by a miner",
-            "A transaction only exists after it’s confirmed"
+            "Both are valid, since each one is signed",
+            "Both confirm, and Aarav’s balance goes negative",
+            "Only one can be valid, because a UTXO can be spent only once",
+            "The wallet picks one at random and the other disappears"
           ],
-          "answer": 1,
-          "right": "Right. A transaction can be valid and signed long before any block contains it.",
-          "wrong": "Not quite. Think about which one holds the other."
+          "answer": 2,
+          "right": "Right. Both transactions point back to the same input, so they conflict and nodes accept only one.",
+          "wrong": "Not quite. Look at what both transactions point back to."
         }
       ]
     </script>
@@ -696,5 +696,6 @@
       });
       prog();
     </script>
+    <script type="module" src="../../navigation.js"></script>
   </body>
 </html>

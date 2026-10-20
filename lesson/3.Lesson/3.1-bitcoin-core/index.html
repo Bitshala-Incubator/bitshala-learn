@@ -80,7 +80,7 @@
             "blocks": [
               {
                 "type": "text",
-                "md": "Run Bitcoin Core as a full node, and it will connect to peers, receive transactions and blocks, and validate every one of them against Bitcoin’s rules itself. It keeps the blockchain, and it keeps track of which outputs are still unspent. None of that is outsourced.\n\nThat’s the whole point stated plainly: you can verify the rules yourself, instead of trusting someone else to tell you they were followed."
+                "md": "Run Bitcoin Core as a full node, and it will connect to peers, receive transactions and blocks, and validate every one of them against Bitcoin’s rules itself. It keeps the blockchain, and it keeps track of which outputs are still unspent. None of that is outsourced.\n\nIt’s tempting to think of a full node as something that just downloads a copy of the blockchain. Downloading is only how the data arrives. When another node sends yours a block, your node checks it against Bitcoin’s rules before accepting it, the same way a node checked Aarav’s transaction back in Lesson 2.1. Verifying is the actual job.\n\nThat’s the whole point stated plainly: you can verify the rules yourself, instead of trusting someone else to tell you they were followed."
               }
             ]
           },
@@ -115,18 +115,6 @@
                 "type": "figure",
                 "asset": "startup",
                 "caption": "None of this is instant. A new node earns its view of the chain, it doesn’t just download it."
-              }
-            ]
-          },
-
-          {
-            "id": "verify2",
-            "label": "Not just downloading",
-            "title": "Downloading isn’t the important part",
-            "blocks": [
-              {
-                "type": "text",
-                "md": "It’s tempting to picture a full node as something that just downloads a copy of the blockchain, the way you’d download a large file. That undersells it.\n\nWhen another node sends yours a block, your node doesn’t say “thanks, saved.” It checks that block against Bitcoin’s rules before accepting it, the same way a node checked Aarav’s transaction back in Lesson 2.1. Downloading is just how the data arrives. Verifying is the actual job."
               }
             ]
           },
@@ -235,7 +223,7 @@
             "blocks": [
               {
                 "type": "text",
-                "md": "Enough description. Here’s a terminal connected to a running node. Run each command and decide for yourself what the answer means, the same question Lesson 15 of your curriculum asks directly: is this node connected, and is it caught up?"
+                "md": "Enough description. Here’s a terminal connected to a running node. Run each command and decide for yourself what the answer means. For any node, there are two questions worth asking first: is it connected to the network, and is it caught up?"
               },
               {
                 "type": "widget",
@@ -253,7 +241,7 @@
                     },
                     {
                       "cmd": "bitcoin-cli getpeerinfo",
-                      "output": "3 peers connected:\n  71.12.xx.xx\n  94.23.xx.xx\n  188.40.xx.xx",
+                      "output": "[\n  { \"addr\": \"71.12.xx.xx:8333\", \"inbound\": false },\n  { \"addr\": \"94.23.xx.xx:8333\", \"inbound\": false },\n  { \"addr\": \"188.40.xx.xx:8333\", \"inbound\": false }\n]",
                       "question": "Is this node actually talking to the network?",
                       "options": [
                         "Yes, it has active peers",
@@ -363,16 +351,16 @@
         {
           "id": "q-chainstate",
           "concept": "chainstate",
-          "prompt": "What does chainstate actually represent?",
+          "prompt": "When a node checks a new transaction, what does it check the inputs against?",
           "options": [
-            "Every transaction that has ever happened",
-            "The node’s current software version",
-            "Which outputs are still unspent, right now",
-            "A backup of bitcoin.conf"
+            "The whole blockchain, replayed from the first block every time",
+            "Chainstate, the current set of unspent outputs",
+            "The settings in bitcoin.conf",
+            "A copy of your wallet’s balance"
           ],
-          "answer": 2,
-          "right": "Right. It’s the live, spendable snapshot the node checks new transactions against.",
-          "wrong": "Not quite. That’s what the blocks folder is for. Chainstate answers a narrower question."
+          "answer": 1,
+          "right": "Right. It doesn’t replay history. It checks against the live snapshot of what’s still spendable.",
+          "wrong": "Not quite. Replaying the whole history each time is exactly what chainstate exists to avoid."
         },
         {
           "id": "q-cli",
@@ -723,5 +711,6 @@
       });
       prog();
     </script>
+    <script type="module" src="../../navigation.js"></script>
   </body>
 </html>

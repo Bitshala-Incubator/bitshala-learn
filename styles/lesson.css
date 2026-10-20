@@ -243,9 +243,27 @@ pre {
   text-decoration: none;
 }
 
+.lesson-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 1.2em;
+}
+
+.lesson-navigation .next-link {
+  margin-top: 0;
+}
+
 .next-link:hover,
 .next-link:focus-visible {
   text-decoration: underline;
+}
+
+@media (max-width: 420px) {
+  .lesson-navigation {
+    flex-wrap: wrap;
+  }
 }
 /* --- widgets specific to 1.2 --- */
 .screens {
@@ -1045,4 +1063,38 @@ code {
   h2 {
     font-size: 27px;
   }
+}
+a {
+  color: var(--ink);
+}
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+.pending {
+  opacity: 0.6;
+  font-style: italic;
+}
+textarea.codebox {
+  width: 100%;
+  min-height: 92px;
+  font:
+    14px/1.5 ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  white-space: pre;
+  tab-size: 2;
+}
+textarea.codebox::placeholder {
+  color: var(--mut);
+  opacity: 0.7;
+  font-style: italic;
 }

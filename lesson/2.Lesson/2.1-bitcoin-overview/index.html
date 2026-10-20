@@ -296,7 +296,7 @@
               {
                 "type": "figure",
                 "asset": "pipeline",
-                "caption": "The whole journey, end to end. Not a straight pipe in reality, but this is the order each role plays its part."
+                "caption": "The six roles, in the order a payment passes through them. Each one does its own job and no other."
               },
               {
                 "type": "text",
@@ -320,7 +320,7 @@
                 "id": "r-explain",
                 "prompt": "Explain Aarav’s payment to someone who has only read Lesson 1.1, using the words wallet, node, and blockchain. Two or three sentences is enough.",
                 "placeholder": "Write it as you’d actually say it out loud.",
-                "model": "Aarav’s wallet builds and signs the transaction, the same way you’d sign a letter. It doesn’t go to me directly, it’s passed around a network of nodes, each one checking it against the rules on its own, the way many independent Mayas would. Once it’s bundled into a block that the network accepts, it becomes part of the blockchain, the shared history that makes the payment real."
+                "model": "Aarav’s wallet builds and signs the transaction, the same way you’d sign a letter. It doesn’t go straight to the recipient. It’s passed around a network of nodes, each one checking it against the rules on its own, the way many independent record-keepers would instead of one Maya. Once it’s bundled into a block that the network accepts, it becomes part of the blockchain, the shared history that makes the payment real."
               }
             ]
           },
@@ -360,16 +360,16 @@
         {
           "id": "q-node",
           "concept": "node",
-          "prompt": "What does a Bitcoin node actually promise to do?",
+          "prompt": "A node receives a transaction that tries to spend coins Aarav has already spent elsewhere. What should it do?",
           "options": [
-            "Guarantee your transaction is included quickly",
-            "Check transactions and blocks against the rules, and relay what passes",
-            "Create private keys on behalf of users",
-            "Decide which transactions deserve to be valid, by its own judgment"
+            "Pass it on, since the sender is trusted",
+            "Drop it, because it breaks the shared rules",
+            "Ask a central server to decide",
+            "Wait for a miner to confirm it first"
           ],
           "answer": 1,
-          "right": "Right. It applies the same shared rules, it doesn’t invent its own.",
-          "wrong": "Not quite. A node doesn’t get to decide on its own authority, it checks against shared rules."
+          "right": "Right. Checking against the shared rules is the node’s job, so a double spend stops at the first honest node.",
+          "wrong": "Not quite. A node doesn’t trust the sender, doesn’t wait for permission, and doesn’t hand the decision to anyone else. It checks against the shared rules."
         },
         {
           "id": "q-blockchain",
@@ -423,8 +423,8 @@
  <circle cx="165" cy="45" r="11" fill="var(--bg)"/><circle cx="165" cy="155" r="11" fill="var(--bg)"/>
  <circle cx="280" cy="55" r="11" fill="var(--bg)"/><circle cx="280" cy="140" r="11" fill="var(--bg)"/>
  <circle cx="370" cy="100" r="15" style="fill:var(--soft)"/>
- <text x="70" y="132" text-anchor="middle" stroke="none" font-size="12">you</text>
- <text x="370" y="132" text-anchor="middle" stroke="none" font-size="12">Aarav</text>
+ <text x="70" y="132" text-anchor="middle" stroke="none" font-size="12">Aarav</text>
+ <text x="370" y="132" text-anchor="middle" stroke="none" font-size="12">you</text>
  <text x="220" y="20" text-anchor="middle" stroke="none" font-size="11" fill="var(--mut)">the transaction hops, node to node</text>
  <defs>${AMK("spA")}</defs></svg>`,
 
@@ -667,5 +667,6 @@
       });
       prog();
     </script>
+    <script type="module" src="../../navigation.js"></script>
   </body>
 </html>
