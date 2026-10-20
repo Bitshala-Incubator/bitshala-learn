@@ -50,7 +50,7 @@
             "blocks": [
               {
                 "type": "text",
-                "md": "Last time, you asked your node whether it was healthy: connected, synced, caught up. Fair enough questions, but they only ever had two possible answers.\n\nHere\u2019s a better one. Somewhere inside your node, sitting in some block, is the exact payment Aarav sent you back in Lesson 2.2, the one you built by hand: 0.002 BTC to you, 0.0009 BTC back to him as change. Can you actually go find it?"
+                "md": "Last time, you asked your node whether it was healthy: connected, synced, caught up. Fair enough questions, but they only ever had two possible answers.\n\nHere\u2019s a better one. Somewhere inside your node, sitting in some block, is the exact payment Aarav sent you back in Lesson 2.2, the one you built by hand: 0.001 BTC to you, 0.0019 BTC back to him as change. Can you actually go find it?"
               }
             ]
           },
@@ -191,7 +191,7 @@
                       ],
                       "answer": 0,
                       "param": "7f3a9c2b...d204 true",
-                      "output": "vin:  UTXO 0.003 BTC (Aarav)\nvout[0]:  0.002 BTC  \u2192 you\nvout[1]:  0.0009 BTC \u2192 Aarav (change)",
+                      "output": "vin:  UTXO 0.003 BTC (Aarav)\nvout[0]:  0.001 BTC  \u2192 you\nvout[1]:  0.0019 BTC \u2192 Aarav (change)",
                       "note": "Right. There it is, the exact transaction you built by hand back in Lesson 2.2."
                     }
                   ]
@@ -213,18 +213,6 @@
                 "type": "figure",
                 "asset": "trail",
                 "caption": "Each call\u2019s output became the next call\u2019s input."
-              }
-            ]
-          },
-
-          {
-            "id": "caution3",
-            "label": "One more rule",
-            "title": "The same caution, pointed at RPC now",
-            "blocks": [
-              {
-                "type": "aside",
-                "md": "Querying freely, getblockcount, getrawtransaction, getblock, costs you nothing and risks nothing. Calls that create or move things, getnewaddress, sendtoaddress, and their relatives, deserve the same care you\u2019d give to anything that actually does something. Know which kind of call you\u2019re making before you make it."
               }
             ]
           },
@@ -327,16 +315,16 @@
         {
           "id": "q-readonly",
           "concept": "read-only-vs-state-changing",
-          "prompt": "Which of these actually changes something, even though it might not sound like it?",
+          "prompt": "A friend pastes this into a terminal: bitcoin-cli -regtest sendtoaddress <address> 0.001. What will it do?",
           "options": [
-            "getblockcount",
-            "getrawtransaction",
-            "getnewaddress",
-            "getblock"
+            "Show the balance of that address",
+            "Create and broadcast a real payment from the wallet",
+            "Download the transactions already sent to that address",
+            "Print the current block height"
           ],
-          "answer": 2,
-          "right": "Right. It feels like asking a question, but it adds a new address to the wallet.",
-          "wrong": "Not quite. That one only reads data that already exists."
+          "answer": 1,
+          "right": "Right. sendtoaddress builds and broadcasts a payment, so run it only when you mean to spend.",
+          "wrong": "Not quite. sendtoaddress doesn’t look anything up. It sends a payment from your wallet."
         }
       ]
     </script>
@@ -734,7 +722,7 @@
                 };
               return {
                 ok: true,
-                text: `{\n  "vout": [\n    { "value": ${S.lastAmount || "0.002"}, "address": "${S.address}" },\n    { "value": 0.0009, "address": "bcrt1qchange..." }\n  ]\n}`,
+                text: `{\n  "vout": [\n    { "value": ${S.lastAmount}, "address": "${S.address}" },\n    { "value": ${(50 - parseFloat(S.lastAmount) - 0.0001).toFixed(4)}, "address": "bcrt1qchange..." }\n  ]\n}`,
               };
             },
           };
@@ -958,5 +946,6 @@
       });
       prog();
     </script>
+    <script type="module" src="../../navigation.js"></script>
   </body>
 </html>

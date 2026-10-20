@@ -151,18 +151,12 @@
           },
           {
             "id": "bigpicture",
-            "label": "Mission 5 of 5 · One last check, then the bigger picture",
-            "title": "Does an independent implementation agree with this page?",
+            "label": "Zoom out · Before the write-up",
+            "title": "How the standards fit together",
             "blocks": [
               {
                 "type": "text",
-                "md": "So far every derivation in this lesson has run inside this page, using one library. Mission 1 was about trusting a published spec instead of a guess — the same instinct applies here: that result is worth double-checking against a second, independently-written implementation that other people in the Bitcoin community actually rely on, the same way you'd want two different odometers to agree before trusting a car's mileage."
-              },
-              {
-                "type": "widget",
-                "id": "w-extverify",
-                "name": "ExternalVerify",
-                "props": {}
+                "md": "Two independent checks have already passed. In Mission 1, a second codebase, iancoleman.io, reproduced the published BIP32 test vector. In Missions 2–3, the library running on this page reproduced the same vector. Two separate implementations agreeing with one published spec is what earns confidence, not any single tool trusted on its own."
               },
               {
                 "type": "aside",
@@ -354,7 +348,7 @@
         CodingChallenge(el, fin) {
           el.classList.add("try");
           el.innerHTML = `<span class="label">Coding challenge · complete the missing lines</span>
-  <p>Complete each line by typing only the expression in the input field. The code around each field is already provided, so you do not need to remove or replace any dashes.</p>
+  <p>Complete each line by typing only the expression in the input field. The code around each field is already provided, so you do not need to remove or replace anything around them.</p>
   <p class="small">Available helpers: <code>hexToBytes(hexString)</code>, <code>HDKey.fromMasterSeed(seedBytes)</code>, and <code>master.publicExtendedKey</code>. The expected value is stored in <code>EXPECTED_XPUB</code>.</p>
   <div class="code-exercise" style="display:grid;gap:14px;margin:16px 0">
    <label style="display:block">1. Convert the test seed to bytes
@@ -621,7 +615,7 @@
             if (stage === 3)
               $("[data-finish]", el).onclick = () => {
                 $("#finalmsg", el).textContent =
-                  "Hardened derivation uses the parent private key in its derivation input. The xpub only has public key data and a chain code, so it cannot compute that child. It also cannot sign transactions. Mission 4 of 5 done — one more mission, then the report.";
+                  "Hardened derivation uses the parent private key in its derivation input. The xpub only has public key data and a chain code, so it cannot compute that child. It also cannot sign transactions. Mission 4 of 5 done. Next, zoom out, then write the report.";
                 fin();
               };
           };
@@ -721,5 +715,6 @@
       });
       prog();
     </script>
+    <script type="module" src="../../navigation.js"></script>
   </body>
 </html>
