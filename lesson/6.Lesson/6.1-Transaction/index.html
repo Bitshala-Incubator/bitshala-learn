@@ -19,10 +19,6 @@
       <header id="head"></header>
       <div id="warn"></div>
       <main id="lesson"></main>
-      <details>
-        <summary>Lesson data</summary>
-        <pre id="raw"></pre>
-      </details>
     </div>
     <script type="application/json" id="lesson-data">
       {
@@ -746,7 +742,6 @@
         });
         main.appendChild(sec);
       });
-      $("#raw").textContent = JSON.stringify(L, null, 1);
       prog();
     </script>
     <script type="module" src="../../navigation.js"></script>

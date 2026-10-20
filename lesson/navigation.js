@@ -59,6 +59,11 @@ const lessons = [
     title: "SegWit and Serialization",
     path: "lesson/6.Lesson/6.2/index.html",
   },
+  {
+    id: "7.1",
+    title: "Bitcoin Script",
+    path: "lesson/7.Lesson/7.1-bitcoin-script/index.html",
+  },
 ];
 
 const lessonData = JSON.parse(
