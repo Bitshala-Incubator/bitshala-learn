@@ -64,6 +64,11 @@ const lessons = [
     title: "Bitcoin Script",
     path: "lesson/7.Lesson/7.1-bitcoin-script/index.html",
   },
+  {
+    id: "7.2",
+    title: "Advanced Spending Conditions",
+    path: "lesson/7.Lesson/7.2-advanced-spending-conditions/index.html",
+  },
 ];
 
 const lessonData = JSON.parse(

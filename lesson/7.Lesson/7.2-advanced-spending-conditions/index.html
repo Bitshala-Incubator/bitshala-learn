@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Advanced Spending Conditions — Bitshala Learn 7.2</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+    <style>
+      figure {
+        overflow-x: auto;
+      }
+      .exercise-table {
+        font-size: 14px;
+      }
+      .exercise-table code {
+        font-size: 12px;
+        word-break: break-all;
+      }
+      .codebox {
+        min-height: 150px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 7.2</span><span id="prog">Ready</span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "7.2",
+        "title": "Advanced Spending Conditions",
+        "subtitle": "Share a coin between several keys, lock it to a date, and hide the rules inside Taproot.",
+        "phase": "Bitcoin Foundations",
+        "module": "Module 7",
+        "minutes": 55,
+        "level": "Beginner",
+        "next": {
+          "id": "7.3",
+          "title": "Continuing Module 7",
+          "teaser": "Aarav can now build locks that need several keys, wait for a date, or stay hidden until used. The next lesson continues Module 7 from here. Check your course outline for what Bitshala covers next."
+        },
+        "sections": [
+          {
+            "id": "start",
+            "label": "The question",
+            "title": "A savings coin nobody can drain alone",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav and Meera want to share a savings coin. Neither wants one person to be able to move it alone. They agree on a lock that needs **two of three keys**: Aarav’s key, Meera’s key, and a backup key that stays offline.\n\nMeera also wants to send Aarav a gift that cannot be spent before a set date. Aarav wants a refund path that opens after **144 blocks**, about one day. And he wants the rules to stay private unless someone actually needs them.\n\n“Every one of those is a script,” Aarav says. “Can we build them ourselves?”\n\nMeera smiles. “Yes. Each one is a few lines of logic. Write the rule, and check it against the cases.”"
+              },
+              {
+                "type": "text",
+                "md": "This lesson has four coding exercises. Each one asks you to write a function. The function is run against test cases, and you see exactly which cases pass and which fail."
+              }
+            ]
+          },
+          {
+            "id": "multisig",
+            "label": "Part 1 · Several keys",
+            "title": "Two of three, in the right order",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "A **multisig** lock lists several public keys and states how many must sign. A 2-of-3 lock accepts any two of its three keys.\n\nBitcoin checks the signatures against the keys **in order**. The unlocking data must list signatures in the same order as the keys in the lock, and each key can match at most once."
+              },
+              {
+                "type": "figure",
+                "asset": "multisig",
+                "caption": "Any two of the three keys can unlock the coin. The signatures must appear in the same order as the keys in the lock."
+              },
+              {
+                "type": "aside",
+                "md": "**Key idea:** the check moves forward through the keys. Once a key has been passed, a later signature cannot match it again."
+              }
+            ]
+          },
+          {
+            "id": "ex1",
+            "label": "Exercise 1 · Write the multisig rule",
+            "title": "Check signatures against keys",
+            "blocks": [
+              {
+                "type": "widget",
+                "id": "w-multisig",
+                "name": "CodeExercise",
+                "props": {
+                  "label": "multisigValid(m, keys, sigs)",
+                  "task": "Write `multisigValid(m, keys, sigs)`. `keys` is the list of keys in the lock, in order. `sigs` is the list of keys that signed, in the order their signatures appear. Return `true` only if at least `m` signatures match keys in order, and no key is used twice.",
+                  "fn": "multisigValid",
+                  "starter": "function multisigValid(m, keys, sigs) {\n  \n}",
+                  "cases": [
+                    {
+                      "label": "2 of 3, correct order",
+                      "args": [2, ["A", "B", "C"], ["A", "C"]],
+                      "expect": true
+                    },
+                    {
+                      "label": "2 of 3, wrong order",
+                      "args": [2, ["A", "B", "C"], ["C", "A"]],
+                      "expect": false
+                    },
+                    {
+                      "label": "2 of 3, only one signature",
+                      "args": [2, ["A", "B", "C"], ["A"]],
+                      "expect": false
+                    },
+                    {
+                      "label": "1 of 2, second key signs",
+                      "args": [1, ["A", "B"], ["B"]],
+                      "expect": true
+                    },
+                    {
+                      "label": "same key used twice",
+                      "args": [2, ["A", "B", "C"], ["B", "B"]],
+                      "expect": false
+                    }
+                  ],
+                  "done": "Every case passes. Each signature has to match a key further along than the one before it, which is exactly how the multisig rule works."
+                }
+              }
+            ]
+          },
+          {
+            "id": "timelocks",
+            "label": "Part 2 · Timelocks",
+            "title": "Two kinds of waiting",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "A timelock stops a coin from being spent until some condition about time holds. There are two kinds.\n\n**CLTV** (OP_CHECKLOCKTIMEVERIFY) is an absolute lock. The lock time is either a block height or a Unix time. A lock time below 500,000,000 is a height; anything above it is a time. The spend is allowed only once the chain has reached that value.\n\n**CSV** (OP_CHECKSEQUENCEVERIFY) is a relative lock. It counts from when the coin itself was confirmed. The spend is allowed only once the coin is at least that many blocks old."
+              },
+              {
+                "type": "figure",
+                "asset": "timelock",
+                "caption": "CLTV fixes a point on the chain. CSV counts from the moment the coin was confirmed."
+              }
+            ]
+          },
+          {
+            "id": "ex2",
+            "label": "Exercise 2 · Absolute timelock",
+            "title": "Has the chain reached the lock?",
+            "blocks": [
+              {
+                "type": "widget",
+                "id": "w-cltv",
+                "name": "CodeExercise",
+                "props": {
+                  "label": "canSpendCLTV(lockTime, chain)",
+                  "task": "Write `canSpendCLTV(lockTime, chain)`. `chain` has the current `height` and `time`. A `lockTime` below 500000000 is a block height, and anything else is a Unix time. Return `true` only when the chain has reached the lock, using the matching field.",
+                  "fn": "canSpendCLTV",
+                  "starter": "function canSpendCLTV(lockTime, chain) {\n  \n}",
+                  "cases": [
+                    {
+                      "label": "height lock, not reached yet",
+                      "args": [800000, { "height": 799999, "time": 0 }],
+                      "expect": false
+                    },
+                    {
+                      "label": "height lock, reached exactly",
+                      "args": [800000, { "height": 800000, "time": 0 }],
+                      "expect": true
+                    },
+                    {
+                      "label": "time lock, reached",
+                      "args": [
+                        1700000000,
+                        { "height": 900000, "time": 1700000001 }
+                      ],
+                      "expect": true
+                    },
+                    {
+                      "label": "time lock, not reached, height is high",
+                      "args": [
+                        1700000000,
+                        { "height": 999999999, "time": 1699999999 }
+                      ],
+                      "expect": false
+                    },
+                    {
+                      "label": "height lock, time is irrelevant",
+                      "args": [800000, { "height": 900000, "time": 1 }],
+                      "expect": true
+                    }
+                  ],
+                  "done": "Correct. The size of the lock time decides which field of the chain to compare, and the other field is ignored."
+                }
+              }
+            ]
+          },
+          {
+            "id": "ex3",
+            "label": "Exercise 3 · Relative timelock",
+            "title": "How old is the coin?",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav’s refund path uses CSV. The input’s `sequence` field carries the relative lock. If bit 31 is set, the relative lock is switched off. Otherwise the lowest 16 bits give the number of blocks the coin must be old."
+              },
+              {
+                "type": "widget",
+                "id": "w-csv",
+                "name": "CodeExercise",
+                "props": {
+                  "label": "canSpendCSV(sequence, blocksOld)",
+                  "task": "Write `canSpendCSV(sequence, blocksOld)`. If bit 31 of `sequence` is set, return `true`, because there is no relative lock. Otherwise the lowest 16 bits of `sequence` are the number of blocks required. Return `true` when `blocksOld` is at least that number.",
+                  "fn": "canSpendCSV",
+                  "starter": "function canSpendCSV(sequence, blocksOld) {\n  \n}",
+                  "cases": [
+                    {
+                      "label": "144-block lock, 143 blocks old",
+                      "args": [144, 143],
+                      "expect": false
+                    },
+                    {
+                      "label": "144-block lock, exactly 144",
+                      "args": [144, 144],
+                      "expect": true
+                    },
+                    {
+                      "label": "144-block lock, much older",
+                      "args": [144, 5000],
+                      "expect": true
+                    },
+                    {
+                      "label": "relative lock switched off",
+                      "args": [2147483792, 0],
+                      "expect": true
+                    },
+                    {
+                      "label": "10-block lock, age 9",
+                      "args": [10, 9],
+                      "expect": false
+                    }
+                  ],
+                  "done": "Correct. The lock counts from the coin’s own confirmation, and bit 31 turns the check off completely."
+                }
+              }
+            ]
+          },
+          {
+            "id": "taproot",
+            "label": "Part 3 · Taproot",
+            "title": "Make every option look like one key",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "**Taproot** puts all the spending options for a coin into one output key. If the owners agree, they can spend with a single cooperative signature on the **key path**. Nobody reveals a script, and the coin looks like an ordinary single-key payment.\n\nIf the owners cannot agree, the spender uses the **script path**. They reveal only the leaf they need, with its proof. Every other leaf stays hidden."
+              },
+              {
+                "type": "figure",
+                "asset": "taproot",
+                "caption": "The key path is one signature and reveals nothing else. The script path reveals only the leaf that is used."
+              }
+            ]
+          },
+          {
+            "id": "ex4",
+            "label": "Exercise 4 · Decide a Taproot spend",
+            "title": "Which branch does this spend use?",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav’s coin has two script leaves. **Leaf A** needs both Meera and Aarav to sign. **Leaf B** needs Aarav to sign, and the coin must be at least 144 blocks old. The key path needs one cooperative signature and is checked first."
+              },
+              {
+                "type": "widget",
+                "id": "w-taproot",
+                "name": "CodeExercise",
+                "props": {
+                  "label": "canSpendTaproot(spend)",
+                  "task": "Write `canSpendTaproot(spend)`. `spend.keyPath` is `true` when the owners gave a cooperative key-path signature. `spend.leaf` is `'A'`, `'B'` or `null`. `spend.sigs` lists who signed the script path. `spend.age` is the number of blocks since the coin was confirmed. If `keyPath` is `true`, return `true`. Otherwise leaf A needs both Meera and Aarav to have signed, and leaf B needs Aarav to have signed with an age of at least 144. Return `false` in every other case.",
+                  "fn": "canSpendTaproot",
+                  "starter": "function canSpendTaproot(spend) {\n  \n}",
+                  "cases": [
+                    {
+                      "label": "cooperative key path",
+                      "args": [
+                        { "keyPath": true, "leaf": null, "sigs": [], "age": 0 }
+                      ],
+                      "expect": true
+                    },
+                    {
+                      "label": "leaf A, both signed",
+                      "args": [
+                        {
+                          "keyPath": false,
+                          "leaf": "A",
+                          "sigs": ["Meera", "Aarav"],
+                          "age": 0
+                        }
+                      ],
+                      "expect": true
+                    },
+                    {
+                      "label": "leaf A, Meera missing",
+                      "args": [
+                        {
+                          "keyPath": false,
+                          "leaf": "A",
+                          "sigs": ["Aarav"],
+                          "age": 0
+                        }
+                      ],
+                      "expect": false
+                    },
+                    {
+                      "label": "leaf B, too early",
+                      "args": [
+                        {
+                          "keyPath": false,
+                          "leaf": "B",
+                          "sigs": ["Aarav"],
+                          "age": 143
+                        }
+                      ],
+                      "expect": false
+                    },
+                    {
+                      "label": "leaf B, after 144 blocks",
+                      "args": [
+                        {
+                          "keyPath": false,
+                          "leaf": "B",
+                          "sigs": ["Aarav"],
+                          "age": 144
+                        }
+                      ],
+                      "expect": true
+                    },
+                    {
+                      "label": "leaf B, signed by Meera only",
+                      "args": [
+                        {
+                          "keyPath": false,
+                          "leaf": "B",
+                          "sigs": ["Meera"],
+                          "age": 200
+                        }
+                      ],
+                      "expect": false
+                    },
+                    {
+                      "label": "no leaf and no key path",
+                      "args": [
+                        {
+                          "keyPath": false,
+                          "leaf": null,
+                          "sigs": ["Meera", "Aarav"],
+                          "age": 0
+                        }
+                      ],
+                      "expect": false
+                    }
+                  ],
+                  "done": "Correct. Taproot checks the key path first. If it is not used, only the leaf that was revealed is checked, and the other leaves never appear on chain."
+                }
+              }
+            ]
+          },
+          {
+            "id": "report",
+            "label": "Final note",
+            "title": "Explain it to Meera",
+            "blocks": [
+              {
+                "type": "reflect",
+                "id": "r-advanced",
+                "prompt": "In a short note to Meera, explain what a 2-of-3 multisig, an absolute timelock, a relative timelock and Taproot each change about who can spend the coin and when. Say which one reveals the least on chain, and why.",
+                "placeholder": "Explain it in your own words.",
+                "model": "A 2-of-3 multisig means no single key can move the coin: any two keys must sign, in key order. A CLTV timelock stops the spend until the chain reaches a fixed block height or time. A CSV timelock stops the spend until the coin itself is a set number of blocks old, counted from its confirmation. Taproot combines all these options under one output key. A cooperative key-path spend reveals only one signature, so nothing about the other options appears on chain. The script path reveals only the leaf that is used, so the unused leaves stay hidden. Of these, Taproot reveals the least, because a cooperative spend shows no script at all."
+              }
+            ]
+          },
+          {
+            "id": "wrapup",
+            "label": "Where this leaves you",
+            "title": "Rules that only show when they are needed",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Meera reads the four functions Aarav wrote and nods. Each rule is a few lines long, and each one is now checked against cases. The coin can need two keys, wait for a date, or stay hidden inside a key until someone needs the rules."
+              },
+              { "type": "next" }
+            ]
+          }
+        ]
+      }
+    </script>
+    <script type="module">
+      const $ = (s, r = document) => r.querySelector(s);
+      const L = JSON.parse($("#lesson-data").textContent);
+      const escapeHTML = (s) =>
+        String(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      const inline = (s) =>
+        s
+          .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+          .replace(/\*(.+?)\*/g, "<i>$1</i>")
+          .replace(/`(.+?)`/g, "<code>$1</code>");
+      const md = (s) =>
+        s
+          .split("\n\n")
+          .map((p) => `<p>${inline(p)}</p>`)
+          .join("");
+      const wrap = (h, c = "") => {
+        const d = document.createElement("div");
+        d.className = "blk " + c;
+        d.innerHTML = h;
+        return d;
+      };
+
+      const ASSETS = {
+        multisig: `<svg viewBox="0 0 520 200" fill="none" stroke="currentColor" stroke-width="1.2"><defs><marker id="msArr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs><rect x="10" y="14" width="150" height="44" fill="var(--soft)"/><text x="85" y="40" text-anchor="middle" stroke="none" font-size="11">Aarav’s key</text><rect x="185" y="14" width="150" height="44" fill="var(--soft)"/><text x="260" y="40" text-anchor="middle" stroke="none" font-size="11">Meera’s key</text><rect x="360" y="14" width="150" height="44" fill="none" stroke-dasharray="4 3"/><text x="435" y="40" text-anchor="middle" stroke="none" font-size="11">backup key (offline)</text><path d="M85 58V110" marker-end="url(#msArr)"/><path d="M260 58V110" marker-end="url(#msArr)"/><path d="M435 58V110" marker-end="url(#msArr)"/><rect x="90" y="112" width="340" height="40" fill="var(--soft)"/><text x="260" y="136" text-anchor="middle" stroke="none" font-size="11" font-weight="600">any 2 of the 3, in key order</text><path d="M260 152V172" marker-end="url(#msArr)"/><rect x="170" y="174" width="180" height="22" fill="none" stroke="var(--acc)" stroke-width="1.6"/><text x="260" y="189" text-anchor="middle" stroke="none" font-size="10" fill="var(--acc)">coin unlocks</text></svg>`,
+        timelock: `<svg viewBox="0 0 520 150" fill="none" stroke="currentColor" stroke-width="1.2"><line x1="20" y1="90" x2="500" y2="90"/><path d="M490 85L500 90L490 95" fill="none"/><circle cx="120" cy="90" r="5" fill="currentColor"/><circle cx="360" cy="90" r="5" fill="currentColor"/><text x="120" y="50" text-anchor="middle" stroke="none" font-size="11" font-weight="600">CLTV: absolute</text><text x="120" y="118" text-anchor="middle" stroke="none" font-size="10">not spendable before block 800,000</text><text x="360" y="50" text-anchor="middle" stroke="none" font-size="11" font-weight="600">CSV: relative</text><text x="360" y="118" text-anchor="middle" stroke="none" font-size="10">not spendable until 144 blocks after confirmation</text><text x="500" y="140" text-anchor="end" stroke="none" font-size="9.5">time</text></svg>`,
+        taproot: `<svg viewBox="0 0 520 236" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="170" y="8" width="180" height="40" fill="var(--soft)"/><text x="260" y="32" text-anchor="middle" stroke="none" font-size="11" font-weight="600">output key (looks like one key)</text><path d="M260 48V66H120V110"/><path d="M260 66H395V110"/><rect x="20" y="110" width="200" height="40" fill="var(--soft)"/><text x="120" y="134" text-anchor="middle" stroke="none" font-size="10.5">key path: cooperative signature</text><rect x="290" y="110" width="210" height="40" fill="var(--soft)"/><text x="395" y="134" text-anchor="middle" stroke="none" font-size="10.5">script path: tree of leaves</text><path d="M375 150L340 180"/><path d="M415 150L450 180"/><rect x="290" y="180" width="100" height="34" fill="none"/><text x="340" y="201" text-anchor="middle" stroke="none" font-size="10">leaf A: 2-of-2</text><rect x="400" y="180" width="110" height="34" fill="none"/><text x="455" y="201" text-anchor="middle" stroke="none" font-size="10">leaf B: after 144</text><text x="20" y="232" stroke="none" font-size="9.5">only the branch that is used is revealed. Unused leaves stay hidden.</text></svg>`,
+      };
+
+      const ACT = ["widget", "reflect"];
+      let P = {};
+      const KEY = "bitshala-learn:" + L.id;
+      try {
+        P = JSON.parse(localStorage.getItem(KEY) || "{}");
+      } catch {}
+      const total = () =>
+        L.sections.flatMap((s) => s.blocks).filter((b) => ACT.includes(b.type))
+          .length;
+      function prog() {
+        const n = Object.keys(P).length,
+          t = total();
+        $("#prog").textContent = `${n} of ${t} activities`;
+        $("#bar").style.width = (n / t) * 100 + "%";
+      }
+      function done(id) {
+        if (P[id]) return;
+        P[id] = 1;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(P));
+        } catch {}
+        prog();
+      }
+
+      // Runs the learner's function by name. Anything other than a plain function is an error.
+      function runUserFn(code, fnName, args) {
+        if (!new RegExp("function\\s+" + fnName + "\\s*\\(").test(code))
+          throw new Error("Define a function named " + fnName + "(...).");
+        const fn = new Function(code + `\nreturn ${fnName};`)();
+        if (typeof fn !== "function")
+          throw new Error("Define a function named " + fnName + "(...).");
+        return fn(...args);
+      }
+
+      const WIDGETS = {
+        CodeExercise(el, fin, p) {
+          el.classList.add("try");
+          el.innerHTML = `<span class="label">${escapeHTML(p.label)}</span>
+            <p>${inline(p.task)}</p>
+            <textarea class="codebox" spellcheck="false" aria-label="Your ${escapeHTML(p.fn)} function"></textarea>
+            <button data-run>Run the tests</button>
+            <div data-res></div>`;
+          const ta = $("textarea", el);
+          ta.value = p.starter;
+          $("[data-run]", el).onclick = () => {
+            let all = true;
+            const rows = p.cases.map((c) => {
+              let got = null,
+                err = null;
+              try {
+                got = runUserFn(ta.value, p.fn, c.args);
+              } catch (e) {
+                err = e.message;
+              }
+              const pass = err === null && got === c.expect;
+              all = all && pass;
+              const shown = err !== null ? "error: " + err : String(got);
+              return `<tr><td>${escapeHTML(c.label)}</td><td><code>${escapeHTML(JSON.stringify(c.args))}</code></td><td>${escapeHTML(String(c.expect))}</td><td>${escapeHTML(shown)}</td><td>${pass ? "pass" : "fail"}</td></tr>`;
+            });
+            $("[data-res]", el).innerHTML =
+              `<table class="vtable exercise-table"><thead><tr><th>case</th><th>input</th><th>expected</th><th>got</th><th></th></tr></thead><tbody>${rows.join("")}</tbody></table>` +
+              (all
+                ? `<p class="msg">${escapeHTML(p.done)}</p>`
+                : '<p class="small">Not every case passes yet. The table shows what your function returned for each one.</p>');
+            if (all) fin();
+          };
+        },
+      };
+
+      const BLOCKS = {
+        text: (b) => wrap(md(b.md)),
+        aside: (b) => wrap(inline(b.md), "aside"),
+        figure: (b) => {
+          const el = document.createElement("figure");
+          el.innerHTML =
+            ASSETS[b.asset] + `<figcaption>${b.caption}</figcaption>`;
+          return el;
+        },
+        widget: (b) => {
+          const el = wrap("");
+          WIDGETS[b.name](el, () => done(b.id), b.props);
+          return el;
+        },
+        reflect: (b) => {
+          const el = wrap(
+            `<div class="try"><span class="label">Write your note</span><p>${b.prompt}</p><textarea placeholder="${b.placeholder}"></textarea><button data-go>Compare with an example</button><div class="out"></div></div>`,
+          );
+          $("[data-go]", el).onclick = () => {
+            $(".out", el).innerHTML =
+              `<p>${b.model}</p><p class="small">Use this as a comparison, not something you need to copy word for word.</p>`;
+            done(b.id);
+          };
+          return el;
+        },
+        next: () => {
+          const n = L.next;
+          return wrap(
+            `<div class="label">Next lesson</div><h3>${n.id} ${n.title}</h3><p>${n.teaser}</p>`,
+            "next",
+          );
+        },
+      };
+      $("#head").innerHTML =
+        `<div class="kicker">${L.phase} · ${L.module}</div><h1>${L.title}</h1><p class="sub">${L.subtitle}</p><div class="meta">Lesson ${L.id} · about ${L.minutes} minutes · ${L.level}</div>`;
+      const main = $("#lesson");
+      L.sections.forEach((s) => {
+        const sec = document.createElement("section");
+        sec.id = s.id;
+        sec.innerHTML = `<div class="label">${s.label}</div><h2>${s.title}</h2>`;
+        s.blocks.forEach((b) => {
+          if (BLOCKS[b.type]) sec.appendChild(BLOCKS[b.type](b));
+        });
+        main.appendChild(sec);
+      });
+      prog();
+    </script>
+    <script type="module" src="../../navigation.js"></script>
+  </body>
+</html>
