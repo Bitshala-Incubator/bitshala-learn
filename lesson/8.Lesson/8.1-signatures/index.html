@@ -1,0 +1,1959 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Signatures — Bitshala Learn 8.1</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+    <style>
+      figure {
+        overflow-x: auto;
+      }
+      .exercise-table {
+        font-size: 14px;
+      }
+      .exercise-table code {
+        font-size: 12px;
+        word-break: break-all;
+      }
+      .codebox {
+        min-height: 190px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --ok: #3d7a4a;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --ok: #86c795;
+        }
+      }
+      :root[data-theme="dark"] {
+        --ok: #86c795;
+      }
+
+      @keyframes fade {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes pop {
+        from {
+          opacity: 0;
+          transform: scale(0);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      @keyframes dash {
+        to {
+          stroke-dashoffset: -9;
+        }
+      }
+      .flow path[marker-end] {
+        stroke-dasharray: 5 4;
+        animation: dash 1s linear infinite;
+      }
+
+      /* storybook */
+      .book {
+        padding: 0;
+        overflow: hidden;
+      }
+      .book-scene {
+        background-color: var(--bg);
+        background-image: radial-gradient(var(--line) 1px, transparent 1.2px);
+        background-size: 16px 16px;
+        border-bottom: 1px solid var(--line);
+        padding: 14px 12px 8px;
+      }
+      .book-scene svg {
+        max-height: 250px;
+        width: 100%;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .book-text {
+        padding: 18px 22px 6px;
+        min-height: 300px;
+      }
+      .book-year {
+        font:
+          600 12px system-ui,
+          sans-serif;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--acc);
+      }
+      .book-text h3 {
+        font-size: 26px;
+        line-height: 1.25;
+        margin: 0.2em 0 0.5em;
+        font-weight: 600;
+      }
+      .book-text p {
+        font-size: 18px;
+        line-height: 1.65;
+        margin: 0 0 0.8em;
+      }
+      .book-text .moral {
+        font-style: italic;
+        color: var(--mut);
+        border-left: 2px solid var(--acc);
+        padding-left: 14px;
+      }
+      .book-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 22px 18px;
+      }
+      .dots {
+        display: flex;
+        gap: 8px;
+      }
+      .dots button {
+        width: 12px;
+        height: 12px;
+        padding: 0;
+        margin: 0;
+        border: 0;
+        border-radius: 50%;
+        background: var(--line);
+      }
+      .dots button[aria-current="true"] {
+        background: var(--acc);
+      }
+      .book-page.turn {
+        animation: pageIn 0.5s ease both;
+      }
+      @keyframes pageIn {
+        from {
+          opacity: 0;
+          transform: translateX(18px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+
+      .book-scene svg text {
+        stroke: none;
+      }
+      .book-scene svg text.cap {
+        font:
+          italic 15px Charter,
+          Georgia,
+          serif;
+        fill: var(--mut);
+      }
+      .book-scene svg text.cap.a {
+        fill: var(--acc);
+      }
+      .book-scene svg text.hand {
+        font:
+          italic 15px Charter,
+          Georgia,
+          serif;
+        fill: var(--ink);
+      }
+      .book-scene svg text.yr {
+        font:
+          12px system-ui,
+          sans-serif;
+        letter-spacing: 0.1em;
+        fill: var(--mut);
+      }
+      .book-scene svg text.nm {
+        font:
+          500 15px system-ui,
+          sans-serif;
+        fill: var(--ink);
+      }
+      .book-scene svg text.nm.a {
+        fill: var(--acc);
+      }
+      .book-scene svg text.seal {
+        font:
+          600 22px Charter,
+          Georgia,
+          serif;
+        fill: var(--bg);
+      }
+      .book-scene svg text.mono {
+        font:
+          600 13px ui-monospace,
+          Menlo,
+          Consolas,
+          monospace;
+        fill: var(--bg);
+      }
+      .sc-fade {
+        animation: fade 0.8s both;
+      }
+      .sc-pop {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: pop 0.5s both cubic-bezier(0.3, 1.6, 0.5, 1);
+      }
+      .sc-stamp {
+        animation: stampDown 2.2s ease-in-out both;
+      }
+      @keyframes stampDown {
+        0% {
+          transform: translateY(-80px);
+          opacity: 0;
+        }
+        30% {
+          opacity: 1;
+        }
+        50%,
+        65% {
+          transform: translateY(0);
+        }
+        100% {
+          transform: translateY(-80px);
+          opacity: 0;
+        }
+      }
+      .sc-clone {
+        animation: cloneMove 2.6s ease-in-out 0.6s both;
+      }
+      @keyframes cloneMove {
+        from {
+          transform: translate(0, 0);
+        }
+        to {
+          transform: translate(282px, 6px);
+        }
+      }
+      .sc-left {
+        animation: splitL 1.3s 0.3s ease-out both;
+      }
+      .sc-right {
+        animation: splitR 1.3s 0.3s ease-out both;
+      }
+      @keyframes splitL {
+        from {
+          transform: translateX(100px);
+        }
+        to {
+          transform: none;
+        }
+      }
+      @keyframes splitR {
+        from {
+          transform: translateX(-100px);
+        }
+        to {
+          transform: none;
+        }
+      }
+      .sc-draw {
+        stroke-dasharray: 440;
+        stroke-dashoffset: 440;
+        animation: draw 2.6s ease-out forwards;
+      }
+      @keyframes draw {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+      .sc-fly {
+        animation: fly 1.8s ease-in-out 0.4s both;
+      }
+      @keyframes fly {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(140px);
+        }
+      }
+
+      /* labs */
+      .lab .ctl {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 14px;
+        align-items: end;
+        margin: 10px 0;
+      }
+      .lab label.f {
+        font:
+          13px system-ui,
+          sans-serif;
+        color: var(--mut);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .lab input[type="text"],
+      .lab select {
+        font:
+          15px system-ui,
+          sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 7px 10px;
+      }
+      .lab .small {
+        font:
+          13px system-ui,
+          sans-serif;
+        color: var(--mut);
+      }
+      .lab button.ghost[aria-pressed="true"] {
+        background: var(--acc);
+        border-color: var(--acc);
+        color: var(--bg);
+      }
+      .stations {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin: 14px 0;
+      }
+      .st {
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 6px;
+        padding: 10px;
+        min-height: 88px;
+        font:
+          13px/1.35 system-ui,
+          sans-serif;
+        transition:
+          border-color 0.3s,
+          transform 0.3s,
+          background 0.3s;
+      }
+      .st b {
+        display: block;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--mut);
+      }
+      .st code {
+        display: block;
+        margin-top: 6px;
+        font-size: 13px;
+        word-break: break-word;
+      }
+      .st.on {
+        border-color: var(--acc);
+        background: var(--soft);
+        transform: translateY(-3px);
+      }
+      .st.done {
+        border-color: var(--ink);
+      }
+      .st code.flip {
+        animation: flip 0.5s both;
+      }
+      @keyframes flip {
+        from {
+          opacity: 0;
+          transform: rotateX(90deg);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .steplog {
+        margin: 8px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+      .steplog p,
+      .steplog li {
+        font:
+          15px/1.55 system-ui,
+          sans-serif;
+        margin: 0.4em 0;
+        animation: fade 0.5s both;
+      }
+      .vpaper {
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 14px 16px;
+        font:
+          15px system-ui,
+          sans-serif;
+      }
+      .vp-msg {
+        font:
+          600 19px Charter,
+          Georgia,
+          serif;
+        margin-bottom: 8px;
+      }
+      .vp-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 5px 0;
+        border-top: 1px dashed var(--line);
+      }
+      .vp-row span {
+        color: var(--mut);
+      }
+      .vp-row b {
+        font:
+          600 14px ui-monospace,
+          Menlo,
+          Consolas,
+          monospace;
+      }
+      .bad {
+        color: var(--acc);
+      }
+      .verdict {
+        min-height: 70px;
+        margin-top: 12px;
+      }
+      .stamp {
+        display: inline-block;
+        font:
+          700 22px system-ui,
+          sans-serif;
+        letter-spacing: 0.12em;
+        border: 3px solid;
+        border-radius: 6px;
+        padding: 6px 16px;
+        transform: rotate(-4deg);
+        animation: stampIn 0.45s both;
+      }
+      .stamp.ok {
+        color: var(--ok);
+      }
+      .stamp.no {
+        color: var(--acc);
+      }
+      @keyframes stampIn {
+        0% {
+          opacity: 0;
+          transform: scale(2.2) rotate(-12deg);
+        }
+        70% {
+          opacity: 1;
+          transform: scale(0.95) rotate(-4deg);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1) rotate(-4deg);
+        }
+      }
+      .login-grid {
+        display: grid;
+        grid-template-columns: 1fr minmax(90px, 1.2fr) 1fr;
+        gap: 8px;
+        align-items: center;
+        margin: 12px 0;
+      }
+      .peer {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--bg);
+        padding: 10px;
+        text-align: center;
+        font:
+          14px/1.4 system-ui,
+          sans-serif;
+      }
+      .peer small {
+        display: block;
+        color: var(--mut);
+      }
+      .lane {
+        position: relative;
+        height: 34px;
+      }
+      .lane::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        border-top: 1px dashed var(--line);
+      }
+      .fly {
+        position: absolute;
+        top: 4px;
+        left: 0;
+        opacity: 0;
+        white-space: nowrap;
+        background: var(--acc);
+        color: var(--bg);
+        border-radius: 99px;
+        padding: 4px 10px;
+        font:
+          600 12px ui-monospace,
+          Menlo,
+          Consolas,
+          monospace;
+      }
+      .fly.go-r {
+        animation: flyR 0.9s ease-in-out both;
+      }
+      .fly.go-l {
+        animation: flyL 0.9s ease-in-out both;
+      }
+      @keyframes flyR {
+        from {
+          opacity: 1;
+          left: 0;
+          transform: none;
+        }
+        to {
+          opacity: 1;
+          left: 100%;
+          transform: translateX(-100%);
+        }
+      }
+      @keyframes flyL {
+        from {
+          opacity: 1;
+          left: 100%;
+          transform: translateX(-100%);
+        }
+        to {
+          opacity: 1;
+          left: 0;
+          transform: none;
+        }
+      }
+      .feed {
+        list-style: none;
+        margin: 10px 0 0;
+        padding: 0;
+      }
+      .feed li {
+        font:
+          14px/1.5 system-ui,
+          sans-serif;
+        padding: 7px 10px;
+        margin: 6px 0;
+        border-left: 3px solid var(--line);
+        background: var(--bg);
+        animation: fade 0.4s both;
+      }
+      .feed li.ok {
+        border-color: var(--ok);
+      }
+      .feed li.no {
+        border-color: var(--acc);
+      }
+      mark.hl {
+        background: var(--acc);
+        color: var(--bg);
+        border-radius: 3px;
+        padding: 0 5px;
+      }
+      .nt-table td,
+      .nt-table th {
+        font-size: 15px;
+      }
+      .nt-reveal {
+        text-align: center;
+        margin-top: 14px;
+      }
+      .nt-key {
+        display: inline-block;
+        font:
+          700 20px ui-monospace,
+          Menlo,
+          Consolas,
+          monospace;
+        border: 3px solid var(--acc);
+        color: var(--acc);
+        padding: 8px 18px;
+        border-radius: 6px;
+        animation: shake 0.6s both;
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20% {
+          transform: translateX(-8px);
+        }
+        40% {
+          transform: translateX(8px);
+        }
+        60% {
+          transform: translateX(-5px);
+        }
+        80% {
+          transform: translateX(5px);
+        }
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0;
+      }
+      .use h3 {
+        font-size: 22px;
+        margin: 0.3em 0 0.5em;
+        font-weight: 600;
+      }
+      .use p {
+        font-size: 17px;
+        margin: 0.6em 0;
+      }
+      .use-flow {
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+        margin: 12px 0;
+      }
+      .use-flow .node {
+        flex: 1;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--bg);
+        padding: 10px 12px;
+        font:
+          14px/1.4 system-ui,
+          sans-serif;
+      }
+      .use-flow .node small {
+        display: block;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--acc);
+        margin-bottom: 4px;
+      }
+      .use-flow .wire {
+        position: relative;
+        flex: 0 0 38px;
+      }
+      .use-flow .wire::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        border-top: 1px dashed var(--mut);
+      }
+      .use-flow .wire i {
+        position: absolute;
+        top: calc(50% - 4px);
+        left: 0;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--acc);
+        animation: travel 1.6s linear infinite;
+      }
+      @keyframes travel {
+        from {
+          left: 0;
+        }
+        to {
+          left: calc(100% - 8px);
+        }
+      }
+      @keyframes travelV {
+        from {
+          top: 0;
+        }
+        to {
+          top: calc(100% - 8px);
+        }
+      }
+      @media (max-width: 560px) {
+        .stations {
+          grid-template-columns: 1fr 1fr;
+        }
+        .use-flow {
+          flex-direction: column;
+        }
+        .use-flow .wire {
+          flex: 0 0 28px;
+        }
+        .use-flow .wire::before {
+          left: 50%;
+          right: auto;
+          top: 0;
+          bottom: 0;
+          border-top: 0;
+          border-left: 1px dashed var(--mut);
+        }
+        .use-flow .wire i {
+          left: calc(50% - 4px);
+          top: 0;
+          animation-name: travelV;
+        }
+        .book-text {
+          min-height: 340px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-delay: 0s !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 8.1</span><span id="prog">Ready</span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "8.1",
+        "title": "Signatures",
+        "subtitle": "How Meera proves she owns a coin without ever showing her private key.",
+        "phase": "Bitcoin Foundations",
+        "module": "Module 8",
+        "minutes": 65,
+        "level": "Beginner",
+        "next": {
+          "id": "8.2",
+          "title": "Continuing Module 8",
+          "teaser": "Aarav now knows how a signature is made and checked. The next lesson continues Module 8 from here. Check your course outline for what Bitshala covers next."
+        },
+        "sections": [
+          {
+            "id": "start",
+            "label": "The question",
+            "title": "Meera pays, and the wallet says ‘valid’",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Meera sends Aarav a payment. When Aarav looks at the transaction in his wallet, it shows a green tick next to the input and the word ‘valid’. Nothing in the transaction contains Meera’s private key.\n\n“So how does it know she’s allowed to spend that coin?” Aarav asks.\n\nMeera answers, “I didn’t show you my key. I showed you that I have it. That’s what a signature does.”"
+              },
+              {
+                "type": "text",
+                "md": "This lesson mixes a storybook, four hands-on labs, three coding exercises and a short note. You will see where signatures came from, watch one being made and checked, meet the websites and apps that already use them, and try to break one yourself. Then you will write the signing rule, the verification rule, and the range rules that Bitcoin applies to real signatures. The numbers are small, so you can follow every step by hand."
+              }
+            ]
+          },
+          {
+            "id": "origin",
+            "label": "Part 0 · The story",
+            "title": "How the signature was born",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Before any maths, Meera tells Aarav a story. Turn the pages: each one has a small animated scene."
+              },
+              {
+                "type": "widget",
+                "id": "w-story",
+                "name": "Storybook",
+                "props": {
+                  "pages": [
+                    {
+                      "scene": "seal",
+                      "year": "Long ago",
+                      "title": "The ring that spoke for the king",
+                      "text": "For centuries, a letter was closed with melted wax and pressed with a signet ring. Anyone could read it, but only the owner of the ring could leave that exact mark.\n\nWhen the wax was unbroken and the mark was right, the reader knew who had sent it.",
+                      "moral": "**Moral:** proof of who wrote something comes from something only one person has."
+                    },
+                    {
+                      "scene": "copy",
+                      "year": "Then came computers",
+                      "title": "The signature that could be copied",
+                      "text": "Imagine a clerk who scans her signature and pastes it under a contract. It looks perfect. It also looks perfect under a contract she has never seen.\n\nA picture of a signature proves nothing, because anyone can copy a picture.",
+                      "moral": "**Moral:** a digital signature must change whenever the message changes."
+                    },
+                    {
+                      "scene": "keys",
+                      "year": "1976",
+                      "title": "Two keys instead of one",
+                      "text": "In 1976 Whitfield Diffie and Martin Hellman asked a question that sounds like a riddle: what if the key that makes the mark and the key that checks it were different?\n\nKeep the first one private. Hand the second to the whole world. Their paper described the idea of a digital signature. It did not yet say how to build a practical one.",
+                      "moral": "**Moral:** anyone can check, but only one person can make."
+                    },
+                    {
+                      "scene": "timeline",
+                      "year": "1977 to the 1990s",
+                      "title": "The recipes arrive",
+                      "text": "A year later, Rivest, Shamir and Adleman published RSA, the first practical signature scheme. ElGamal (1985) and Schnorr (1989) followed, then DSA, proposed by the US standards body NIST in 1991 and published in 1994.\n\nDSA is the (r, s) recipe you will code in this lesson. Before the decade ended, ECDSA, the same recipe on an elliptic curve, had been standardised too.",
+                      "moral": "**Moral:** ideas are tested in public for years before money depends on them."
+                    },
+                    {
+                      "scene": "bitcoin",
+                      "year": "2008 to 2009",
+                      "title": "Money that answers to a signature",
+                      "text": "When Bitcoin launched in 2009, every coin was locked to a public key. Spending it meant publishing a signature made with ECDSA on a curve called secp256k1.\n\nEvery node checks every signature. None of them ever sees a private key, and none of them has to trust Meera.",
+                      "moral": "**Moral:** with signatures nobody has to be trusted, only checked."
+                    },
+                    {
+                      "scene": "taproot",
+                      "year": "2021",
+                      "title": "A second seal",
+                      "text": "In November 2021 the Taproot upgrade added Schnorr signatures (BIP 340) on the very same curve. Schnorr’s idea dates from 1989. Bitcoin waited until 2021 to use it.\n\nThe story is still being written, and you now know how its first chapters work.",
+                      "moral": "**Moral:** the idea stays the same while the recipes improve."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "signing",
+            "label": "Part 1 · Signing",
+            "title": "What happens when a transaction is signed",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "A signature is never made over the transaction as a whole. The wallet first builds a short fingerprint of the transaction, a number called **z**, which is a hash of the parts that the signature commits to.\n\nThen the signer uses three things: their **private key** x, the fingerprint z, and a fresh random number **k** that is used once and then thrown away. The output of signing is a pair of numbers, **r** and **s**. Together they are the signature."
+              },
+              {
+                "type": "figure",
+                "asset": "signflow",
+                "caption": "Signing turns a transaction into a fingerprint z, then combines z with the private key x and a fresh random k to produce the signature (r, s)."
+              },
+              {
+                "type": "text",
+                "md": "Now watch it happen. The machine below uses our toy numbers: Meera’s private key is 7 and her public key is 8. Type a message, pick a nonce, and press the button."
+              },
+              {
+                "type": "widget",
+                "id": "w-machine",
+                "name": "SignMachine",
+                "props": {}
+              },
+              {
+                "type": "aside",
+                "md": "**Key idea:** the private key never leaves the wallet. Only the signature, which is built from it, is published."
+              }
+            ]
+          },
+          {
+            "id": "ex1",
+            "label": "Exercise 1 · Sign a fingerprint",
+            "title": "Write the signing rule",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "The numbers here come from a small toy group: the modulus is 23, the order is 11, and the generator is 4. Bitcoin uses much larger numbers, but the rule is the same. Meera’s private key is 7, so her public key is 8. The starter code gives you two helpers, `modPow` and `modInv`."
+              },
+              {
+                "type": "widget",
+                "id": "w-sign",
+                "name": "CodeExercise",
+                "props": {
+                  "label": "sign(z, x, k)",
+                  "task": "Write `sign(z, x, k)`. Let `r = (G^k mod P) mod Q`, then `s = k⁻¹ · (z + x·r) mod Q`. Return the pair `[r, s]`. The helpers `modPow` and `modInv` are provided.",
+                  "fn": "sign",
+                  "starter": "const P = 23, Q = 11, G = 4;\n\nfunction modPow(b, e, m) {\n  let r = 1;\n  b %= m;\n  while (e > 0) {\n    if (e & 1) r = (r * b) % m;\n    b = (b * b) % m;\n    e >>= 1;\n  }\n  return r;\n}\n\nfunction modInv(a, m) {\n  for (let x = 1; x < m; x++) if ((a * x) % m === 1) return x;\n  return null;\n}\n\nfunction sign(z, x, k) {\n  \n}",
+                  "cases": [
+                    {
+                      "label": "fingerprint 5, key 7, nonce 3",
+                      "args": [5, 7, 3],
+                      "expect": [7, 7]
+                    },
+                    {
+                      "label": "fingerprint 2, key 3, nonce 5",
+                      "args": [2, 3, 5],
+                      "expect": [1, 1]
+                    },
+                    {
+                      "label": "fingerprint 9, key 7, nonce 4",
+                      "args": [9, 7, 4],
+                      "expect": [3, 2]
+                    },
+                    {
+                      "label": "fingerprint 7, key 7, nonce 4",
+                      "args": [7, 7, 4],
+                      "expect": [3, 7]
+                    }
+                  ],
+                  "done": "Every case passes. The signature is built from the fingerprint, the private key and the nonce, and nothing in it reveals the private key directly."
+                }
+              }
+            ]
+          },
+          {
+            "id": "verification",
+            "label": "Part 2 · Verification",
+            "title": "Anyone can check it, nobody can forge it",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Verification needs no secrets. A checker has the fingerprint z, the signature (r, s), and the **public key** y. The public key is computed from the private key, but it is not the private key. From these, the checker runs a short calculation and gets a value v. If v equals r, the signature is valid. If not, it is rejected.\n\nIf the fingerprint changes, the transaction has been tampered with, and the check fails. If the signature was made with another key, the check fails too."
+              },
+              {
+                "type": "figure",
+                "asset": "verifyflow",
+                "caption": "Verification uses only public information: the fingerprint, the signature and the public key. It never touches the private key."
+              },
+              {
+                "type": "text",
+                "md": "Now be the troublemaker. Below is Meera’s signed payment, already checked. Press the buttons to tamper with it and watch the check react."
+              },
+              {
+                "type": "widget",
+                "id": "w-verifylab",
+                "name": "VerifyLab",
+                "props": {}
+              }
+            ]
+          },
+          {
+            "id": "ex2",
+            "label": "Exercise 2 · Verify a signature",
+            "title": "Write the checking rule",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Write the verification rule. Compute `w = s⁻¹ mod Q`, then `u1 = z·w mod Q` and `u2 = r·w mod Q`. Then compute `v = ((G^u1 · y^u2) mod P) mod Q`. The signature is valid only when `v` equals `r`. A signature must also have `r` and `s` between 1 and Q−1, otherwise it is invalid."
+              },
+              {
+                "type": "widget",
+                "id": "w-verify",
+                "name": "CodeExercise",
+                "props": {
+                  "label": "verify(z, r, s, y)",
+                  "task": "Write `verify(z, r, s, y)`. Return `false` if `r` or `s` is outside 1 to Q−1. Otherwise compute `w`, `u1`, `u2` and `v` as described above, and return `true` only when `v` equals `r`. The helpers from Exercise 1 are still in scope if you keep them in the same box.",
+                  "fn": "verify",
+                  "starter": "const P = 23, Q = 11, G = 4;\n\nfunction modPow(b, e, m) {\n  let r = 1;\n  b %= m;\n  while (e > 0) {\n    if (e & 1) r = (r * b) % m;\n    b = (b * b) % m;\n    e >>= 1;\n  }\n  return r;\n}\n\nfunction modInv(a, m) {\n  for (let x = 1; x < m; x++) if ((a * x) % m === 1) return x;\n  return null;\n}\n\nfunction verify(z, r, s, y) {\n  \n}",
+                  "cases": [
+                    {
+                      "label": "Meera’s signature, correct message",
+                      "args": [5, 7, 7, 8],
+                      "expect": true
+                    },
+                    {
+                      "label": "another signature, another key (3)",
+                      "args": [2, 1, 1, 18],
+                      "expect": true
+                    },
+                    {
+                      "label": "Meera’s second signature",
+                      "args": [9, 3, 2, 8],
+                      "expect": true
+                    },
+                    {
+                      "label": "message changed after signing",
+                      "args": [6, 7, 7, 8],
+                      "expect": false
+                    },
+                    {
+                      "label": "wrong public key",
+                      "args": [5, 7, 7, 18],
+                      "expect": false
+                    },
+                    {
+                      "label": "r is zero",
+                      "args": [5, 0, 7, 8],
+                      "expect": false
+                    },
+                    {
+                      "label": "s was tampered with",
+                      "args": [5, 7, 8, 8],
+                      "expect": false
+                    }
+                  ],
+                  "done": "Every case passes. The checker never saw the private key, and it still tells a real signature from a forged or altered one."
+                }
+              }
+            ]
+          },
+          {
+            "id": "uses",
+            "label": "Part 3 · Signatures in the wild",
+            "title": "You have been using signatures all along",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav is surprised to learn that signatures are not only a Bitcoin idea. Meera shows him that his phone, his browser and his favourite code site all verify signatures every day. Pick a tile to see who signs, what is signed, and who checks it. Most tiles end with a place you can go and look at a real one."
+              },
+              {
+                "type": "widget",
+                "id": "w-uses",
+                "name": "WhereUsed",
+                "props": {
+                  "items": [
+                    {
+                      "name": "The browser padlock",
+                      "signer": "A certificate authority",
+                      "signs": "A website’s certificate, which ties the site name to its public key",
+                      "checker": "Your browser, using the authority’s public key already built into your system",
+                      "line": "Every time you open an https page, a chain of signatures is checked before the page loads.",
+                      "tryit": "Click the padlock next to any web address and open the certificate details. You will see who signed it and which signature algorithm was used."
+                    },
+                    {
+                      "name": "Passkeys and passwordless login",
+                      "signer": "Your phone or laptop",
+                      "signs": "A random challenge sent by the website",
+                      "checker": "The website, using the public key it stored when you signed up",
+                      "line": "There is no password to send or leak. The site stores only a public key, which cannot be used to log in. You will try exactly this in the next lab.",
+                      "tryit": "Visit [webauthn.io](https://webauthn.io), a demo site where you can register and log in with a passkey."
+                    },
+                    {
+                      "name": "Verified commits",
+                      "signer": "A developer’s key",
+                      "signs": "A Git commit, so everyone knows who really made the change",
+                      "checker": "GitHub, which shows a ‘Verified’ badge when the signature matches a public key on the author’s account",
+                      "line": "Anyone can type another person’s name into a commit. Only the key holder can make it show ‘Verified’.",
+                      "tryit": "Read how it works in the [GitHub guide to commit signature verification](https://docs.github.com/en/authentication/managing-commit-signature-verification)."
+                    },
+                    {
+                      "name": "Software updates",
+                      "signer": "The software publisher",
+                      "signs": "The installer or update file",
+                      "checker": "Your device, before it installs anything",
+                      "line": "A tampered update fails the check, even if it came from a hijacked download server.",
+                      "tryit": "On Windows, right-click a downloaded installer, choose Properties, and look for the Digital Signatures tab."
+                    },
+                    {
+                      "name": "Bitcoin transactions",
+                      "signer": "The owner of the coin’s private key",
+                      "signs": "A fingerprint of the transaction",
+                      "checker": "Every Bitcoin node",
+                      "line": "This is the green tick from the start of the lesson, repeated by every node on the network.",
+                      "tryit": "Open any transaction on [mempool.space](https://mempool.space) and expand its details to see the signature data of each input."
+                    },
+                    {
+                      "name": "Nostr posts",
+                      "signer": "The author’s key",
+                      "signs": "Each post, which Nostr calls an event",
+                      "checker": "Any relay or app that receives it",
+                      "line": "Nostr uses the same secp256k1 curve as Bitcoin with Schnorr signatures, so one key can prove authorship across many apps without any company vouching for it.",
+                      "tryit": "Read about the protocol at [nostr.com](https://nostr.com)."
+                    },
+                    {
+                      "name": "Signed messages",
+                      "signer": "A wallet that holds the key for an address",
+                      "signs": "Any text, such as ‘I am Meera, 3 June’",
+                      "checker": "Anyone who knows the address",
+                      "line": "It proves you control an address without moving a single coin. Exchanges and counterparties use it to confirm ownership.",
+                      "tryit": "Bitcoin Core has `signmessage` and `verifymessage` commands. You met its command line in [Lesson 3.2](../../3.Lesson/3.2-bitcoin-core-rpc/)."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "text",
+                "md": "The passkey idea is worth acting out. Below, shop.example knows only Meera’s public key. Log in once, then play Eve, who is listening on the wire, and see why copying a signature does not help her."
+              },
+              {
+                "type": "widget",
+                "id": "w-login",
+                "name": "LoginDemo",
+                "props": {}
+              }
+            ]
+          },
+          {
+            "id": "ecdsa",
+            "label": "Part 4 · ECDSA in Bitcoin",
+            "title": "The same idea, on a real curve",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Bitcoin uses **ECDSA** (Elliptic Curve Digital Signature Algorithm) on a curve called **secp256k1**. The shape of the calculation is the one you just wrote. The difference is that the numbers are about 256 bits long, and the multiplication is done on points of an elliptic curve instead of plain numbers modulo a prime.\n\nTwo details matter a great deal in practice:\n\n**The nonce k must be fresh and secret.** If the same k is ever used twice with the same key, the private key can be calculated from the two signatures. A famous example is the 2010 PlayStation 3 signing key, which was recovered for this reason."
+              },
+              {
+                "type": "text",
+                "md": "Do not take that on trust. In the lab below, Meera’s wallet has a bug and reuses its nonce. Play Eve and recover the private key step by step, then switch to a wallet that uses a fresh nonce and see what changes."
+              },
+              {
+                "type": "widget",
+                "id": "w-nonce",
+                "name": "NonceTrap",
+                "props": {}
+              },
+              {
+                "type": "text",
+                "md": "**Bitcoin nodes accept only ‘low-S’ signatures.** Because the signature (r, s) and the signature (r, −s) both verify, Bitcoin’s standard rules accept only the version where s is in the lower half of the range. This stops a third party from changing a transaction’s signature bytes and changing its ID."
+              },
+              {
+                "type": "aside",
+                "md": "**Key idea:** the curve gives the signature its size and security. The rule in your code gives it its meaning: only the owner of the private key can produce a value that passes."
+              }
+            ]
+          },
+          {
+            "id": "ex3",
+            "label": "Exercise 3 · Standard signature rules",
+            "title": "Which signatures do nodes accept?",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Write the range rules a node applies before it checks the maths. For this exercise the order is `n = 11`, so the low half of the range is 1 to 5. A signature is standard only if `r` is between 1 and n−1, and `s` is between 1 and the midpoint `floor(n/2)`."
+              },
+              {
+                "type": "widget",
+                "id": "w-standard",
+                "name": "CodeExercise",
+                "props": {
+                  "label": "isStandardSig(r, s, n)",
+                  "task": "Write `isStandardSig(r, s, n)`. Return `true` only if `r` is between 1 and n−1 inclusive, and `s` is between 1 and `Math.floor(n / 2)` inclusive. Otherwise return `false`.",
+                  "fn": "isStandardSig",
+                  "starter": "function isStandardSig(r, s, n) {\n  \n}",
+                  "cases": [
+                    {
+                      "label": "both in range",
+                      "args": [3, 5, 11],
+                      "expect": true
+                    },
+                    {
+                      "label": "s in the upper half",
+                      "args": [3, 6, 11],
+                      "expect": false
+                    },
+                    {
+                      "label": "r is zero",
+                      "args": [0, 2, 11],
+                      "expect": false
+                    },
+                    {
+                      "label": "r equal to n",
+                      "args": [11, 2, 11],
+                      "expect": false
+                    },
+                    { "label": "small s", "args": [4, 1, 11], "expect": true },
+                    {
+                      "label": "s equal to n",
+                      "args": [4, 11, 11],
+                      "expect": false
+                    }
+                  ],
+                  "done": "Correct. A node checks the range before it spends time on the maths. Real Bitcoin uses the same rule with a 256-bit order."
+                }
+              }
+            ]
+          },
+          {
+            "id": "report",
+            "label": "Final note",
+            "title": "Explain it to Aarav",
+            "blocks": [
+              {
+                "type": "reflect",
+                "id": "r-signatures",
+                "prompt": "In a short note to Aarav, explain what happens when a transaction is signed, how a checker verifies the signature against a public key without the private key, and what role ECDSA plays in Bitcoin. Mention why the random nonce must never be reused.",
+                "placeholder": "Explain it in your own words.",
+                "model": "Signing starts from a fingerprint of the transaction. The signer combines that fingerprint with the private key and a fresh random nonce k, and produces the pair (r, s). Verification uses only public values: the fingerprint, the signature and the public key. It performs a short calculation and accepts only if the result equals r, so the private key is never needed. Bitcoin uses ECDSA on the secp256k1 curve, with the same shape of calculation on much larger numbers. The nonce must be used once: reusing it lets anyone compute the private key from two signatures. Nodes also accept only low-S signatures, which removes the second valid form of the same signature."
+              }
+            ]
+          },
+          {
+            "id": "wrapup",
+            "label": "Where this leaves you",
+            "title": "A signature is proof, not a secret",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav looks at the green tick again. It is not a password and it does not reveal Meera’s key. It is a short proof, built from a fresh random number and a fingerprint of the transaction, that only the holder of the key could have produced."
+              },
+              {
+                "type": "text",
+                "md": "**Keep exploring.** Read the Schnorr specification in [BIP 340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki), browse step-by-step explanations on [learnmeabitcoin.com](https://learnmeabitcoin.com), and look up real signatures on [mempool.space](https://mempool.space)."
+              },
+              { "type": "next" }
+            ]
+          }
+        ]
+      }
+    </script>
+    <script type="module">
+      const $ = (s, r = document) => r.querySelector(s);
+      const L = JSON.parse($("#lesson-data").textContent);
+      const escapeHTML = (s) =>
+        String(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      const inline = (s) =>
+        s
+          .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+          .replace(/\*(.+?)\*/g, "<i>$1</i>")
+          .replace(/`(.+?)`/g, "<code>$1</code>")
+          .replace(
+            /\[([^\]]+)\]\((https:\/\/[^\s)]+)\)/g,
+            '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>',
+          )
+          .replace(/\[([^\]]+)\]\((\.\.\/[^\s)]+)\)/g, '<a href="$2">$1</a>');
+      const md = (s) =>
+        s
+          .split("\n\n")
+          .map((p) => `<p>${inline(p)}</p>`)
+          .join("");
+      const wrap = (h, c = "") => {
+        const d = document.createElement("div");
+        d.className = "blk " + c;
+        d.innerHTML = h;
+        return d;
+      };
+
+      const ASSETS = {
+        signflow: `<svg class="flow" viewBox="0 0 520 130" fill="none" stroke="currentColor" stroke-width="1.2"><defs><marker id="sfArr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs><rect x="10" y="30" width="100" height="58" fill="var(--soft)"/><text x="60" y="56" text-anchor="middle" stroke="none" font-size="11">transaction</text><text x="60" y="72" text-anchor="middle" stroke="none" font-size="9.5">inputs and outputs</text><path d="M112 59H130" marker-end="url(#sfArr)"/><rect x="132" y="30" width="100" height="58" fill="var(--soft)"/><text x="182" y="56" text-anchor="middle" stroke="none" font-size="11">fingerprint z</text><text x="182" y="72" text-anchor="middle" stroke="none" font-size="9.5">hash of the data</text><path d="M234 59H252" marker-end="url(#sfArr)"/><rect x="254" y="30" width="112" height="58" fill="var(--soft)"/><text x="310" y="52" text-anchor="middle" stroke="none" font-size="11">sign with</text><text x="310" y="68" text-anchor="middle" stroke="none" font-size="9.5">private key x</text><text x="310" y="81" text-anchor="middle" stroke="none" font-size="9.5">and random k</text><path d="M368 59H386" marker-end="url(#sfArr)"/><rect x="388" y="30" width="122" height="58" fill="none" stroke="var(--acc)" stroke-width="1.6"/><text x="449" y="56" text-anchor="middle" stroke="none" font-size="11" fill="var(--acc)">signature (r, s)</text><text x="449" y="72" text-anchor="middle" stroke="none" font-size="9.5" fill="var(--acc)">published</text><text x="10" y="118" stroke="none" font-size="9.5">k is used once, then thrown away. The private key x never appears in the output.</text></svg>`,
+        verifyflow: `<svg class="flow" viewBox="0 0 520 220" fill="none" stroke="currentColor" stroke-width="1.2"><defs><marker id="vfArr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs><rect x="10" y="18" width="150" height="40" fill="var(--soft)"/><text x="85" y="42" text-anchor="middle" stroke="none" font-size="11">fingerprint z</text><rect x="10" y="78" width="150" height="40" fill="var(--soft)"/><text x="85" y="102" text-anchor="middle" stroke="none" font-size="11">signature (r, s)</text><rect x="10" y="138" width="150" height="40" fill="var(--soft)"/><text x="85" y="162" text-anchor="middle" stroke="none" font-size="11">public key y</text><path d="M160 38L200 100" marker-end="url(#vfArr)"/><path d="M160 98L200 110" marker-end="url(#vfArr)"/><path d="M160 158L200 120" marker-end="url(#vfArr)"/><rect x="200" y="80" width="150" height="56" fill="var(--soft)"/><text x="275" y="104" text-anchor="middle" stroke="none" font-size="11">compute v from</text><text x="275" y="122" text-anchor="middle" stroke="none" font-size="10">z, r, s and y</text><path d="M350 108H378" marker-end="url(#vfArr)"/><rect x="380" y="80" width="130" height="56" fill="none" stroke="var(--acc)" stroke-width="1.6"/><text x="445" y="104" text-anchor="middle" stroke="none" font-size="11" fill="var(--acc)">is v equal to r?</text><text x="445" y="122" text-anchor="middle" stroke="none" font-size="10" fill="var(--acc)">yes: valid, no: rejected</text><text x="10" y="208" stroke="none" font-size="9.5">no private key is needed anywhere in this check</text></svg>`,
+      };
+
+      const ACT = ["widget", "reflect"];
+      let P = {};
+      const KEY = "bitshala-learn:" + L.id;
+      try {
+        P = JSON.parse(localStorage.getItem(KEY) || "{}");
+      } catch {}
+      const total = () =>
+        L.sections.flatMap((s) => s.blocks).filter((b) => ACT.includes(b.type))
+          .length;
+      function prog() {
+        const n = Object.keys(P).length,
+          t = total();
+        $("#prog").textContent = `${n} of ${t} activities`;
+        $("#bar").style.width = (n / t) * 100 + "%";
+      }
+      function done(id) {
+        if (P[id]) return;
+        P[id] = 1;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(P));
+        } catch {}
+        prog();
+      }
+
+      // Runs the learner's function by name. Anything other than a plain function is an error.
+      function runUserFn(code, fnName, args) {
+        if (!new RegExp("function\\s+" + fnName + "\\s*\\(").test(code))
+          throw new Error("Define a function named " + fnName + "(...).");
+        const fn = new Function(code + `\nreturn ${fnName};`)();
+        if (typeof fn !== "function")
+          throw new Error("Define a function named " + fnName + "(...).");
+        return fn(...args);
+      }
+
+      const WIDGETS = {
+        CodeExercise(el, fin, p) {
+          el.classList.add("try");
+          el.innerHTML = `<span class="label">${escapeHTML(p.label)}</span>
+            <p>${inline(p.task)}</p>
+            <textarea class="codebox" spellcheck="false" aria-label="Your ${escapeHTML(p.fn)} function"></textarea>
+            <button data-run>Run the tests</button>
+            <div data-res></div>`;
+          const ta = $("textarea", el);
+          ta.value = p.starter;
+          $("[data-run]", el).onclick = () => {
+            let all = true;
+            const rows = p.cases.map((c) => {
+              let got = null,
+                err = null;
+              try {
+                got = runUserFn(ta.value, p.fn, c.args);
+              } catch (e) {
+                err = e.message;
+              }
+              const pass =
+                err === null &&
+                JSON.stringify(got) === JSON.stringify(c.expect);
+              all = all && pass;
+              const shown =
+                err !== null ? "error: " + err : JSON.stringify(got);
+              return `<tr><td>${escapeHTML(c.label)}</td><td><code>${escapeHTML(JSON.stringify(c.args))}</code></td><td>${escapeHTML(JSON.stringify(c.expect))}</td><td>${escapeHTML(shown)}</td><td>${pass ? "pass" : "fail"}</td></tr>`;
+            });
+            $("[data-res]", el).innerHTML =
+              `<table class="vtable exercise-table"><thead><tr><th>case</th><th>input</th><th>expected</th><th>got</th><th></th></tr></thead><tbody>${rows.join("")}</tbody></table>` +
+              (all
+                ? `<p class="msg">${escapeHTML(p.done)}</p>`
+                : '<p class="small">Not every case passes yet. The table shows what your function returned for each one.</p>');
+            if (all) fin();
+          };
+        },
+      };
+
+      // ---------- toy group (P=23, Q=11, G=4) used by the labs ----------
+      const TP = 23,
+        TQ = 11,
+        TG = 4,
+        TX = 7,
+        TY = 8;
+      const tmod = (a) => ((a % TQ) + TQ) % TQ;
+      const tpow = (b, e) => {
+        let r = 1;
+        b %= TP;
+        while (e > 0) {
+          if (e & 1) r = (r * b) % TP;
+          b = (b * b) % TP;
+          e >>= 1;
+        }
+        return r;
+      };
+      const tinv = (a) => {
+        a = tmod(a);
+        for (let x = 1; x < TQ; x++) if ((a * x) % TQ === 1) return x;
+        return null;
+      };
+      // Seed 3 makes "Pay Aarav 0.5 BTC" hash to 5, matching Exercise 1.
+      const toyHash = (s) => {
+        let h = 3;
+        for (const c of s) h = (h * 31 + c.charCodeAt(0)) % TQ;
+        return h;
+      };
+      const toySign = (z, x, k) => {
+        const R = tpow(TG, k),
+          r = R % TQ,
+          ki = tinv(k);
+        if (!r || ki === null) return null;
+        const s = tmod(ki * (z + x * r));
+        return s ? { R, r, s, ki } : null;
+      };
+      const toyVerify = (z, r, s, y) => {
+        if (r < 1 || r >= TQ || s < 1 || s >= TQ) return { ok: false };
+        const w = tinv(s),
+          u1 = tmod(z * w),
+          u2 = tmod(r * w);
+        const V = (tpow(TG, u1) * tpow(y, u2)) % TP,
+          v = V % TQ;
+        return { ok: v === r, w, u1, u2, V, v };
+      };
+      const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const sleep = (ms) => new Promise((r) => setTimeout(r, RM ? 0 : ms));
+      const pick = (n) => 1 + Math.floor(Math.random() * n);
+      const restart = (node, cls) => {
+        node.classList.remove(cls);
+        void node.offsetWidth;
+        node.classList.add(cls);
+      };
+
+      // ---------- storybook scenes ----------
+      const SC = (label, body) =>
+        `<svg viewBox="0 0 480 220" fill="none" stroke="currentColor" stroke-width="1.5" role="img" aria-label="${label}">${body}</svg>`;
+      const SQUIGGLE =
+        "M44 140c8-26 14-26 18-6s10 18 20-2 14-22 22-4 10 6 20-2";
+      const PAPER = (x, y, w, h) =>
+        `<rect x="${x + 4}" y="${y + 6}" width="${w}" height="${h}" rx="6" fill="var(--line)" stroke="none" opacity=".7"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="var(--bg)"/>`;
+      const TEXTLINES = (x, y, w, n) =>
+        `<path d="${Array.from({ length: n }, (_, i) => `M${x} ${y + i * 14}h${i === n - 1 ? w * 0.6 : w}`).join("")}" stroke="var(--mut)" stroke-width="3" stroke-dasharray="0.1 6.5" opacity=".65"/>`;
+      const SPARK = (x, y, d) =>
+        `<g transform="translate(${x} ${y})"><path class="sc-pop" style="animation-delay:${d}s" d="M0-9L2.4-2.4L9 0L2.4 2.4L0 9L-2.4 2.4L-9 0L-2.4-2.4Z" fill="var(--acc)" stroke="none"/></g>`;
+      const SCENES = {
+        seal: SC(
+          "A signet ring presses a wax seal onto a letter",
+          `<ellipse cx="240" cy="186" rx="120" ry="7" fill="var(--line)" stroke="none" opacity=".6"/>
+          ${PAPER(150, 36, 180, 138)}
+          <text class="hand" x="170" y="68">Dear Aarav,</text>
+          ${TEXTLINES(170, 88, 134, 3)}
+          <g class="sc-pop" style="animation-delay:1.1s"><circle cx="240" cy="148" r="25" fill="var(--acc)" stroke="none"/><circle cx="240" cy="148" r="18" stroke="var(--bg)" opacity=".75"/><text class="seal" x="240" y="156" text-anchor="middle">M</text></g>
+          <g class="sc-stamp"><circle cx="240" cy="92" r="12" stroke-width="4" stroke="var(--ink)"/><path d="M240 104V136" stroke-width="7" stroke="var(--ink)"/><rect x="224" y="136" width="32" height="12" rx="3" fill="var(--ink)" stroke="none"/></g>
+          <text class="cap sc-fade" style="animation-delay:1.8s" x="240" y="208" text-anchor="middle">only the ring’s owner can leave this mark</text>`,
+        ),
+        copy: SC(
+          "A picture of a signature is copied from one document onto another",
+          `${PAPER(24, 30, 150, 130)}
+          <text class="hand" style="font-size:13px" x="40" y="58">Pay Aarav 0.5 BTC</text>
+          ${TEXTLINES(40, 76, 112, 2)}
+          <path d="${SQUIGGLE}" stroke-width="2"/>
+          ${PAPER(306, 30, 150, 130)}
+          <text class="hand" style="font-size:13px" x="322" y="58">Pay Mallory 100 BTC</text>
+          ${TEXTLINES(322, 76, 112, 2)}
+          <path d="M326 146h110" stroke="var(--mut)" stroke-dasharray="3 5"/>
+          <path class="sc-fade" style="animation-delay:.4s" d="M190 96Q240 44 290 96" stroke="var(--mut)" stroke-dasharray="3 5" opacity=".7"/>
+          <text class="cap sc-fade" style="animation-delay:.4s" x="240" y="52" text-anchor="middle">copy and paste</text>
+          <g class="sc-clone"><path d="${SQUIGGLE}" stroke="var(--acc)" stroke-width="2.6"/></g>
+          <text class="cap" x="99" y="190" text-anchor="middle">signed by the clerk</text>
+          <text class="cap a sc-fade" style="animation-delay:3.2s" x="381" y="190" text-anchor="middle">never seen by the clerk</text>`,
+        ),
+        keys: SC(
+          "A key splits into a private half and a public half",
+          `<g class="sc-left"><circle cx="76" cy="92" r="19" stroke="var(--acc)" stroke-width="3.5"/><circle cx="76" cy="92" r="5" fill="var(--acc)" stroke="none"/><path d="M95 92H162M138 92V108M152 92V104" stroke="var(--acc)" stroke-width="4"/><text class="nm a" x="120" y="146" text-anchor="middle">private key</text><text class="cap" x="120" y="168" text-anchor="middle">makes the mark</text></g>
+          <g class="sc-right"><circle cx="336" cy="92" r="19" stroke="var(--ink)" stroke-width="3.5"/><circle cx="336" cy="92" r="5" fill="var(--ink)" stroke="none"/><path d="M355 92H422M398 92V108M412 92V104" stroke="var(--ink)" stroke-width="4"/><path d="M306 76q-8 16 0 32M296 68q-14 24 0 48" stroke="var(--mut)" opacity=".6"/><text class="nm" x="380" y="146" text-anchor="middle">public key</text><text class="cap" x="380" y="168" text-anchor="middle">checks the mark</text></g>
+          <g class="sc-fade" style="animation-delay:1.7s"><path d="M196 92H262M254 85L262 92L254 99" stroke="var(--mut)"/><text class="cap" x="229" y="72" text-anchor="middle">easy this way</text><text class="cap" x="229" y="124" text-anchor="middle">not backwards</text></g>`,
+        ),
+        timeline: SC(
+          "A timeline of signature schemes from 1977 to the late 1990s",
+          `<path class="sc-draw" d="M24 100H456" stroke="var(--mut)"/>
+          ${[
+            ["1977", "RSA", "first practical", 54],
+            ["1985", "ElGamal", "", 143],
+            ["1989", "Schnorr", "", 232],
+            ["1994", "DSA", "(r, s)", 321],
+            ["late 1990s", "ECDSA", "on curves", 414],
+          ]
+            .map(
+              ([y, n, d, x], i) =>
+                `<g class="sc-fade" style="animation-delay:${0.5 + i * 0.55}s"><circle cx="${x}" cy="100" r="8" fill="${i > 2 ? "var(--acc)" : "var(--bg)"}" stroke="${i > 2 ? "var(--acc)" : "var(--ink)"}" stroke-width="2"/><text class="yr" x="${x}" y="72" text-anchor="middle">${y.toUpperCase()}</text><text class="nm${i > 2 ? " a" : ""}" x="${x}" y="134" text-anchor="middle">${n}</text>${d ? `<text class="cap" x="${x}" y="155" text-anchor="middle">${d}</text>` : ""}</g>`,
+            )
+            .join("")}
+          <text class="cap a sc-fade" style="animation-delay:3.4s" x="240" y="198" text-anchor="middle">the recipe you will code is DSA’s</text>`,
+        ),
+        bitcoin: SC(
+          "A signature travels from a wallet to Bitcoin nodes, which each check it",
+          `${PAPER(28, 58, 92, 100)}
+          <circle cx="74" cy="96" r="9" stroke="var(--acc)" stroke-width="2.5"/><path d="M83 96H104M98 96V105" stroke="var(--acc)" stroke-width="2.5"/>
+          <text class="nm" x="74" y="136" text-anchor="middle">wallet</text>
+          <text class="cap" x="74" y="188" text-anchor="middle">private key</text><text class="cap" x="74" y="206" text-anchor="middle">stays home</text>
+          <g class="sc-fly"><rect x="138" y="98" width="64" height="26" rx="13" fill="var(--acc)" stroke="none"/><text class="mono" x="170" y="116" text-anchor="middle">(r, s)</text></g>
+          <g class="sc-fade" style="animation-delay:2.2s"><path d="M346 111L392 66M346 111H390M346 111L392 156" stroke="var(--mut)" stroke-dasharray="3 5"/></g>
+          ${[66, 111, 156]
+            .map(
+              (y, i) =>
+                `<circle cx="412" cy="${y}" r="20" fill="var(--bg)" stroke="var(--ink)"/><g class="sc-pop" style="animation-delay:${2.5 + i * 0.35}s"><path d="M402 ${y}l7 7 13-15" stroke="var(--ok)" stroke-width="3"/></g>`,
+            )
+            .join("")}
+          <text class="cap" x="412" y="204" text-anchor="middle">every node checks</text>`,
+        ),
+        taproot: SC(
+          "A second seal, Schnorr, appears beside the original ECDSA seal",
+          `<circle cx="104" cy="94" r="46" fill="var(--bg)" stroke="var(--ink)" stroke-width="2"/><circle cx="104" cy="94" r="36" stroke="var(--mut)" stroke-dasharray="2 5"/>
+          <text class="nm" x="104" y="99" text-anchor="middle">ECDSA</text>
+          <text class="cap" x="104" y="170" text-anchor="middle">since 2009</text>
+          <g class="sc-pop" style="animation-delay:.9s"><circle cx="376" cy="94" r="46" fill="var(--acc)" stroke="none"/><circle cx="376" cy="94" r="36" stroke="var(--bg)" stroke-dasharray="2 5" opacity=".8"/><text class="nm" x="376" y="99" text-anchor="middle" style="fill:var(--bg)">Schnorr</text></g>
+          ${SPARK(432, 44, 1.4)}${SPARK(326, 140, 1.7)}${SPARK(424, 150, 2)}
+          <text class="cap sc-fade" style="animation-delay:1.3s" x="376" y="170" text-anchor="middle">added by Taproot, 2021</text>
+          <g class="sc-fade" style="animation-delay:1.6s"><path d="M164 94H300M292 87L300 94L292 101" stroke="var(--mut)"/><text class="cap" x="232" y="76" text-anchor="middle">same curve</text><text class="cap" x="232" y="124" text-anchor="middle">secp256k1</text></g>`,
+        ),
+      };
+
+      Object.assign(WIDGETS, {
+        Storybook(el, fin, p) {
+          el.classList.add("try", "book");
+          const n = p.pages.length;
+          el.innerHTML = `<div class="book-scene" data-scene></div>
+            <div class="book-page book-text" data-page aria-live="polite"></div>
+            <div class="book-nav">
+              <button class="ghost" data-prev>Back</button>
+              <div class="dots">${p.pages.map((_, i) => `<button aria-label="Page ${i + 1}" data-dot="${i}"></button>`).join("")}</div>
+              <button data-next>Turn the page</button>
+            </div>`;
+          const prev = $("[data-prev]", el),
+            next = $("[data-next]", el),
+            page = $("[data-page]", el),
+            dots = [...el.querySelectorAll("[data-dot]")],
+            seen = new Set();
+          let i = 0;
+          const show = (j) => {
+            i = j;
+            seen.add(j);
+            const pg = p.pages[j];
+            $("[data-scene]", el).innerHTML = SCENES[pg.scene];
+            page.innerHTML = `<div class="book-year">${pg.year} · page ${j + 1} of ${n}</div><h3>${pg.title}</h3>${md(pg.text)}<p class="moral">${inline(pg.moral)}</p>`;
+            restart(page, "turn");
+            prev.disabled = j === 0;
+            next.disabled = j === n - 1;
+            next.textContent = j === n - 1 ? "The end" : "Turn the page";
+            dots.forEach((d, k) =>
+              d.setAttribute("aria-current", String(k === j)),
+            );
+            if (seen.size === n) fin();
+          };
+          prev.onclick = () => show(i - 1);
+          next.onclick = () => show(i + 1);
+          dots.forEach((d, k) => (d.onclick = () => show(k)));
+          show(0);
+        },
+
+        SignMachine(el, fin) {
+          el.classList.add("try", "lab");
+          const names = [
+            "Message",
+            "Fingerprint",
+            "Inside the wallet",
+            "Published",
+          ];
+          const kOpts = Array.from(
+            { length: 10 },
+            (_, i) =>
+              `<option value="${i + 1}"${i === 2 ? " selected" : ""}>${i + 1}</option>`,
+          ).join("");
+          el.innerHTML = `<span class="label">Try it · The signing machine</span>
+            <div class="ctl">
+              <label class="f">Message<input type="text" data-msg maxlength="40" value="Pay Aarav 0.5 BTC" /></label>
+              <label class="f">Nonce k<select data-k>${kOpts}</select></label>
+              <button data-go>Sign it</button>
+            </div>
+            <div class="stations">${names.map((t, i) => `<div class="st"><b>${i + 1} · ${t}</b><code></code></div>`).join("")}</div>
+            <div class="steplog" data-log aria-live="polite"></div>`;
+          const st = [...el.querySelectorAll(".st")],
+            log = $("[data-log]", el);
+          let tok = 0;
+          const light = (i, text) => {
+            st.forEach((s, j) => {
+              s.classList.toggle("on", j === i);
+              if (j < i) s.classList.add("done");
+            });
+            const c = $("code", st[i]);
+            c.textContent = text;
+            restart(c, "flip");
+          };
+          const say = (h) => {
+            const q = document.createElement("p");
+            q.innerHTML = h;
+            log.appendChild(q);
+          };
+          $("[data-go]", el).onclick = async () => {
+            const my = ++tok;
+            st.forEach((s) => {
+              s.classList.remove("on", "done");
+              $("code", s).textContent = "";
+            });
+            log.innerHTML = "";
+            const msg = $("[data-msg]", el).value.trim() || "(empty message)",
+              k = +$("[data-k]", el).value,
+              z = toyHash(msg),
+              sg = toySign(z, TX, k);
+            light(0, msg);
+            say(
+              `Meera’s wallet receives the message <b>${escapeHTML(msg)}</b>.`,
+            );
+            await sleep(900);
+            if (my !== tok) return;
+            light(1, "z = " + z);
+            say(
+              `It boils the message down to a short fingerprint, <b>z = ${z}</b>. In real Bitcoin, changing a single letter gives a completely different z. (This toy fingerprint has only 11 possible values. A real one has 2<sup>256</sup>.)`,
+            );
+            await sleep(1200);
+            if (my !== tok) return;
+            if (!sg) {
+              light(2, "unlucky nonce");
+              say(
+                `With k = ${k} this message makes <b>s = 0</b>, which is not allowed. Pick another nonce and sign again.`,
+              );
+              return;
+            }
+            light(2, `x secret, k = ${k}`);
+            say(
+              `Inside the wallet, using the private key x = ${TX} (never published):<br>r = (4<sup>${k}</sup> mod 23) mod 11 = ${sg.R} mod 11 = <b>${sg.r}</b><br>s = k⁻¹·(z + x·r) mod 11 = ${sg.ki}·(${z} + ${TX}·${sg.r}) mod 11 = <b>${sg.s}</b>`,
+            );
+            await sleep(1400);
+            if (my !== tok) return;
+            light(3, `(r, s) = (${sg.r}, ${sg.s})`);
+            st[3].classList.add("done");
+            const chk = toyVerify(z, sg.r, sg.s, TY);
+            say(
+              `Published: the signature <b>(${sg.r}, ${sg.s})</b>. The private key is not in it. A checker who knows only the public key y = ${TY} and z = ${z} gets: <b>${chk.ok ? "valid" : "invalid"}</b>.`,
+            );
+            say(
+              `Change the nonce and sign again. The pair (r, s) changes completely, yet every one of them verifies.`,
+            );
+            fin();
+          };
+        },
+
+        VerifyLab(el, fin) {
+          el.classList.add("try", "lab");
+          const M0 = "Pay Aarav 0.5 BTC",
+            M1 = "Pay Mallory 5 BTC",
+            sig = toySign(toyHash(M0), TX, 3),
+            eveY = tpow(TG, 3),
+            on = { msg: false, key: false, sig: false };
+          let sawOk = false,
+            sawNo = false;
+          const toggles = [
+            ["msg", "Tamper with the message"],
+            ["key", "Check against Eve’s public key"],
+            ["sig", "Alter the signature"],
+          ];
+          el.innerHTML = `<span class="label">Try it · Break the signature</span>
+            <div class="vpaper">
+              <div class="vp-msg" data-m></div>
+              <div class="vp-row"><span>Signature</span><b data-sg></b></div>
+              <div class="vp-row"><span>Public key</span><b data-pk></b></div>
+            </div>
+            <div class="ctl">${toggles.map(([k, t]) => `<button class="ghost" aria-pressed="false" data-t="${k}">${t}</button>`).join("")}<button class="ghost" data-reset>Reset</button></div>
+            <ol class="steplog" data-steps aria-live="polite"></ol>
+            <div class="verdict" data-verdict></div>`;
+          const render = () => {
+            const m = on.msg ? M1 : M0,
+              z = toyHash(m),
+              s = on.sig ? tmod(sig.s + 1) : sig.s,
+              y = on.key ? eveY : TY,
+              v = toyVerify(z, sig.r, s, y);
+            $("[data-m]", el).textContent = m;
+            $("[data-m]", el).classList.toggle("bad", on.msg);
+            const sgEl = $("[data-sg]", el);
+            sgEl.textContent = `(r, s) = (${sig.r}, ${s})`;
+            sgEl.classList.toggle("bad", on.sig);
+            const pkEl = $("[data-pk]", el);
+            pkEl.textContent = on.key
+              ? `y = ${y} (Eve’s key)`
+              : `y = ${y} (Meera’s key)`;
+            pkEl.classList.toggle("bad", on.key);
+            const lines = [
+              `Fingerprint of the message: <b>z = ${z}</b>`,
+              `w = s⁻¹ mod 11 = <b>${v.w}</b>`,
+              `u1 = z·w mod 11 = <b>${v.u1}</b>, u2 = r·w mod 11 = <b>${v.u2}</b>`,
+              `v = (4<sup>${v.u1}</sup>·${y}<sup>${v.u2}</sup> mod 23) mod 11 = ${v.V} mod 11 = <b>${v.v}</b>`,
+              `Compare: v = ${v.v}, r = ${sig.r}.`,
+            ];
+            $("[data-steps]", el).innerHTML = lines
+              .map(
+                (l, i) => `<li style="animation-delay:${i * 0.35}s">${l}</li>`,
+              )
+              .join("");
+            const why = [
+              on.msg &&
+                "the message changed after signing, so z no longer matches",
+              on.key && "this public key does not belong to the signer",
+              on.sig && "the signature was altered",
+            ].filter(Boolean);
+            $("[data-verdict]", el).innerHTML =
+              `<span class="stamp ${v.ok ? "ok" : "no"}" style="animation-delay:${lines.length * 0.35}s">${v.ok ? "VALID" : "REJECTED"}</span>` +
+              `<p class="small" style="animation:fade .5s ${lines.length * 0.35 + 0.3}s both">${v.ok ? "Everything matches, so v equals r. Nobody needed the private key to see that." : "v is not equal to r because " + why.join(" and ") + "."}</p>`;
+            el.querySelectorAll("[data-t]").forEach((b) =>
+              b.setAttribute("aria-pressed", String(on[b.dataset.t])),
+            );
+            if (v.ok) sawOk = true;
+            else sawNo = true;
+            if (sawOk && sawNo) fin();
+          };
+          el.querySelectorAll("[data-t]").forEach(
+            (b) =>
+              (b.onclick = () => {
+                on[b.dataset.t] = !on[b.dataset.t];
+                render();
+              }),
+          );
+          $("[data-reset]", el).onclick = () => {
+            on.msg = on.key = on.sig = false;
+            render();
+          };
+          render();
+        },
+
+        WhereUsed(el, fin, p) {
+          el.classList.add("try", "lab");
+          const seen = new Set();
+          el.innerHTML = `<span class="label">Explore · Signatures around you</span>
+            <div class="chips" data-tabs>${p.items.map((it, i) => `<button class="chip" aria-pressed="false" data-i="${i}">${it.name}</button>`).join("")}</div>
+            <div class="use" data-panel aria-live="polite"><p class="small">Pick a tile to see how it works.</p></div>
+            <p class="small" data-count>0 of ${p.items.length} explored</p>`;
+          const tabs = [...el.querySelectorAll("[data-i]")];
+          tabs.forEach((t) => {
+            t.onclick = () => {
+              const i = +t.dataset.i,
+                it = p.items[i];
+              seen.add(i);
+              tabs.forEach((x) => {
+                x.classList.toggle("right", x === t);
+                x.setAttribute("aria-pressed", String(x === t));
+              });
+              $("[data-panel]", el).innerHTML = `<h3>${it.name}</h3>
+                <div class="use-flow">
+                  <div class="node"><small>Signs</small>${it.signer}</div><div class="wire"><i></i></div>
+                  <div class="node"><small>What is signed</small>${it.signs}</div><div class="wire"><i></i></div>
+                  <div class="node"><small>Checks</small>${it.checker}</div>
+                </div>
+                <p>${it.line}</p><p class="small"><b>Try it:</b> ${inline(it.tryit)}</p>`;
+              $("[data-count]", el).textContent =
+                `${seen.size} of ${p.items.length} explored`;
+              if (seen.size === p.items.length) fin();
+            };
+          });
+        },
+
+        LoginDemo(el, fin) {
+          el.classList.add("try", "lab");
+          let chal = null,
+            last = null,
+            prevZ = -1,
+            busy = false,
+            replayed = false,
+            tries = 0,
+            lucky = 0;
+          el.innerHTML = `<span class="label">Try it · Log in with a signature</span>
+            <div class="login-grid">
+              <div class="peer"><b>shop.example</b><small>knows only y = ${TY}</small></div>
+              <div class="lane"><span class="fly" data-fly></span></div>
+              <div class="peer"><b>Meera’s phone</b><small>holds x, never sends it</small></div>
+            </div>
+            <div class="ctl"><button data-ask>1 · Ask to log in</button><button data-ok disabled>2 · Approve on the phone</button></div>
+            <div class="ctl"><span class="small">Eve is listening on the wire:</span><button class="ghost" data-replay disabled>Replay Meera’s old signature</button><button class="ghost" data-guess disabled>Guess a signature</button></div>
+            <ol class="feed" data-feed aria-live="polite"></ol>`;
+          const ask = $("[data-ask]", el),
+            ok = $("[data-ok]", el),
+            replay = $("[data-replay]", el),
+            guess = $("[data-guess]", el),
+            feed = $("[data-feed]", el),
+            fly = $("[data-fly]", el);
+          const add = (cls, h) => {
+            const li = document.createElement("li");
+            li.className = cls;
+            li.innerHTML = h;
+            feed.appendChild(li);
+          };
+          const send = async (label, dir) => {
+            fly.textContent = label;
+            fly.className = "fly go-" + dir;
+            await sleep(950);
+            fly.className = "fly";
+          };
+          const freshZ = (...avoid) => {
+            let z;
+            do z = Math.floor(Math.random() * TQ);
+            while (avoid.includes(z));
+            prevZ = z;
+            return z;
+          };
+          const verdict = (z, r, s) => {
+            const v = toyVerify(z, r, s, TY);
+            return { ok: v.ok, text: `v = ${v.v}, r = ${r}` };
+          };
+          ask.onclick = async () => {
+            if (busy) return;
+            busy = true;
+            feed.innerHTML = "";
+            chal = freshZ(prevZ);
+            add(
+              "",
+              `<b>shop.example</b> sends a fresh random challenge: <b>z = ${chal}</b>.`,
+            );
+            await send("z = " + chal, "r");
+            ok.disabled = false;
+            busy = false;
+          };
+          ok.onclick = async () => {
+            if (busy || chal === null) return;
+            busy = true;
+            ok.disabled = true;
+            let sg, k;
+            // r of 1 or 2 can collide in the tiny toy group, so skip those nonces.
+            do {
+              k = pick(10);
+              sg = toySign(chal, TX, k);
+            } while (!sg || sg.r < 3);
+            add(
+              "",
+              `Meera’s phone signs z = ${chal} with a fresh nonce k = ${k}: <b>(r, s) = (${sg.r}, ${sg.s})</b>.`,
+            );
+            await send(`(${sg.r}, ${sg.s})`, "l");
+            const v = verdict(chal, sg.r, sg.s);
+            add(
+              v.ok ? "ok" : "no",
+              `shop.example checks with y = ${TY}: ${v.text}. <b>${v.ok ? "Welcome back, Meera." : "Rejected."}</b>`,
+            );
+            last = { z: chal, r: sg.r, s: sg.s };
+            chal = null;
+            replay.disabled = guess.disabled = false;
+            busy = false;
+          };
+          replay.onclick = async () => {
+            if (busy || !last) return;
+            busy = true;
+            ok.disabled = true;
+            feed.innerHTML = "";
+            chal = null;
+            const z2 = freshZ(prevZ, last.z);
+            add(
+              "",
+              `A new login starts. <b>shop.example</b> sends challenge <b>z = ${z2}</b>.`,
+            );
+            await send("z = " + z2, "r");
+            add(
+              "",
+              `Eve answers with the old signature <b>(${last.r}, ${last.s})</b> that she copied from the wire.`,
+            );
+            await send(`(${last.r}, ${last.s})`, "l");
+            const v = verdict(z2, last.r, last.s);
+            add(
+              v.ok ? "ok" : "no",
+              `shop.example checks: ${v.text}. <b>${v.ok ? "Accepted." : "Rejected."}</b> A signature only fits the challenge it was made for, so a copy is useless.`,
+            );
+            replayed = true;
+            if (replayed) fin();
+            busy = false;
+          };
+          guess.onclick = async () => {
+            if (busy || !last) return;
+            busy = true;
+            ok.disabled = true;
+            feed.innerHTML = "";
+            chal = null;
+            const z2 = freshZ(prevZ),
+              r = pick(10),
+              s = pick(10);
+            add(
+              "",
+              `A new login starts. <b>shop.example</b> sends challenge <b>z = ${z2}</b>.`,
+            );
+            await send("z = " + z2, "r");
+            add(
+              "",
+              `Eve has no private key, so she guesses <b>(${r}, ${s})</b>.`,
+            );
+            await send(`(${r}, ${s})`, "l");
+            const v = verdict(z2, r, s);
+            tries++;
+            if (v.ok) lucky++;
+            add(
+              v.ok ? "ok" : "no",
+              v.ok
+                ? `${v.text}. <b>Accepted: a lucky guess.</b> This toy group has only 100 possible signatures, so about 1 guess in 10 passes. In Bitcoin the odds are about 1 in 2<sup>256</sup>.`
+                : `${v.text}. <b>Rejected.</b> (Guesses so far: ${tries}, accepted: ${lucky}.)`,
+            );
+            busy = false;
+          };
+        },
+
+        NonceTrap(el, fin) {
+          el.classList.add("try", "lab");
+          const MA = "Pay Aarav 0.5 BTC",
+            MB = "Pay Aarav 0.2 BTC",
+            zA = toyHash(MA),
+            zB = toyHash(MB);
+          let reuse = true,
+            step = 0;
+          el.innerHTML = `<span class="label">Try it · Play Eve</span>
+            <div class="ctl">
+              <button class="ghost" aria-pressed="true" data-mode="reuse">Wallet reuses k (the bug)</button>
+              <button class="ghost" aria-pressed="false" data-mode="fresh">Wallet uses a fresh k each time</button>
+            </div>
+            <div data-stage></div>
+            <div class="ctl"><button data-next></button><button class="ghost" data-again>Start over</button></div>`;
+          const stage = $("[data-stage]", el),
+            nextBtn = $("[data-next]", el);
+          const build = () => {
+            const A = toySign(zA, TX, 3),
+              B = toySign(zB, TX, reuse ? 3 : 7),
+              hl = (v, on) => (on ? `<mark class="hl">${v}</mark>` : v),
+              table = (on) =>
+                `<table class="nt-table"><thead><tr><th></th><th>message</th><th>z</th><th>signature (r, s)</th></tr></thead><tbody>
+                  <tr><td>Tx A</td><td>${MA}</td><td>${zA}</td><td>(${hl(A.r, on)}, ${A.s})</td></tr>
+                  <tr><td>Tx B</td><td>${MB}</td><td>${zB}</td><td>(${hl(B.r, on)}, ${B.s})</td></tr></tbody></table>`;
+            if (!reuse)
+              return [
+                `Two signatures from Meera’s wallet are public. Eve can read them, but she has no private key.${table(false)}`,
+                `The r values are different (${A.r} and ${B.r}), so nothing links the two nonces. Eve has two equations but three unknowns: x, k<sub>1</sub> and k<sub>2</sub>. She cannot solve them.`,
+                `Eve is stuck. A fresh nonce for every signature keeps x safe. Bitcoin Core derives k from the private key and the message (RFC 6979), so two different messages never share a nonce.`,
+              ];
+            const k = tmod(tmod(zA - zB) * tinv(tmod(A.s - B.s))),
+              x = tmod(tmod(A.s * k - zA) * tinv(A.r));
+            return [
+              `Two signatures from Meera’s wallet are public. Eve can read them, but she has no private key.${table(false)}`,
+              `Look at r: it is <mark class="hl">${A.r}</mark> in both. The same r means the wallet used the same nonce k twice.${table(true)}`,
+              `Subtract the two signing equations. The secret x cancels: s<sub>1</sub> − s<sub>2</sub> = k⁻¹·(z<sub>1</sub> − z<sub>2</sub>), so<br>k = (z<sub>1</sub> − z<sub>2</sub>) / (s<sub>1</sub> − s<sub>2</sub>) = (${zA} − ${zB}) / (${A.s} − ${B.s}) = <b>${k}</b> (mod 11).`,
+              `Rearrange s = k⁻¹·(z + x·r) for x:<br>x = (s·k − z) / r = (${A.s}·${k} − ${zA}) / ${A.r} = <b>${x}</b> (mod 11).`,
+              `Check: 4<sup>${x}</sup> mod 23 = ${tpow(TG, x)}, which is Meera’s public key. Eve now holds the private key and can sign anything as Meera.<div class="nt-reveal"><span class="nt-key">private key x = ${x}</span></div>`,
+            ];
+          };
+          const render = () => {
+            const steps = build();
+            stage.innerHTML =
+              `<ol class="steplog">` +
+              steps
+                .slice(0, step + 1)
+                .map((s) => `<li>${s}</li>`)
+                .join("") +
+              `</ol>`;
+            const lastStep = step >= steps.length - 1;
+            nextBtn.disabled = lastStep;
+            nextBtn.textContent = lastStep ? "Done" : "Next step";
+            el.querySelectorAll("[data-mode]").forEach((b) =>
+              b.setAttribute(
+                "aria-pressed",
+                String((b.dataset.mode === "reuse") === reuse),
+              ),
+            );
+            if (lastStep && reuse) fin();
+          };
+          nextBtn.onclick = () => {
+            step++;
+            render();
+          };
+          $("[data-again]", el).onclick = () => {
+            step = 0;
+            render();
+          };
+          el.querySelectorAll("[data-mode]").forEach(
+            (b) =>
+              (b.onclick = () => {
+                reuse = b.dataset.mode === "reuse";
+                step = 0;
+                render();
+              }),
+          );
+          render();
+        },
+      });
+
+      const BLOCKS = {
+        text: (b) => wrap(md(b.md)),
+        aside: (b) => wrap(inline(b.md), "aside"),
+        figure: (b) => {
+          const el = document.createElement("figure");
+          el.innerHTML =
+            ASSETS[b.asset] + `<figcaption>${b.caption}</figcaption>`;
+          return el;
+        },
+        widget: (b) => {
+          const el = wrap("");
+          WIDGETS[b.name](el, () => done(b.id), b.props || {});
+          return el;
+        },
+        reflect: (b) => {
+          const el = wrap(
+            `<div class="try"><span class="label">Write your note</span><p>${b.prompt}</p><textarea placeholder="${b.placeholder}"></textarea><button data-go>Compare with an example</button><div class="out"></div></div>`,
+          );
+          $("[data-go]", el).onclick = () => {
+            $(".out", el).innerHTML =
+              `<p>${b.model}</p><p class="small">Use this as a comparison, not something you need to copy word for word.</p>`;
+            done(b.id);
+          };
+          return el;
+        },
+        next: () => {
+          const n = L.next;
+          return wrap(
+            `<div class="label">Next lesson</div><h3>${n.id} ${n.title}</h3><p>${n.teaser}</p>`,
+            "next",
+          );
+        },
+      };
+      $("#head").innerHTML =
+        `<div class="kicker">${L.phase} · ${L.module}</div><h1>${L.title}</h1><p class="sub">${L.subtitle}</p><div class="meta">Lesson ${L.id} · about ${L.minutes} minutes · ${L.level}</div>`;
+      const main = $("#lesson");
+      L.sections.forEach((s) => {
+        const sec = document.createElement("section");
+        sec.id = s.id;
+        sec.innerHTML = `<div class="label">${s.label}</div><h2>${s.title}</h2>`;
+        s.blocks.forEach((b) => {
+          if (BLOCKS[b.type]) sec.appendChild(BLOCKS[b.type](b));
+        });
+        main.appendChild(sec);
+      });
+      prog();
+    </script>
+    <script type="module" src="../../navigation.js"></script>
+  </body>
+</html>

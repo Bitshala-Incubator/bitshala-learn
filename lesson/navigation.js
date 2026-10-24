@@ -69,6 +69,11 @@ const lessons = [
     title: "Advanced Spending Conditions",
     path: "lesson/7.Lesson/7.2-advanced-spending-conditions/index.html",
   },
+  {
+    id: "8.1",
+    title: "Signatures",
+    path: "lesson/8.Lesson/8.1-signatures/index.html",
+  },
 ];
 
 const lessonData = JSON.parse(
