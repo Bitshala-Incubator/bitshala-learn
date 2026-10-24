@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Bitcoin Script — Bitshala Learn 7.1</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+    <style>
+      /* Stack diagrams: centred like the other figures, never wider than the text column. */
+      .figwrap {
+        margin: 1.2em 0;
+      }
+      .figwrap svg {
+        width: 100%;
+        max-width: 560px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+      }
+      /* An input and its button share one row, the same height, and wrap together on phones. */
+      .inrow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: stretch;
+        margin: 10px 0;
+      }
+      .inrow input {
+        flex: 1 1 200px;
+        min-width: 0;
+        margin: 0;
+        padding: 0.6rem 0.8rem;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: white;
+        color: var(--ink);
+        font:
+          15px system-ui,
+          sans-serif;
+        box-sizing: border-box;
+      }
+      .inrow button {
+        margin: 0;
+        white-space: nowrap;
+      }
+      .try .msg {
+        margin: 8px 0 0;
+      }
+      .fieldrow {
+        margin: 16px 0;
+        padding-bottom: 14px;
+        border-bottom: 1px dashed var(--line);
+      }
+      .fieldrow:last-child {
+        border-bottom: none;
+      }
+      .fieldrow p {
+        margin: 0 0 6px;
+      }
+      .fieldrow .ok {
+        color: var(--ink);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 7.1</span><span id="prog">Ready</span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "7.1",
+        "title": "Bitcoin Script",
+        "subtitle": "Read a real lock on the blockchain, run it, and fix a spend that fails.",
+        "phase": "Bitcoin Foundations",
+        "module": "Module 7",
+        "minutes": 35,
+        "level": "Beginner",
+        "next": {
+          "id": "7.2",
+          "title": "Advanced Spending Conditions",
+          "teaser": "Aarav can now read a lock and fix a failing spend. Next, he and Meera share a coin between several keys, lock it to a date, and hide the rules inside Taproot."
+        },
+        "sections": [
+          {
+            "id": "start",
+            "label": "The question",
+            "title": "Meera’s coin has a line of code on it",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav opens the page for a payment Meera sent him last week. Where he expected a plain address, the output shows a line that reads like code: `OP_DUP OP_HASH160 ... OP_EQUALVERIFY OP_CHECKSIG`.\n\n“Is that a program?” he asks. “And who actually runs it?”\n\nMeera nods. “A very small one. Every output carries a lock. Whoever spends it has to pass that lock, and every Bitcoin node checks it. Let’s read a real one first.”"
+              },
+              {
+                "type": "text",
+                "md": "This lesson has three hands-on exercises and one short note. There are no multiple-choice questions. You read real scripts, type answers you can check on the blockchain, run scripts, and fix one that fails."
+              }
+            ]
+          },
+          {
+            "id": "ex1",
+            "label": "Exercise 1 · Read a real script",
+            "title": "Open the blockchain and read two locks",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Each output on Bitcoin has a locking script. Explorers show it as a list of opcodes. Open each link below, find the output named, and type what you see. The blockchain never changes, so these answers stay the same."
+              },
+              {
+                "type": "widget",
+                "id": "w-chain",
+                "name": "ChainRead",
+                "props": {}
+              }
+            ]
+          },
+          {
+            "id": "model",
+            "label": "How it works",
+            "title": "Two scripts, one stack",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Every output has a **locking script**. Every input that spends it carries an **unlocking script** (scriptSig, or the witness for SegWit). A node runs the unlocking script first, then the locking script, on one shared **stack**."
+              },
+              {
+                "type": "figure",
+                "asset": "lockflow",
+                "caption": "The unlocking data is pushed first, then the locking script runs on the same stack. The spend is valid only if one true value is left at the end."
+              },
+              {
+                "type": "text",
+                "md": "A **data push** puts a value on the top of the stack. An **opcode** pops the items it needs, does its job, and pushes a result back. Scripts run left to right, and there are no loops, so every script finishes.\n\nReal nodes check only the top item at the end. The vault in the next exercise is stricter: leftover items also reject the spend, so you can see every one of them."
+              },
+              {
+                "type": "figure",
+                "asset": "stackfig",
+                "caption": "The script `2 3 OP_ADD 5 OP_EQUAL` run on the stack. Each column is the stack after one step. The top of the stack is the highest box, and the final [1] is true."
+              }
+            ]
+          },
+          {
+            "id": "ex2",
+            "label": "Exercise 2 · Open Meera’s vault",
+            "title": "Write unlocking data that opens both doors",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Meera’s vault has two doors, and each has its own lock. Type the numbers you would send as unlocking data, separated by spaces. The interpreter runs your numbers and then the lock, and draws the stack. A door opens only when exactly one true value is left. Many answers work for each door."
+              },
+              {
+                "type": "widget",
+                "id": "w-vault",
+                "name": "OpenVault",
+                "props": {}
+              }
+            ]
+          },
+          {
+            "id": "ex3",
+            "label": "Exercise 3 · Fix a rejected spend",
+            "title": "The lock is right, the spend is wrong",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav’s spend is rejected. The lock is correct and must not change. Change only the unlocking data until the spend passes. Read the stack after the last opcode to see what is wrong."
+              },
+              {
+                "type": "widget",
+                "id": "w-fix",
+                "name": "FixSpend",
+                "props": {}
+              },
+              {
+                "type": "aside",
+                "md": "**Key idea:** the final stack decides the spend. A correct answer on top is not enough if something is still left underneath."
+              }
+            ]
+          },
+          {
+            "id": "locks",
+            "label": "The two common locks",
+            "title": "P2PKH and P2SH",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "**P2PKH** locks a coin to the hash of a public key. The spender reveals the key and signs. Two checks run: the key must hash to the value in the lock (`OP_EQUALVERIFY`), and the signature must match that key and this transaction (`OP_CHECKSIG`)."
+              },
+              {
+                "type": "figure",
+                "asset": "p2pkh",
+                "caption": "Check 1 compares the revealed key’s hash with the lock. Check 2 verifies the signature. Either failure rejects the spend."
+              },
+              {
+                "type": "text",
+                "md": "**P2SH** locks a coin to the hash of a whole redeem script, so the conditions stay hidden until someone spends. The spender reveals the redeem script. The node hashes it, compares it with the lock (`OP_EQUAL`), and only then runs it."
+              },
+              {
+                "type": "figure",
+                "asset": "p2sh",
+                "caption": "The lock stores only the 20-byte commitment. The redeem script is revealed at spend, hashed, and compared."
+              }
+            ]
+          },
+          {
+            "id": "report",
+            "label": "Final note",
+            "title": "Explain it in your own words",
+            "blocks": [
+              {
+                "type": "reflect",
+                "id": "r-script",
+                "prompt": "In a short note for Aarav, explain: what the locking and unlocking scripts are, how the stack changes as a script runs, why a spend can be rejected even when a signature is valid, and what P2SH changes about the lock.",
+                "placeholder": "Explain it in your own words.",
+                "model": "The locking script sits on the output and says what must be true to spend it. The unlocking script sits on the input and supplies the data. Both run on one stack. Data pushes put values on top, and opcodes pop the items they need, compute, and push a result. A spend is rejected at the first opcode that fails, and it is also rejected when the final stack does not hold exactly one true value. So a valid signature is not enough: the revealed key must hash to the lock’s value, and nothing can be left over. For P2SH, the lock holds only a hash of a redeem script, so the conditions stay hidden until the spend. The node hashes the revealed script, checks it against the lock, and only then runs it."
+              }
+            ]
+          },
+          {
+            "id": "wrapup",
+            "label": "Where this leaves you",
+            "title": "The line of code is a short program",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav can read Meera’s lock now. It is a short list of instructions the network runs for every spend: which data must be supplied, in what order, and what the stack must look like at the end."
+              },
+              { "type": "next" }
+            ]
+          }
+        ]
+      }
+    </script>
+    <script type="module">
+      const $ = (s, r = document) => r.querySelector(s);
+      const L = JSON.parse($("#lesson-data").textContent);
+      const escapeHTML = (s) =>
+        String(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      const inline = (s) =>
+        s
+          .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+          .replace(/\*(.+?)\*/g, "<i>$1</i>")
+          .replace(/`(.+?)`/g, "<code>$1</code>");
+      const md = (s) =>
+        s
+          .split("\n\n")
+          .map((p) => `<p>${inline(p)}</p>`)
+          .join("");
+      const wrap = (h, c = "") => {
+        const d = document.createElement("div");
+        d.className = "blk " + c;
+        d.innerHTML = h;
+        return d;
+      };
+
+      // Stack drawing. Each step is { label, state }; state is the stack, bottom to top.
+      function stackSVG(steps) {
+        const colW = 92,
+          boxH = 26,
+          gap = 5,
+          top = 16;
+        const maxH = Math.max(1, ...steps.map((s) => s.state.length));
+        const baseY = top + maxH * (boxH + gap);
+        const W = steps.length * colW + 8,
+          H = baseY + 30;
+        let s = `<svg viewBox="0 0 ${W} ${H}" fill="none" stroke="currentColor" stroke-width="1.2">`;
+        steps.forEach((st, i) => {
+          const x = 8 + i * colW,
+            cx = x + (colW - 6) / 2;
+          s += `<line x1="${x + 6}" y1="${baseY}" x2="${x + colW - 12}" y2="${baseY}"/>`;
+          if (!st.state.length)
+            s += `<text x="${cx}" y="${baseY - 8}" text-anchor="middle" stroke="none" font-size="9" fill="currentColor" opacity="0.6">empty</text>`;
+          st.state.forEach((v, k) => {
+            const y = baseY - (k + 1) * (boxH + gap) + gap;
+            s += `<rect x="${x + 6}" y="${y}" width="${colW - 18}" height="${boxH}" fill="var(--soft)"/>`;
+            s += `<text x="${cx}" y="${y + boxH / 2 + 4}" text-anchor="middle" stroke="none" font-size="12" font-family="ui-monospace,monospace">${v}</text>`;
+          });
+          s += `<text x="${cx}" y="${baseY + 18}" text-anchor="middle" stroke="none" font-size="10">${escapeHTML(st.label)}</text>`;
+        });
+        return s + "</svg>";
+      }
+
+      const ASSETS = {
+        lockflow: `<svg viewBox="0 0 520 236" fill="none" stroke="currentColor" stroke-width="1.2"><defs><marker id="lfArr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs><rect x="10" y="10" width="240" height="62" fill="var(--soft)"/><text x="130" y="32" text-anchor="middle" stroke="none" font-size="11" font-weight="600">locking script (on the output)</text><text x="130" y="54" text-anchor="middle" stroke="none" font-size="10" font-family="ui-monospace,monospace">OP_DUP OP_HASH160 ... OP_CHECKSIG</text><rect x="270" y="10" width="240" height="62" fill="var(--soft)"/><text x="390" y="32" text-anchor="middle" stroke="none" font-size="11" font-weight="600">unlocking script (on the input)</text><text x="390" y="54" text-anchor="middle" stroke="none" font-size="10" font-family="ui-monospace,monospace">&lt;signature&gt; &lt;public key&gt;</text><path d="M130 72V100H220V116" marker-end="url(#lfArr)"/><path d="M390 72V100H300V116" marker-end="url(#lfArr)"/><rect x="110" y="118" width="300" height="40" fill="var(--soft)"/><text x="260" y="142" text-anchor="middle" stroke="none" font-size="11" font-weight="600">run both on one shared stack</text><path d="M260 158V170H155V180" marker-end="url(#lfArr)"/><path d="M260 170H365V180" marker-end="url(#lfArr)"/><rect x="60" y="182" width="190" height="42" fill="none" stroke="var(--acc)" stroke-width="1.6"/><text x="155" y="200" text-anchor="middle" stroke="none" font-size="10" font-weight="600" fill="var(--acc)">one true value left?</text><text x="155" y="215" text-anchor="middle" stroke="none" font-size="10" fill="var(--acc)">yes: spend is valid</text><rect x="270" y="182" width="190" height="42" fill="none"/><text x="365" y="200" text-anchor="middle" stroke="none" font-size="10" font-weight="600">anything else</text><text x="365" y="215" text-anchor="middle" stroke="none" font-size="10">spend is rejected</text></svg>`,
+        stackfig: () => stackSVG(DEMO),
+        p2pkh: `<svg viewBox="0 0 520 262" fill="none" stroke="currentColor" stroke-width="1.2"><defs><marker id="p2pkhArr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs><rect x="10" y="20" width="130" height="40" fill="var(--soft)"/><text x="75" y="44" text-anchor="middle" stroke="none" font-size="11">public key</text><path d="M140 40H186" marker-end="url(#p2pkhArr)"/><rect x="190" y="20" width="110" height="40" fill="var(--soft)"/><text x="245" y="44" text-anchor="middle" stroke="none" font-size="11" font-family="ui-monospace,monospace">HASH160</text><path d="M300 40H346" marker-end="url(#p2pkhArr)"/><rect x="350" y="20" width="150" height="40" fill="var(--soft)"/><text x="425" y="44" text-anchor="middle" stroke="none" font-size="11">hash of the key</text><path d="M425 60V116" marker-end="url(#p2pkhArr)"/><text x="416" y="94" text-anchor="end" stroke="none" font-size="10" font-family="ui-monospace,monospace">OP_EQUALVERIFY</text><rect x="350" y="120" width="150" height="40" fill="none" stroke="var(--acc)" stroke-width="1.6"/><text x="425" y="144" text-anchor="middle" stroke="none" font-size="11" fill="var(--acc)">hash in the lock</text><rect x="10" y="190" width="190" height="40" fill="var(--soft)"/><text x="105" y="214" text-anchor="middle" stroke="none" font-size="11">signature + public key</text><path d="M200 210H246" marker-end="url(#p2pkhArr)"/><rect x="250" y="190" width="130" height="40" fill="var(--soft)"/><text x="315" y="214" text-anchor="middle" stroke="none" font-size="11" font-family="ui-monospace,monospace">OP_CHECKSIG</text><path d="M380 210H406" marker-end="url(#p2pkhArr)"/><rect x="410" y="190" width="100" height="40" fill="none"/><text x="460" y="214" text-anchor="middle" stroke="none" font-size="11">valid?</text><text x="10" y="252" stroke="none" font-size="9.5">check 1: the key must hash to the lock’s value. check 2: the signature must match that key and this transaction.</text></svg>`,
+        p2sh: `<svg viewBox="0 0 520 206" fill="none" stroke="currentColor" stroke-width="1.2"><defs><marker id="p2shArr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs><rect x="10" y="20" width="170" height="40" fill="var(--soft)"/><text x="95" y="44" text-anchor="middle" stroke="none" font-size="11">redeem script (revealed at spend)</text><path d="M180 40H206" marker-end="url(#p2shArr)"/><rect x="210" y="20" width="110" height="40" fill="var(--soft)"/><text x="265" y="44" text-anchor="middle" stroke="none" font-size="11" font-family="ui-monospace,monospace">HASH160</text><path d="M320 40H346" marker-end="url(#p2shArr)"/><rect x="350" y="20" width="150" height="40" fill="var(--soft)"/><text x="425" y="44" text-anchor="middle" stroke="none" font-size="11">20-byte commitment</text><path d="M425 60V116" marker-end="url(#p2shArr)"/><text x="416" y="94" text-anchor="end" stroke="none" font-size="10" font-family="ui-monospace,monospace">OP_EQUAL</text><rect x="350" y="120" width="150" height="40" fill="none" stroke="var(--acc)" stroke-width="1.6"/><text x="425" y="144" text-anchor="middle" stroke="none" font-size="11" fill="var(--acc)">hash in the lock</text><path d="M350 140H186" marker-end="url(#p2shArr)"/><text x="268" y="133" text-anchor="middle" stroke="none" font-size="10">only if equal</text><rect x="10" y="120" width="170" height="40" fill="var(--soft)"/><text x="95" y="144" text-anchor="middle" stroke="none" font-size="11">run the redeem script</text><text x="10" y="192" stroke="none" font-size="9.5">the lock stores only the 20-byte commitment. The full conditions appear only at spend.</text></svg>`,
+      };
+      // The demo trace for the figure: 2 3 OP_ADD 5 OP_EQUAL.
+      const DEMO = [
+        { label: "start", state: [] },
+        { label: "push 2", state: [2] },
+        { label: "push 3", state: [2, 3] },
+        { label: "ADD", state: [5] },
+        { label: "push 5", state: [5, 5] },
+        { label: "EQUAL", state: [1] },
+      ];
+
+      const ACT = ["widget", "reflect"];
+      let P = {};
+      const KEY = "bitshala-learn:" + L.id;
+      try {
+        P = JSON.parse(localStorage.getItem(KEY) || "{}");
+      } catch {}
+      const total = () =>
+        L.sections.flatMap((s) => s.blocks).filter((b) => ACT.includes(b.type))
+          .length;
+      function prog() {
+        const n = Object.keys(P).length,
+          t = total();
+        $("#prog").textContent = `${n} of ${t} activities`;
+        $("#bar").style.width = (n / t) * 100 + "%";
+      }
+      function done(id) {
+        if (P[id]) return;
+        P[id] = 1;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(P));
+        } catch {}
+        prog();
+      }
+      const fmtStack = (s) =>
+        s.length ? "[" + s.join(", ") + "]" : "[ empty ]";
+      function terminalLine(cmd, out, err = false) {
+        return `<div class="tline"><span class="tprompt">$</span>${escapeHTML(cmd)}</div><div class="tout${err ? " terr" : ""}">${escapeHTML(out)}</div>`;
+      }
+      const logBox = (logs) =>
+        logs.length
+          ? `<div class="termbox">${logs.map((x) => terminalLine(x.cmd, x.out, x.err)).join("")}</div>`
+          : "";
+
+      // The one interpreter every exercise uses. Numbers are pushed; OP_DUP, OP_ADD and
+      // OP_EQUAL are the only opcodes in this course's vault. Every step records the stack.
+      function runStack(tokens, stack, trace) {
+        for (const t of tokens) {
+          const isNum = /^\d+$/.test(t);
+          if (isNum) stack.push(Number(t));
+          else if (t === "OP_DUP") {
+            if (!stack.length)
+              throw new Error(
+                "OP_DUP needs one item on the stack, but the stack is empty.",
+              );
+            stack.push(stack[stack.length - 1]);
+          } else if (t === "OP_ADD" || t === "OP_EQUAL") {
+            if (stack.length < 2)
+              throw new Error(
+                `${t} needs two items on the stack, but only ${stack.length} ${stack.length === 1 ? "is" : "are"} there.`,
+              );
+            const b = stack.pop(),
+              a = stack.pop();
+            stack.push(t === "OP_ADD" ? a + b : a === b ? 1 : 0);
+          } else throw new Error(`"${t}" is not an opcode in this vault.`);
+          trace.push({
+            cmd: isNum ? `push ${t}` : t,
+            out: fmtStack(stack),
+            state: [...stack],
+          });
+        }
+      }
+      // Runs unlocking data, then the locking script, on one stack.
+      function simulate(unlock, lock) {
+        const trace = [],
+          stack = [];
+        try {
+          runStack(unlock.split(/\s+/).filter(Boolean), stack, trace);
+          runStack(lock.split(/\s+/).filter(Boolean), stack, trace);
+        } catch (e) {
+          trace.push({ cmd: "error", out: e.message, err: true });
+        }
+        return { trace, stack };
+      }
+      const stepsOf = (trace) => [
+        { label: "start", state: [] },
+        ...trace
+          .filter((t) => t.state)
+          .map((t) => ({ label: t.cmd, state: t.state })),
+      ];
+      // A spend passes when exactly one true (non-zero) value is left and nothing failed.
+      const passes = (sim) =>
+        !sim.trace.some((t) => t.err) &&
+        sim.stack.length === 1 &&
+        sim.stack[0] !== 0;
+
+      // Exercise 1: values read from real transactions. Matching is forgiving about case,
+      // spaces and a missing OP_ prefix, and nothing else.
+      const CHAIN = [
+        {
+          id: "genesis-last",
+          q: "Open the genesis transaction (the coinbase from block 0). Output 0 is a p2pk lock. Type the last opcode of its script.",
+          url: "https://blockstream.info/tx/4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
+          link: "Open the genesis transaction ↗",
+          ans: "OP_CHECKSIG",
+          kind: "opcode",
+        },
+        {
+          id: "genesis-push",
+          q: "Same output. The public key is pushed with OP_PUSHBYTES_65. How many bytes is that key?",
+          url: "https://blockstream.info/tx/4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
+          link: "Open the genesis transaction ↗",
+          ans: "65",
+          kind: "number",
+        },
+        {
+          id: "segwit-push",
+          q: "Open lesson 6.2’s transaction. Output 0 is OP_0 followed by a push of 20 bytes. How many bytes are in the pushed data?",
+          url: "https://mempool.space/tx/96a20265f02c93f5cf6194747bdffda48e2c0b882c9e65ab7c865884b74fc748",
+          link: "Open the lesson 6.2 transaction ↗",
+          ans: "20",
+          kind: "number",
+        },
+        {
+          id: "p2sh-last",
+          q: "On the Blockstream homepage, open any recent transaction. Find an output whose address starts with 3. Type the last opcode of its script.",
+          url: "https://blockstream.info",
+          link: "Open Blockstream ↗",
+          ans: "OP_EQUAL",
+          kind: "opcode",
+        },
+      ];
+      const normalise = (v, kind) => {
+        const s = v.trim().toUpperCase().replace(/\s+/g, " ");
+        if (kind === "number") return s.replace(/\s*BYTES?$/, "");
+        const word = s.replace(/^OP_/, "");
+        return /^[A-Z0-9_]+$/.test(word) ? "OP_" + word : s;
+      };
+
+      // Exercise 2 data: two doors. The numbers are run for real, so many answers work.
+      const DOORS = [
+        {
+          id: "d1",
+          lock: "OP_ADD 7 OP_EQUAL",
+          hint: "Two numbers go in, they are added, and the sum is compared with 7.",
+        },
+        {
+          id: "d2",
+          lock: "OP_DUP OP_ADD 10 OP_EQUAL",
+          hint: "One number goes in. It is copied, the two copies are added, and the sum is compared with 10.",
+        },
+      ];
+
+      const WIDGETS = {
+        ChainRead(el, fin) {
+          el.classList.add("try");
+          const got = {};
+          const draw = () => {
+            let h = '<span class="label">Read the blockchain</span>';
+            CHAIN.forEach((c, n) => {
+              h += `<div class="fieldrow"><p>${n + 1}. ${escapeHTML(c.q)}</p><p class="small"><a href="${c.url}" target="_blank" rel="noopener">${c.link}</a></p>`;
+              if (got[c.id])
+                h += `<p class="ok">Correct: ${escapeHTML(c.ans)}</p>`;
+              else
+                h += `<div class="inrow"><input type="text" data-f="${c.id}" placeholder="type your answer" spellcheck="false" aria-label="Answer ${n + 1}" /><button data-check="${c.id}">Check</button></div><div class="msg" data-m="${c.id}"></div>`;
+              h += "</div>";
+            });
+            el.innerHTML = h;
+            CHAIN.forEach((c) => {
+              if (got[c.id]) return;
+              $(`[data-check="${c.id}"]`, el).onclick = () => {
+                const v = $(`[data-f="${c.id}"]`, el).value;
+                const msg = $(`[data-m="${c.id}"]`, el);
+                if (!v.trim()) {
+                  msg.textContent = "Type an answer first.";
+                  return;
+                }
+                if (normalise(v, c.kind) === c.ans) {
+                  got[c.id] = true;
+                  draw();
+                  if (Object.keys(got).length === CHAIN.length) {
+                    el.insertAdjacentHTML(
+                      "beforeend",
+                      '<p class="msg">All four read correctly. Exercise 1 done. These values are on the chain, so anyone can check them.</p>',
+                    );
+                    fin();
+                  }
+                } else {
+                  msg.textContent =
+                    "Not that value. Read the script again on the page: count the pushes and find the opcodes.";
+                }
+              };
+            });
+          };
+          draw();
+        },
+
+        OpenVault(el, fin) {
+          el.classList.add("try");
+          const open = {};
+          let h = '<span class="label">Open Meera’s vault</span>';
+          DOORS.forEach((d, n) => {
+            h += `<div class="blk" data-door="${d.id}"><p><b>Door ${n + 1}</b> · lock: <code>${d.lock}</code></p><p class="small">${d.hint}</p><div class="inrow"><input type="text" placeholder="e.g. 3 4" spellcheck="false" aria-label="Unlocking data for door ${n + 1}" /><button data-try>Try</button></div><div data-out></div></div>`;
+          });
+          h += '<div class="msg" id="vaultmsg"></div>';
+          el.innerHTML = h;
+
+          const runDoor = (d, box) => {
+            const out = $("[data-out]", box);
+            const unlockText = $("input", box).value.trim();
+            if (!unlockText) {
+              out.innerHTML =
+                '<p class="msg">Type at least one number first.</p>';
+              return;
+            }
+            if (unlockText.split(/\s+/).some((t) => !/^\d+$/.test(t))) {
+              out.innerHTML =
+                '<p class="msg">Unlocking data is numbers only. The opcodes belong to the lock.</p>';
+              return;
+            }
+            const sim = simulate(unlockText, d.lock);
+            const errored = sim.trace.some((t) => t.err);
+            if (errored) {
+              out.innerHTML = logBox(sim.trace);
+              return;
+            }
+            const figure = `<div class="figwrap">${stackSVG(stepsOf(sim.trace))}</div>`;
+            const ok = passes(sim);
+            let msg;
+            if (ok)
+              msg = `Door opens. The stack ends as ${fmtStack(sim.stack)}: one true value, and nothing left over.`;
+            else if (sim.stack.length !== 1)
+              msg = `Still shut. The stack ends as ${fmtStack(sim.stack)}. Only the one true value may remain.`;
+            else
+              msg =
+                "Still shut. The top of the stack is 0, which is false, so the lock stays closed.";
+            out.innerHTML =
+              figure +
+              logBox(sim.trace) +
+              `<p class="${ok ? "msg" : "small"}">${msg}</p>`;
+            if (!ok) return;
+            open[d.id] = true;
+            $("input", box).disabled = true;
+            $("[data-try]", box).disabled = true;
+            if (Object.keys(open).length === DOORS.length) {
+              $("#vaultmsg", el).textContent =
+                "Both doors are open. Exercise 2 done. Many answers work, because the lock checks the result, not the exact numbers you typed.";
+              fin();
+            }
+          };
+          el.querySelectorAll("[data-door]").forEach((box) => {
+            const d = DOORS.find((x) => x.id === box.dataset.door);
+            $("[data-try]", box).onclick = () => runDoor(d, box);
+          });
+        },
+
+        FixSpend(el, fin) {
+          el.classList.add("try");
+          const LOCK = "OP_ADD 5 OP_EQUAL";
+          const BROKEN = "2 3 2";
+          el.innerHTML = `<span class="label">Fix Aarav’s spend</span>
+            <p>Aarav’s unlocking data is <code>${BROKEN}</code> and the lock is <code>${LOCK}</code>. The lock is fixed. Change the unlocking data only.</p>
+            <div class="inrow"><input type="text" id="fixin" value="${BROKEN}" spellcheck="false" aria-label="Unlocking data" /><button data-fix>Run the spend</button></div>
+            <div id="fixout"></div>`;
+          const run = () => {
+            const v = $("#fixin", el).value.trim();
+            const out = $("#fixout", el);
+            if (!v || v.split(/\s+/).some((t) => !/^\d+$/.test(t))) {
+              out.innerHTML =
+                '<p class="msg">Unlocking data is numbers only, separated by spaces.</p>';
+              return;
+            }
+            const sim = simulate(v, LOCK);
+            if (sim.trace.some((t) => t.err)) {
+              out.innerHTML = logBox(sim.trace);
+              return;
+            }
+            const figure = `<div class="figwrap">${stackSVG(stepsOf(sim.trace))}</div>`;
+            if (passes(sim)) {
+              out.innerHTML =
+                figure +
+                logBox(sim.trace) +
+                '<p class="msg">The spend passes: exactly one true value is left. Exercise 3 done.</p>';
+              el.querySelector("[data-fix]").disabled = true;
+              fin();
+              return;
+            }
+            const why =
+              sim.stack.length !== 1
+                ? `Still rejected. ${sim.stack.length} items are left on the stack, but only one true value may remain.`
+                : "Still rejected. The top of the stack is 0, which is false.";
+            out.innerHTML =
+              figure + logBox(sim.trace) + `<p class="small">${why}</p>`;
+          };
+          $("[data-fix]", el).onclick = run;
+          $("#fixin", el).addEventListener("keydown", (e) => {
+            if (e.key === "Enter") run();
+          });
+        },
+      };
+
+      const BLOCKS = {
+        text: (b) => wrap(md(b.md)),
+        aside: (b) => wrap(inline(b.md), "aside"),
+        figure: (b) => {
+          const el = document.createElement("figure");
+          const a = ASSETS[b.asset];
+          el.innerHTML =
+            (typeof a === "function" ? a() : a) +
+            `<figcaption>${b.caption}</figcaption>`;
+          return el;
+        },
+        widget: (b) => {
+          const el = wrap("");
+          WIDGETS[b.name](el, () => done(b.id));
+          return el;
+        },
+        reflect: (b) => {
+          const el = wrap(
+            `<div class="try"><span class="label">Write your note</span><p>${b.prompt}</p><textarea placeholder="${b.placeholder}"></textarea><button data-go>Compare with an example</button><div class="out"></div></div>`,
+          );
+          $("[data-go]", el).onclick = () => {
+            $(".out", el).innerHTML =
+              `<p>${b.model}</p><p class="small">Use this as a comparison, not something you need to copy word for word.</p>`;
+            done(b.id);
+          };
+          return el;
+        },
+        next: () => {
+          const n = L.next;
+          return wrap(
+            `<div class="label">Next lesson</div><h3>${n.id} ${n.title}</h3><p>${n.teaser}</p>`,
+            "next",
+          );
+        },
+      };
+      $("#head").innerHTML =
+        `<div class="kicker">${L.phase} · ${L.module}</div><h1>${L.title}</h1><p class="sub">${L.subtitle}</p><div class="meta">Lesson ${L.id} · about ${L.minutes} minutes · ${L.level}</div>`;
+      const main = $("#lesson");
+      L.sections.forEach((s) => {
+        const sec = document.createElement("section");
+        sec.id = s.id;
+        sec.innerHTML = `<div class="label">${s.label}</div><h2>${s.title}</h2>`;
+        s.blocks.forEach((b) => {
+          if (BLOCKS[b.type]) sec.appendChild(BLOCKS[b.type](b));
+        });
+        main.appendChild(sec);
+      });
+      prog();
+    </script>
+    <script type="module" src="../../navigation.js"></script>
+  </body>
+</html>
