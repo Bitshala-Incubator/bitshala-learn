@@ -725,6 +725,74 @@
           transition-duration: 0.01ms !important;
         }
       }
+
+      /* Checks widget (from lesson 8.2) */
+      .hexgrid {
+        display: grid;
+        grid-template-columns: auto repeat(8, minmax(0, 1fr));
+        gap: 4px;
+        margin: 10px 0 18px;
+        font:
+          13px ui-monospace,
+          Consolas,
+          monospace;
+        text-align: center;
+      }
+      .hexgrid .row-label {
+        padding-right: 6px;
+        color: var(--mut);
+        font:
+          12px system-ui,
+          sans-serif;
+        text-align: right;
+        white-space: nowrap;
+      }
+      .hexgrid .byte {
+        padding: 4px 0;
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        background: var(--bg);
+      }
+      .hexgrid.revealed .byte.r,
+      .tag-r {
+        background: color-mix(in srgb, var(--acc) 22%, var(--bg));
+      }
+      .hexgrid.revealed .byte.s,
+      .tag-s {
+        background: color-mix(in srgb, #3d7a4a 24%, var(--bg));
+      }
+      .mission-steps {
+        padding-left: 0;
+        list-style: none;
+      }
+      .match-item {
+        margin: 16px 0;
+      }
+      .match-item label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+      .match-item input,
+      .match-item select {
+        width: 100%;
+        max-width: 420px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          16px system-ui,
+          sans-serif;
+      }
+      .match-item input {
+        max-width: 160px;
+      }
+      .match-item input[aria-invalid="true"],
+      .match-item select[aria-invalid="true"] {
+        border-color: var(--acc);
+      }
     </style>
   </head>
   <body>
@@ -748,8 +816,8 @@
         "level": "Beginner",
         "next": {
           "id": "8.2",
-          "title": "Continuing Module 8",
-          "teaser": "Aarav now knows how a signature is made and checked. The next lesson continues Module 8 from here. Check your course outline for what Bitshala covers next."
+          "title": "Schnorr and Taproot",
+          "teaser": "Aarav now knows how signatures are made and checked. Next, he’ll see how Schnorr signatures combine and how Taproot uses them to commit to flexible spending conditions."
         },
         "sections": [
           {
@@ -760,10 +828,6 @@
               {
                 "type": "text",
                 "md": "Meera sends Aarav a payment. When Aarav looks at the transaction in his wallet, it shows a green tick next to the input and the word ‘valid’. Nothing in the transaction contains Meera’s private key.\n\n“So how does it know she’s allowed to spend that coin?” Aarav asks.\n\nMeera answers, “I didn’t show you my key. I showed you that I have it. That’s what a signature does.”"
-              },
-              {
-                "type": "text",
-                "md": "This lesson mixes a storybook, four hands-on labs, three coding exercises and a short note. You will see where signatures came from, watch one being made and checked, meet the websites and apps that already use them, and try to break one yourself. Then you will write the signing rule, the verification rule, and the range rules that Bitcoin applies to real signatures. The numbers are small, so you can follow every step by hand."
               }
             ]
           },
@@ -1102,6 +1166,40 @@
               {
                 "type": "aside",
                 "md": "**Key idea:** the curve gives the signature its size and security. The rule in your code gives it its meaning: only the owner of the private key can produce a value that passes."
+              },
+              {
+                "type": "widget",
+                "id": "ex-real-sig",
+                "name": "Checks",
+                "props": {
+                  "key": "ex-real-sig",
+                  "label": "Exercise 4 · Read a real signature on the chain",
+                  "icon": "box",
+                  "intro": "This is the input of the first Bitcoin payment ever made, in <a href=\"https://mempool.space/tx/f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16\" target=\"_blank\" rel=\"noopener noreferrer\">transaction f4184fc5 on mempool.space</a>. Open the input and read its <b>scriptSig</b>. It begins with the push opcode 47 (hex).",
+                  "steps": [
+                    {
+                      "label": "How many bytes does the signature push contain?",
+                      "type": "number",
+                      "answer": "71",
+                      "hint": "The push opcode 0x47 means 71 bytes follow."
+                    },
+                    {
+                      "label": "How many bytes is r inside the DER signature?",
+                      "type": "number",
+                      "answer": "32",
+                      "hint": "The byte after 02 is the length of r."
+                    },
+                    {
+                      "label": "The last byte of the push, in hex (the sighash flag)",
+                      "type": "text",
+                      "answer": "01",
+                      "hint": "01 means SIGHASH_ALL."
+                    }
+                  ],
+                  "button": "Check",
+                  "done": "All correct. The 71 bytes are a DER signature (70 bytes) plus one sighash byte.",
+                  "reveal": "<p>Early transactions use DER-encoded ECDSA signatures, with the sighash flag appended. Taproot later switched to 64-byte Schnorr signatures, which you just read.</p>"
+                }
               }
             ]
           },
@@ -1144,7 +1242,11 @@
                       "args": [11, 2, 11],
                       "expect": false
                     },
-                    { "label": "small s", "args": [4, 1, 11], "expect": true },
+                    {
+                      "label": "small s",
+                      "args": [4, 1, 11],
+                      "expect": true
+                    },
                     {
                       "label": "s equal to n",
                       "args": [4, 11, 11],
@@ -1183,7 +1285,9 @@
                 "type": "text",
                 "md": "**Keep exploring.** Read the Schnorr specification in [BIP 340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki), browse step-by-step explanations on [learnmeabitcoin.com](https://learnmeabitcoin.com), and look up real signatures on [mempool.space](https://mempool.space)."
               },
-              { "type": "next" }
+              {
+                "type": "next"
+              }
             ]
           }
         ]
@@ -1227,7 +1331,7 @@
       };
 
       const ASSETS = {
-        signflow: `<svg class="flow" viewBox="0 0 520 130" fill="none" stroke="currentColor" stroke-width="1.2"><defs><marker id="sfArr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs><rect x="10" y="30" width="100" height="58" fill="var(--soft)"/><text x="60" y="56" text-anchor="middle" stroke="none" font-size="11">transaction</text><text x="60" y="72" text-anchor="middle" stroke="none" font-size="9.5">inputs and outputs</text><path d="M112 59H130" marker-end="url(#sfArr)"/><rect x="132" y="30" width="100" height="58" fill="var(--soft)"/><text x="182" y="56" text-anchor="middle" stroke="none" font-size="11">fingerprint z</text><text x="182" y="72" text-anchor="middle" stroke="none" font-size="9.5">hash of the data</text><path d="M234 59H252" marker-end="url(#sfArr)"/><rect x="254" y="30" width="112" height="58" fill="var(--soft)"/><text x="310" y="52" text-anchor="middle" stroke="none" font-size="11">sign with</text><text x="310" y="68" text-anchor="middle" stroke="none" font-size="9.5">private key x</text><text x="310" y="81" text-anchor="middle" stroke="none" font-size="9.5">and random k</text><path d="M368 59H386" marker-end="url(#sfArr)"/><rect x="388" y="30" width="122" height="58" fill="none" stroke="var(--acc)" stroke-width="1.6"/><text x="449" y="56" text-anchor="middle" stroke="none" font-size="11" fill="var(--acc)">signature (r, s)</text><text x="449" y="72" text-anchor="middle" stroke="none" font-size="9.5" fill="var(--acc)">published</text><text x="10" y="118" stroke="none" font-size="9.5">k is used once, then thrown away. The private key x never appears in the output.</text></svg>`,
+        signflow: `<svg class="flow" viewBox="0 0 640 140" fill="none" stroke="currentColor" stroke-width="1.2" role="img" aria-label="Signing flow: transaction, fingerprint z, sign with x and k, signature published"><defs><marker id="sfArr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="var(--ink)"/></marker></defs><rect x="0" y="22" width="142" height="76" rx="6" fill="var(--soft)" stroke="var(--line)" stroke-width="1"/><text x="71" y="56" text-anchor="middle" stroke="none" font-size="13" font-weight="700">Transaction</text><text x="71" y="72" text-anchor="middle" stroke="none" font-size="12">inputs and outputs</text><path d="M146 60H162" stroke="var(--ink)" stroke-width="1.4" marker-end="url(#sfArr)"/><rect x="166" y="22" width="142" height="76" rx="6" fill="var(--soft)" stroke="var(--line)" stroke-width="1"/><text x="237" y="56" text-anchor="middle" stroke="none" font-size="13" font-weight="700">Fingerprint z</text><text x="237" y="72" text-anchor="middle" stroke="none" font-size="12">hash of the data</text><path d="M312 60H328" stroke="var(--ink)" stroke-width="1.4" marker-end="url(#sfArr)"/><rect x="332" y="22" width="142" height="76" rx="6" fill="var(--soft)" stroke="var(--line)" stroke-width="1"/><text x="403" y="48" text-anchor="middle" stroke="none" font-size="13" font-weight="700">Sign</text><text x="403" y="64" text-anchor="middle" stroke="none" font-size="12">private key x</text><text x="403" y="80" text-anchor="middle" stroke="none" font-size="12">and random k</text><path d="M478 60H494" stroke="var(--ink)" stroke-width="1.4" marker-end="url(#sfArr)"/><rect x="498" y="22" width="142" height="76" rx="6" fill="none" stroke="var(--acc)" stroke-width="1.6"/><text x="569" y="56" text-anchor="middle" stroke="none" font-size="13" font-weight="700" fill="var(--acc)">Signature</text><text x="569" y="72" text-anchor="middle" stroke="none" font-size="12" fill="var(--acc)">(r, s) published</text><text x="0" y="128" stroke="none" font-size="13" fill="var(--ink)">k is used once, then thrown away. The private key x never appears in the output.</text></svg>`,
         verifyflow: `<svg class="flow" viewBox="0 0 520 220" fill="none" stroke="currentColor" stroke-width="1.2"><defs><marker id="vfArr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs><rect x="10" y="18" width="150" height="40" fill="var(--soft)"/><text x="85" y="42" text-anchor="middle" stroke="none" font-size="11">fingerprint z</text><rect x="10" y="78" width="150" height="40" fill="var(--soft)"/><text x="85" y="102" text-anchor="middle" stroke="none" font-size="11">signature (r, s)</text><rect x="10" y="138" width="150" height="40" fill="var(--soft)"/><text x="85" y="162" text-anchor="middle" stroke="none" font-size="11">public key y</text><path d="M160 38L200 100" marker-end="url(#vfArr)"/><path d="M160 98L200 110" marker-end="url(#vfArr)"/><path d="M160 158L200 120" marker-end="url(#vfArr)"/><rect x="200" y="80" width="150" height="56" fill="var(--soft)"/><text x="275" y="104" text-anchor="middle" stroke="none" font-size="11">compute v from</text><text x="275" y="122" text-anchor="middle" stroke="none" font-size="10">z, r, s and y</text><path d="M350 108H378" marker-end="url(#vfArr)"/><rect x="380" y="80" width="130" height="56" fill="none" stroke="var(--acc)" stroke-width="1.6"/><text x="445" y="104" text-anchor="middle" stroke="none" font-size="11" fill="var(--acc)">is v equal to r?</text><text x="445" y="122" text-anchor="middle" stroke="none" font-size="10" fill="var(--acc)">yes: valid, no: rejected</text><text x="10" y="208" stroke="none" font-size="9.5">no private key is needed anywhere in this check</text></svg>`,
       };
 
@@ -1266,6 +1370,73 @@
       }
 
       const WIDGETS = {
+        // Numbered steps, each with an answer and a hint. Optional hex grid.
+        Checks(el, fin, p) {
+          el.classList.add("try", "lab");
+          const steps = p.steps,
+            id = p.key || "ck" + Math.random().toString(36).slice(2, 8);
+          el.innerHTML =
+            `<span class="label">${p.label}</span>` +
+            (p.intro ? `<p>${p.intro}</p>` : "") +
+            (p.helper
+              ? `<details class="helper"><summary>${p.helper.summary}</summary><p class="small">${p.helper.body}</p></details>`
+              : "") +
+            (p.grid ? `<div class="hexgrid" data-grid></div>` : "") +
+            `<ol class="mission-steps">` +
+            steps
+              .map(
+                (st, i) =>
+                  `<li class="match-item"><label for="${id}-${i}">${st.label}</label>` +
+                  (st.options
+                    ? `<select id="${id}-${i}">${st.options.map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}</select>`
+                    : `<input id="${id}-${i}" ${st.type === "number" ? 'type="number" min="1"' : ""} inputmode="${st.type === "number" ? "numeric" : "text"}" autocomplete="off" />`) +
+                  `</li>`,
+              )
+              .join("") +
+            `</ol>` +
+            `<div class="ctl"><button type="button" data-check>${p.button}</button></div>` +
+            `<p class="activity-status" data-status role="status" aria-live="polite"></p>` +
+            `<div data-reveal class="note" hidden>${p.reveal}</div>`;
+          const grid = $("[data-grid]", el);
+          if (p.grid) {
+            const per = p.grid.perRow;
+            p.grid.hex.match(/../g).forEach((byte, i) => {
+              if (i % per === 0) {
+                const label = document.createElement("span");
+                label.className = "row-label";
+                label.textContent = `${i + 1}–${i + per}`;
+                grid.append(label);
+              }
+              const cell = document.createElement("span");
+              cell.className = `byte ${i < p.grid.split ? "r" : "s"}`;
+              cell.textContent = byte;
+              cell.title = `byte ${i + 1}`;
+              grid.append(cell);
+            });
+          }
+          $("[data-check]", el).onclick = () => {
+            const hints = [];
+            steps.forEach((st, i) => {
+              const field = $(`#${id}-${i}`, el);
+              const ok =
+                field.value.trim().toLowerCase().replace(/\s+/g, "") ===
+                String(st.answer);
+              field.setAttribute("aria-invalid", String(!ok));
+              if (!ok) hints.push(st.hint);
+            });
+            const solved = hints.length === 0;
+            const status = $("[data-status]", el);
+            status.dataset.result = solved ? "good" : "bad";
+            status.textContent = solved
+              ? p.done
+              : `${steps.length - hints.length} of ${steps.length} correct. Hint: ${hints[0]}`;
+            $("[data-reveal]", el).hidden = !solved;
+            if (p.grid) grid.classList.toggle("revealed", solved);
+            if (solved) fin();
+          };
+        },
+
+        // Pick one path; only the correct one completes the question.
         CodeExercise(el, fin, p) {
           el.classList.add("try");
           el.innerHTML = `<span class="label">${escapeHTML(p.label)}</span>
