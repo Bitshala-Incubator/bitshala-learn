@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Blockchain Structure — Bitshala Learn 11.2</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+    <link rel="stylesheet" href="../../../styles/widgets.css" />
+    
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 11.2</span><span id="prog">Ready</span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+    <script type="application/json" id="lesson-data">
+{
+  "id": "11.2",
+  "title": "Blockchain Structure",
+  "subtitle": "How hashes link blocks and summarise transactions, and how the test networks let you practise safely.",
+  "phase": "Bitcoin Foundations",
+  "module": "Module 11",
+  "minutes": 50,
+  "level": "Beginner",
+  "sections": [
+    {
+      "id": "question",
+      "label": "The question",
+      "title": "What holds the chain together?",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Meera shows Aarav a chain of blocks. She says that changing one old transaction would break the chain. Aarav asks how a single hash can protect so much data."
+        },
+        {
+          "type": "text",
+          "md": "We will hash a real block header ourselves, follow real links between blocks, build a Merkle tree, and look at the test networks developers use."
+        }
+      ]
+    },
+    {
+      "id": "part1",
+      "label": "Part 1 · Hashing",
+      "title": "A fingerprint for any data",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "A **hash** turns any input into a fixed-length output. Bitcoin uses **SHA-256**, applied twice (double SHA-256). The same input always gives the same output, but a tiny change gives a completely different one."
+        },
+        {
+          "type": "figure",
+          "asset": "hashflow",
+          "caption": "A block’s identity is the double SHA-256 of its 80-byte header. Bitcoin displays it byte-reversed, which is why the hash starts with zeros."
+        },
+        {
+          "type": "widget",
+          "id": "ex-hash-compute",
+          "name": "Checks",
+          "props": {
+            "key": "ex-hash-compute",
+            "label": "Exercise 1 · Explore the genesis block hash",
+            "icon": "box",
+            "intro": "Open <a href=\"https://mempool.space/block/000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\" target=\"_blank\" rel=\"noopener noreferrer\">the genesis block on mempool.space</a>. This is block 0, the first block ever created.",
+            "steps": [
+              {
+                "label": "What are the first 8 hex characters of the genesis block hash?",
+                "type": "text",
+                "answer": "00000000",
+                "hint": "Look for the block hash field. Those leading zeros show proof-of-work was done."
+              },
+              {
+                "label": "How many transactions are in the genesis block?",
+                "type": "number",
+                "answer": "1",
+                "hint": "The genesis block has only the coinbase transaction, like the other early blocks."
+              }
+            ],
+            "button": "Check",
+            "done": "Both correct. The genesis block is the foundation of Bitcoin, with one transaction that created 50 BTC.",
+            "reveal": "<p>The hash starts with leading zeros because Satoshi mined it with proof-of-work. The hash is a fingerprint of the 80-byte header—change one byte and the whole hash changes completely.</p>"
+          }
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "label": "Part 2 · Linking blocks",
+      "title": "Each block stores the one before",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Every block stores the hash of the block before it. To check a link, you read the stored value and compare it with the hash of the earlier block’s header."
+        },
+        {
+          "type": "widget",
+          "id": "ex-block-link",
+          "name": "Checks",
+          "props": {
+            "key": "ex-block-link",
+            "label": "Exercise 2 · Follow a real link",
+            "icon": "layers",
+            "intro": "Open <a href=\"https://mempool.space/block/0000000082b5015589a3fdf2d4baff403e6f0be035a5d9742c1cae6295464449\" target=\"_blank\" rel=\"noopener noreferrer\">block 3 on mempool.space</a>. Find its previous-block hash field.",
+            "steps": [
+              {
+                "label": "Block 3: first 12 characters of its previous-block hash",
+                "type": "text",
+                "answer": "000000006a62",
+                "hint": "That should be the hash of block 2. You saw block 2’s hash in the last lesson."
+              },
+              {
+                "label": "Block 3: how many transactions does it hold?",
+                "type": "number",
+                "answer": "1",
+                "hint": "Blocks this early hold only the coinbase transaction."
+              }
+            ],
+            "button": "Check",
+            "done": "Both correct. Block 3 points at block 2, and block 2 points at block 1.",
+            "reveal": "<p>The link is the stored hash. Your node does not trust the link: it recomputes the hash of block 2’s header and checks that it matches what block 3 stored.</p>"
+          }
+        },
+        {
+          "type": "widget",
+          "id": "ex-edit-block",
+          "name": "PathToggle",
+          "props": {
+            "label": "Exercise 3 · Edit block 1",
+            "icon": "warn",
+            "question": "Block 1 on mempool.space has the hash 00000000839a8e68…. Someone edits a transaction in block 1, so its hash changes. What happens to the link from block 2?",
+            "preselect": "breaks",
+            "paths": {
+              "breaks": {
+                "button": "Block 2 still stores the old hash, so the link fails",
+                "correct": true,
+                "feedback": "Correct. Block 2 is unchanged, so it still stores the old hash. The new block 1 does not match it, and every node rejects the edited chain."
+              },
+              "updates": {
+                "button": "Block 2's stored hash updates to match",
+                "correct": false,
+                "feedback": "Not quite. Nothing updates a stored hash automatically. Block 2 would have to be changed too, and that changes its own hash."
+              },
+              "site": {
+                "button": "The explorer rewrites block 2",
+                "correct": false,
+                "feedback": "No. A block explorer only shows what the chain stores. It cannot change block 2."
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "label": "Part 3 · Merkle trees",
+      "title": "One root for every transaction",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "A block can hold thousands of transactions. A **Merkle tree** hashes them in pairs, then hashes the pairs, until one **Merkle root** is left. That root goes into the block header."
+        },
+        {
+          "type": "figure",
+          "asset": "merkle4",
+          "caption": "Four transactions make two pair-hashes, then one Merkle root. Each round halves the number of hashes."
+        },
+        {
+          "type": "widget",
+          "id": "ex-block1-root",
+          "name": "Checks",
+          "props": {
+            "key": "ex-block1-root",
+            "label": "Exercise 4 · Read the root of block 1",
+            "icon": "layers",
+            "intro": "Open <a href=\"https://mempool.space/block/00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048\" target=\"_blank\" rel=\"noopener noreferrer\">block 1 on mempool.space</a>. Compare its Merkle root with its one transaction.",
+            "steps": [
+              {
+                "label": "Block 1 holds one transaction. Does its Merkle root equal that txid? (yes or no)",
+                "type": "text",
+                "answer": "yes",
+                "hint": "With one transaction there is nothing to pair."
+              },
+              {
+                "label": "How many pairing rounds does block 1 need?",
+                "type": "number",
+                "answer": "0",
+                "hint": "A single txid is already the root."
+              }
+            ],
+            "button": "Check",
+            "done": "Both correct. A block with one transaction has that transaction’s txid as its Merkle root.",
+            "reveal": "<p>The Merkle root is only a summary. Its job is to make any change to one transaction change the header, so with one transaction the summary is the transaction itself.</p>"
+          }
+        },
+        {
+          "type": "widget",
+          "id": "ex-odd-count",
+          "name": "PathToggle",
+          "props": {
+            "label": "Exercise 5 · An odd number of transactions",
+            "icon": "target",
+            "question": "A block has three transactions. How does Bitcoin pair them up in the first round?",
+            "paths": {
+              "repeat": {
+                "button": "It repeats the last hash, so every pair is complete",
+                "correct": true,
+                "feedback": "Correct. The last hash is paired with itself, so every round has pairs. Bitcoin's Merkle tree is built this way."
+              },
+              "drop": {
+                "button": "It drops one transaction from the block",
+                "correct": false,
+                "feedback": "No. A miner cannot drop a transaction from the Merkle tree, because the root must cover every transaction in the block."
+              },
+              "single": {
+                "button": "It hashes the odd one alone and skips the pairing",
+                "correct": false,
+                "feedback": "Not quite. A lone hash without a partner would make the tree shape ambiguous. Bitcoin repeats the last hash instead."
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "part4",
+      "label": "Part 4 · Test networks",
+      "title": "Practise without real coins",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Developers need a chain to test on. **Testnet** (now testnet4) is a public practice network whose coins have no value. **Signet** has more predictable block times, because its blocks are signed by approved signers. **Regtest** is a local chain where you make blocks on demand. Sources: [Bitcoin Core Academy: testnets](https://bitcoincore.academy/testnets.html) and [Bitcoin Core source: chainparamsbase.cpp](https://github.com/bitcoin/bitcoin/blob/master/src/chainparamsbase.cpp)."
+        },
+        {
+          "type": "widget",
+          "id": "ex-dev-choice",
+          "name": "PathToggle",
+          "props": {
+            "label": "Exercise 6 · Pick the right network",
+            "icon": "target",
+            "question": "A team wants a shared public test chain where anyone can get free test coins from a faucet. Which network?",
+            "paths": {
+              "testnet4": {
+                "button": "Testnet4",
+                "correct": true,
+                "feedback": "Correct. Testnet4 is public, and anyone can get test coins from a faucet."
+              },
+              "regtest": {
+                "button": "Regtest",
+                "correct": false,
+                "feedback": "Not quite. Regtest runs on your own computer, so nobody else can join it or use its faucet."
+              },
+              "mainnet": {
+                "button": "Mainnet",
+                "correct": false,
+                "feedback": "No. Mainnet uses real coins, so test traffic should never go there."
+              }
+            }
+          }
+        },
+        {
+          "type": "widget",
+          "id": "ex-flags",
+          "name": "Checks",
+          "props": {
+            "key": "ex-flags",
+            "label": "Exercise 7 · Start Bitcoin Core on a test chain",
+            "icon": "box",
+            "intro": "Bitcoin Core selects a chain with a command-line flag. The flag names are in the <a href=\"https://github.com/bitcoin/bitcoin/blob/master/src/chainparamsbase.cpp\" target=\"_blank\" rel=\"noopener noreferrer\">source file</a>, which defines the options for each network.",
+            "steps": [
+              {
+                "label": "The flag that starts Bitcoin Core on testnet4 (type it exactly)",
+                "type": "text",
+                "answer": "-testnet4",
+                "hint": "It is the flag name with a single dash and no spaces."
+              },
+              {
+                "label": "The flag that starts a local regtest chain (type it exactly)",
+                "type": "text",
+                "answer": "-regtest",
+                "hint": "Regtest is the one network you run alone."
+              }
+            ],
+            "button": "Check",
+            "done": "Both flags correct. These flags point the same software at a different chain.",
+            "reveal": "<p>One binary, several chains: the flag decides which genesis block, ports and rules the node uses.</p>"
+          }
+        }
+      ]
+    },
+    {
+      "id": "real",
+      "label": "Real life",
+      "title": "Why test networks matter",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Wallets and apps are tested on test networks before they touch real money. A bug on a test network costs nothing, while a bug on mainnet can cost real coins. Background: [Spark: which test network to use](https://www.spark.money/tools/bitcoin-testnet-vs-signet-vs-regtest)."
+        },
+        {
+          "type": "aside",
+          "md": "**Who benefits?** Developers test safely. Users get wallets that were tried before launch."
+        }
+      ]
+    },
+    {
+      "id": "wrapup",
+      "label": "Wrap-up",
+      "title": "Now we can answer Meera",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Hashes link the blocks, and a Merkle root summarises the transactions. Editing an old block breaks the link after it."
+        },
+        {
+          "type": "reflect",
+          "id": "reflect-structure",
+          "prompt": "In one sentence, explain why editing block 1 breaks the chain, using the words hash and link.",
+          "placeholder": "Editing block 1 changes…",
+          "model": "Editing block 1 changes its hash. Block 2 still stores the old hash, so the link no longer matches, and nodes reject the chain unless every later block is rebuilt."
+        },
+        {
+          "type": "next"
+        }
+      ]
+    }
+  ]
+}
+    </script>
+    <script src="./figures.js"></script>
+    <script src="../../shared/lesson-engine.js"></script>
+    <script type="module" src="../../navigation.js"></script>
+  </body>
+</html>

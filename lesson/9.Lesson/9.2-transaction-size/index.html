@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Transaction Size — Bitshala Learn 9.2</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+    <link rel="stylesheet" href="../../../styles/widgets.css" />
+    
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 9.2</span><span id="prog">Ready</span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+    <script type="application/json" id="lesson-data">
+{
+  "id": "9.2",
+  "title": "Transaction Size",
+  "subtitle": "Why a transaction’s fee depends on its virtual size, not on the number of bytes it takes up.",
+  "phase": "Bitcoin Foundations",
+  "module": "Module 9",
+  "minutes": 40,
+  "level": "Beginner",
+  "sections": [
+    {
+      "id": "question",
+      "label": "The question",
+      "title": "Which one takes more space?",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Aarav compares two payments in his wallet. The first is **250 bytes**. The second is **310 bytes**, so it looks bigger. Meera says that the bigger one may still take less space in a block."
+        },
+        {
+          "type": "text",
+          "md": "Fees are paid per **virtual byte**, so the question is what counts as a byte. We will work through that in four steps."
+        }
+      ]
+    },
+    {
+      "id": "part1",
+      "label": "Part 1 · Size",
+      "title": "Not every byte costs the same",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "A transaction has two parts. The **non-witness** part holds the inputs and outputs. The **witness** part holds the signatures. SegWit (see [lesson 6.2](../../6.Lesson/6.2-SegWit%20and%20Serialization/index.html)) counts witness bytes at a discount."
+        },
+        {
+          "type": "figure",
+          "asset": "bytes",
+          "caption": "Example: Tx 2 has 200 non-witness bytes and 110 witness bytes."
+        },
+        {
+          "type": "aside",
+          "md": "**Weight = non-witness bytes × 4 + witness bytes**"
+        },
+        {
+          "type": "text",
+          "md": "Fees use **vbytes**: weight divided by 4, rounded up. The fee is the vbytes times the rate you pick (see [lesson 9.1](../9.1-fees/index.html))."
+        },
+        {
+          "type": "widget",
+          "id": "ex-weight-micro",
+          "name": "Checks",
+          "props": {
+            "key": "ex-weight-micro",
+            "label": "Quick check · Split a real transaction",
+            "icon": "layers",
+            "intro": "Open <a href=\"https://mempool.space/tx/0440278dd4c3cdd6848fcf2cdc924fbb1aeea718c714c7a861a47bc16fc50c29\" target=\"_blank\" rel=\"noopener noreferrer\">this Taproot payment on mempool.space</a>. It lists its size in bytes and its weight in WU. Two facts split the bytes: <b>N + W = size</b> and <b>4N + W = weight</b>, where N is non-witness bytes and W is witness bytes.",
+            "steps": [
+              {
+                "label": "Non-witness bytes N (size 153, weight 408)",
+                "type": "number",
+                "answer": "85",
+                "hint": "Subtract the first equation from the second: 3N = weight − size."
+              },
+              {
+                "label": "Witness bytes W",
+                "type": "number",
+                "answer": "68",
+                "hint": "W = size − N."
+              },
+              {
+                "label": "Virtual size in vbytes (weight ÷ 4, rounded up)",
+                "type": "number",
+                "answer": "102",
+                "hint": "408 ÷ 4."
+              }
+            ],
+            "button": "Check",
+            "done": "All three correct. Only 68 of its 153 bytes are witness, and those are weighed at one unit each.",
+            "reveal": "<p>The witness holds one 64-byte Schnorr signature, its length bytes, and the 2-byte SegWit marker and flag. Everything else counts 4 units per byte.</p>"
+          }
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "label": "Part 2 · Compare",
+      "title": "Bigger in bytes, smaller in vbytes",
+      "blocks": [
+        {
+          "type": "table",
+          "headers": [
+            "",
+            "Tx 1 (no witness)",
+            "Tx 2 (SegWit)"
+          ],
+          "rows": [
+            [
+              "Non-witness bytes",
+              "250",
+              "200"
+            ],
+            [
+              "Witness bytes",
+              "0",
+              "110"
+            ],
+            [
+              "Total bytes",
+              "250",
+              "310"
+            ]
+          ]
+        },
+        {
+          "type": "widget",
+          "id": "ex-compare-size",
+          "name": "Checks",
+          "props": {
+            "key": "ex-compare-size",
+            "label": "Exercise 1 · Compare two real payments",
+            "icon": "layers",
+            "intro": "Tx A is <a href=\"https://mempool.space/tx/8f7f7d662261dd304961f693e156107353cbd527e390cc987046a7b88bddcc4e\" target=\"_blank\" rel=\"noopener noreferrer\">8f7f7d66…</a> (222 bytes, 561 WU). Tx B is <a href=\"https://mempool.space/tx/0440278dd4c3cdd6848fcf2cdc924fbb1aeea718c714c7a861a47bc16fc50c29\" target=\"_blank\" rel=\"noopener noreferrer\">0440278d…</a> (153 bytes, 408 WU). Read the numbers on the pages to answer.",
+            "steps": [
+              {
+                "label": "Which one is bigger in bytes? (A or B)",
+                "type": "text",
+                "answer": "a",
+                "hint": "Compare the byte counts, not the vbytes."
+              },
+              {
+                "label": "Difference in vbytes, A minus B",
+                "type": "number",
+                "answer": "39",
+                "hint": "Tx A is 141 vB. Tx B is 102 vB."
+              }
+            ],
+            "button": "Check",
+            "done": "Both correct. Tx A is bigger in bytes and in vbytes, so it pays a bigger fee for the same rate.",
+            "reveal": "<p>Here the bigger transaction is also the one with more vbytes, because it has more non-witness data. The rule is always the same: fees follow vbytes, not raw bytes.</p>"
+          }
+        },
+        {
+          "type": "widget",
+          "id": "ex-which",
+          "name": "PathToggle",
+          "props": {
+            "label": "Exercise 2 · Which takes more space?",
+            "icon": "target",
+            "question": "Which transaction takes more block space?",
+            "paths": {
+              "tx1": {
+                "button": "Tx 1 (250 vB)",
+                "icon": "check",
+                "correct": true,
+                "feedback": "Correct. Tx 1 is 250 vB, and Tx 2 is only 228 vB."
+              },
+              "tx2": {
+                "button": "Tx 2 (310 bytes)",
+                "icon": "cross",
+                "correct": false,
+                "feedback": "Not quite. Tx 2 has more bytes, but its witness bytes count less."
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "label": "Part 3 · Build it",
+      "title": "Build a transaction’s weight",
+      "blocks": [
+        {
+          "type": "widget",
+          "id": "ex-weight-build",
+          "name": "WeightCalc",
+          "props": {
+            "label": "Exercise 3 · Build the weight",
+            "intro": "Set the two byte counts so the transaction is 228 vbytes. Watch how the weight and fee change.",
+            "start": {
+              "nw": 150,
+              "w": 60
+            },
+            "target": 228,
+            "rate": 10,
+            "done": "228 vB. At 10 sat/vB the fee is 2,280 sat."
+          }
+        },
+        {
+          "type": "widget",
+          "id": "ex-fee-vb",
+          "name": "Checks",
+          "props": {
+            "key": "ex-fee-vb",
+            "label": "Exercise 4 · Pay the fee",
+            "icon": "coin",
+            "intro": "The transaction is 228 vB and you pay 10 sat/vB.",
+            "steps": [
+              {
+                "label": "Fee (sat)",
+                "type": "number",
+                "answer": "2280",
+                "hint": "228 × 10"
+              }
+            ],
+            "button": "Check",
+            "done": "2,280 sat",
+            "reveal": "<p>Only vbytes matter for the fee, so the 310 bytes of Tx 2 cost less than the 250 bytes of Tx 1.</p>"
+          }
+        }
+      ]
+    },
+    {
+      "id": "real",
+      "label": "Real life",
+      "title": "Why the discount exists",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "A block can hold **4,000,000 weight units**. Without a discount, a block would hold about 1 MB of old-style data. Counting signatures at 1 unit each lets more transactions fit in the same block. Background: [BIP 141, Segregated Witness](https://bips.dev/141/) and the [weight units glossary entry](https://www.spark.money/glossary/weight-units)."
+        },
+        {
+          "type": "aside",
+          "md": "**Who gets the benefit?** Senders pay less per transaction. Miners fit more transactions into each block, so they earn their fees from more payments."
+        }
+      ]
+    },
+    {
+      "id": "wrapup",
+      "label": "Wrap-up",
+      "title": "Now we can answer Aarav",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Aarav’s 310-byte payment is cheaper than his 250-byte one, because the fee follows vbytes, not raw bytes."
+        },
+        {
+          "type": "reflect",
+          "id": "reflect-size",
+          "prompt": "In one sentence, explain why the witness part counts 1 unit per byte instead of 4.",
+          "placeholder": "Witness bytes count less because…",
+          "model": "The discount makes the signature data cheaper to include, so more transactions fit in each block and senders pay less for the same payment."
+        },
+        {
+          "type": "next"
+        }
+      ]
+    }
+  ],
+  "next": {
+    "id": "10.1",
+    "title": "P2P Network",
+    "teaser": "Aarav’s payment reaches the network because nodes pass it to their peers. Next, he looks at how those nodes find each other."
+  }
+}
+    </script>
+    <script src="./figures.js"></script>
+    <script src="../../shared/lesson-engine.js"></script>
+    <script type="module" src="../../navigation.js"></script>
+  </body>
+</html>

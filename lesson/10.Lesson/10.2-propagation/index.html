@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Propagation — Bitshala Learn 10.2</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+    <link rel="stylesheet" href="../../../styles/widgets.css" />
+    
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 10.2</span><span id="prog">Ready</span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+    <script type="application/json" id="lesson-data">
+{
+  "id": "10.2",
+  "title": "Propagation",
+  "subtitle": "How a transaction and a block spread from node to node until the whole network has them.",
+  "phase": "Bitcoin Foundations",
+  "module": "Module 10",
+  "minutes": 45,
+  "level": "Beginner",
+  "sections": [
+    {
+      "id": "question",
+      "label": "The question",
+      "title": "How fast does a payment spread?",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Aarav’s payment appears on nodes across the world within seconds. No node sends it to everyone at once. Each node passes it on to its neighbours, and they pass it on again."
+        },
+        {
+          "type": "text",
+          "md": "This spread is called **propagation**. We will look at the messages behind one hop, run a small spread, then check a real transaction on a block explorer."
+        }
+      ]
+    },
+    {
+      "id": "part1",
+      "label": "Part 1 · Transactions",
+      "title": "Announce first, send on request",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "A node does not send a full transaction to every peer. It first sends a short **inv** message with the transaction’s ID. A peer that does not have it replies with **getdata**. Only then does the node send the **tx**."
+        },
+        {
+          "type": "figure",
+          "asset": "hop",
+          "caption": "One hop between two peers: an announcement, a request, and then the full transaction."
+        },
+        {
+          "type": "aside",
+          "md": "**Why?** Peers that already have a transaction never need its full data again. Only short messages travel for the rest."
+        },
+        {
+          "type": "widget",
+          "id": "ex-getdata",
+          "name": "PathToggle",
+          "props": {
+            "label": "Exercise 1 · Answer an announcement",
+            "icon": "box",
+            "question": "Your node receives an inv listing one transaction ID that it does not have. What does it send back to get the transaction?",
+            "paths": {
+              "getdata": {
+                "button": "getdata, asking for that transaction ID",
+                "icon": "check",
+                "correct": true,
+                "feedback": "Correct. getdata asks for the full item, named by the ID from the inv."
+              },
+              "tx": {
+                "button": "tx, with its own copy of the transaction",
+                "icon": "cross",
+                "correct": false,
+                "feedback": "Not quite. Your node does not have the transaction, so it has no tx to send. It has to request one first."
+              },
+              "ping": {
+                "button": "ping, to check the connection",
+                "icon": "cross",
+                "correct": false,
+                "feedback": "Not quite. ping only checks that the connection is alive. It does not ask for data."
+              }
+            }
+          }
+        },
+        {
+          "type": "widget",
+          "id": "ex-spread",
+          "name": "SpreadSim",
+          "props": {
+            "label": "Exercise 2 · Watch the spread",
+            "intro": "Aarav’s node (A) has the transaction. Each round, every node that has it passes it to its neighbours. Press Next round until every node has it.",
+            "nodes": {
+              "A": [100, 80],
+              "B": [260, 50],
+              "C": [420, 90],
+              "D": [500, 200],
+              "E": [340, 210],
+              "F": [160, 200]
+            },
+            "edges": [
+              ["A", "B"],
+              ["B", "C"],
+              ["C", "D"],
+              ["D", "E"],
+              ["E", "F"],
+              ["F", "A"],
+              ["B", "E"],
+              ["A", "E"]
+            ],
+            "start": "A"
+          }
+        },
+        {
+          "type": "widget",
+          "id": "ex-rounds",
+          "name": "Checks",
+          "props": {
+            "key": "ex-rounds",
+            "label": "Exercise 3 · Count the rounds",
+            "icon": "target",
+            "intro": "Use the simulation you just ran. Add one more link, C to F, and count again.",
+            "steps": [
+              {
+                "label": "Rounds until every node has it, with the original six links",
+                "type": "number",
+                "answer": "2",
+                "hint": "Round 1 reaches B, E and F. Round 2 reaches C and D."
+              },
+              {
+                "label": "Rounds with the extra C to F link (it does not add a round here)",
+                "type": "number",
+                "answer": "2",
+                "hint": "C already gets the transaction in round 2, so the new link adds nothing to the count."
+              }
+            ],
+            "button": "Check",
+            "done": "Both correct. Extra links can make a spread faster, but only when they reach nodes that would otherwise wait.",
+            "reveal": "<p>Nodes pass things on at the same time, so the spread grows like rings from the start. The number of rounds is the longest shortest path from the start to any node.</p>"
+          }
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "label": "Part 2 · Blocks and checks",
+      "title": "A block is checked at every hop",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "A block follows the same announce-request-send idea. The difference is the check: a node validates a block before it relays it. A bad block stops at the first honest node."
+        },
+        {
+          "type": "widget",
+          "id": "ex-bad-block",
+          "name": "PathToggle",
+          "props": {
+            "label": "Exercise 4 · A bad block arrives",
+            "icon": "warn",
+            "question": "Node B receives a block that fails the checks. What should it do?",
+            "paths": {
+              "drop": {
+                "button": "Drop it and do not relay it",
+                "icon": "check",
+                "correct": true,
+                "feedback": "Correct. Passing on an invalid block would spread the problem. Bitcoin Core also raises a misbehaviour score for the peer that sent it."
+              },
+              "relay": {
+                "button": "Relay it to help the network",
+                "icon": "cross",
+                "correct": false,
+                "feedback": "Not quite. Relaying it would pass the invalid block to all of B’s peers."
+              },
+              "fix": {
+                "button": "Fix it, then relay",
+                "icon": "cross",
+                "correct": false,
+                "feedback": "Not yet. Nodes do not change other people’s blocks, and a fixed block would have a different hash anyway."
+              }
+            }
+          }
+        },
+        {
+          "type": "widget",
+          "id": "ex-compact",
+          "name": "Checks",
+          "props": {
+            "key": "ex-compact",
+            "label": "Exercise 5 · Look up a relay standard",
+            "icon": "layers",
+            "intro": "Blocks can be sent in a compact form, so peers only transfer the transactions they are missing. The standard is in the <a href=\"https://github.com/bitcoin/bips\" target=\"_blank\" rel=\"noopener noreferrer\">BIPs repository</a>. Find the BIP that defines compact block relay.",
+            "steps": [
+              {
+                "label": "Number of the BIP that defines compact block relay",
+                "type": "number",
+                "answer": "152",
+                "hint": "It is a three-digit number, and it is the one whose title is Compact Block Relay."
+              }
+            ],
+            "button": "Check",
+            "done": "BIP 152. A peer that already has most transactions only needs the rest.",
+            "reveal": "<p>Compact blocks send the block header and short IDs. The receiver fills in the transactions from its own mempool and asks only for the missing ones.</p>"
+          }
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "label": "Part 3 · A real transaction",
+      "title": "Follow the first payment",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "The first Bitcoin payment ever made, from Satoshi Nakamoto to Hal Finney, was relayed like any other transaction. Its ID is f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16."
+        },
+        {
+          "type": "widget",
+          "id": "ex-real-tx",
+          "name": "Checks",
+          "props": {
+            "key": "ex-real-tx",
+            "label": "Exercise 6 · Read the transaction on a block explorer",
+            "icon": "box",
+            "intro": "Open <a href=\"https://mempool.space/tx/f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16\" target=\"_blank\" rel=\"noopener noreferrer\">this transaction on mempool.space</a>. Read the block it is in and count its outputs.",
+            "steps": [
+              {
+                "label": "Height of the block that confirmed it",
+                "type": "number",
+                "answer": "170",
+                "hint": "Look for the block link near the top of the transaction page."
+              },
+              {
+                "label": "Number of outputs",
+                "type": "number",
+                "answer": "2",
+                "hint": "One output pays Hal Finney, and the other returns the change."
+              }
+            ],
+            "button": "Check",
+            "done": "Both correct. Block 170 confirmed the payment, and the 50 BTC it spends came from block 9.",
+            "reveal": "<p>The input is the 50 BTC coinbase from block 9. Block 170 included the payment, and the outputs were 10 BTC to Hal Finney and the rest back to Satoshi.</p>"
+          }
+        }
+      ]
+    },
+    {
+      "id": "real",
+      "label": "Real life",
+      "title": "Why propagation is designed this way",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Announcing first saves bandwidth, and checking before relaying keeps invalid data from spreading. The message flow is described in the [Bitcoin developer guide](https://developer.bitcoin.org/devguide/p2p_network.html)."
+        },
+        {
+          "type": "aside",
+          "md": "**Who benefits?** Users see their transactions reach miners quickly. Honest nodes stop bad blocks from spreading."
+        }
+      ]
+    },
+    {
+      "id": "wrapup",
+      "label": "Wrap-up",
+      "title": "Now we can answer Aarav",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Aarav’s payment spreads round by round. Each node announces, requests, and checks before it passes the data on."
+        },
+        {
+          "type": "reflect",
+          "id": "reflect-prop",
+          "prompt": "In one sentence, explain why each node checks a transaction or block before it passes it on.",
+          "placeholder": "Checking first means…",
+          "model": "Checking first means an invalid transaction or block stops at the first honest node, so the network does not spread data that every node would reject anyway."
+        },
+        {
+          "type": "next"
+        }
+      ]
+    }
+  ],
+  "next": {
+    "id": "11.1",
+    "title": "Blocks",
+    "teaser": "Aarav’s payment has spread. Next, we open a block and read its header to see how it is fixed in place."
+  }
+}
+    </script>
+    <script src="./figures.js"></script>
+    <script src="../../shared/lesson-engine.js"></script>
+    <script type="module" src="../../navigation.js"></script>
+  </body>
+</html>

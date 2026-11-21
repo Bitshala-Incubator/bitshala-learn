@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>P2P Network — Bitshala Learn 10.1</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+    <link rel="stylesheet" href="../../../styles/widgets.css" />
+    
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn · Lesson 10.1</span><span id="prog">Ready</span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+    <script type="application/json" id="lesson-data">
+{
+  "id": "10.1",
+  "title": "P2P Network",
+  "subtitle": "How Bitcoin nodes find each other and pass transactions along, with no central server.",
+  "phase": "Bitcoin Foundations",
+  "module": "Module 10",
+  "minutes": 45,
+  "level": "Beginner",
+  "sections": [
+    {
+      "id": "question",
+      "label": "The question",
+      "title": "Who is Aarav talking to?",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Aarav sends a payment from his wallet. He never connects to a company or a server. Yet within seconds, many computers around the world have the payment. How does that happen?"
+        },
+        {
+          "type": "text",
+          "md": "The answer is the **peer-to-peer (P2P) network**. Every computer that runs Bitcoin software is a node, and nodes connect directly to one another. The exercises use the real settings and source code of Bitcoin Core, so you can check each number yourself."
+        }
+      ]
+    },
+    {
+      "id": "part1",
+      "label": "Part 1 · The network",
+      "title": "Many nodes, no server",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "A **node** runs the Bitcoin software and checks transactions and blocks. A **peer** is another node that your node is connected to. Each node keeps a few connections open and passes along what it hears."
+        },
+        {
+          "type": "figure",
+          "asset": "mesh",
+          "caption": "Node A (highlighted) reaches every other node through its peers. A transaction hops from peer to peer, so no single node has to talk to all the others."
+        },
+        {
+          "type": "aside",
+          "md": "**There is no central server.** Remove any one node and the rest keep working."
+        }
+      ]
+    },
+    {
+      "id": "part2",
+      "label": "Part 2 · Connections",
+      "title": "Connections have two directions",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "A node opens **outbound** connections to peers it chooses. Other nodes can also open **inbound** connections to it. Both kinds count toward the node’s total connections."
+        },
+        {
+          "type": "figure",
+          "asset": "direction",
+          "caption": "Outbound: your node chose the peer. Inbound: the peer chose your node. Only outbound connections are under your node’s control."
+        },
+        {
+          "type": "widget",
+          "id": "ex-core-limits",
+          "name": "Checks",
+          "props": {
+            "key": "ex-core-limits",
+            "label": "Exercise 1 · Read Bitcoin Core’s connection limits",
+            "icon": "layers",
+            "intro": "Open the connection constants in the <a href=\"https://github.com/bitcoin/bitcoin/blob/master/src/net.h\" target=\"_blank\" rel=\"noopener noreferrer\">Bitcoin Core source file net.h</a>. Look for the names in the steps.",
+            "steps": [
+              {
+                "label": "MAX_OUTBOUND_FULL_RELAY_CONNECTIONS plus MAX_BLOCK_RELAY_ONLY_CONNECTIONS (the most outbound connections a node makes)",
+                "type": "number",
+                "answer": "10",
+                "hint": "8 full-relay peers and 2 block-relay-only peers."
+              },
+              {
+                "label": "DEFAULT_MAX_PEER_CONNECTIONS in the same file",
+                "type": "number",
+                "answer": "200",
+                "hint": "It is a single number in the constants section, not a range."
+              }
+            ],
+            "button": "Check",
+            "done": "Both correct. Outbound links are capped by the node’s own choice, and the total is capped by the default setting.",
+            "reveal": "<p>Outbound is limited to 8 + 2. Inbound fills the rest up to the total cap. Node operators can change the total with the <code>-maxconnections</code> setting.</p>"
+          }
+        },
+        {
+          "type": "widget",
+          "id": "ex-peerinfo",
+          "name": "Checks",
+          "props": {
+            "key": "ex-peerinfo",
+            "label": "Exercise 2 · Read a node’s peer list",
+            "icon": "box",
+            "intro": "On a running node, <code>bitcoin-cli getpeerinfo</code> returns one object per peer. Each object has fields such as <code>addr</code>, <code>inbound</code> and <code>version</code>. The field names below are the ones the command returns.",
+            "steps": [
+              {
+                "label": "Which field is true when the peer connected to your node (not the other way round)? Type its name.",
+                "type": "text",
+                "answer": "inbound",
+                "hint": "It is the direction word from the figure above."
+              },
+              {
+                "label": "Which command gives totals for inbound and outbound connections? Type the command name without bitcoin-cli.",
+                "type": "text",
+                "answer": "getnetworkinfo",
+                "hint": "It describes the node’s network, not individual peers."
+              }
+            ],
+            "button": "Check",
+            "done": "Both correct. You now know where to look on a real node.",
+            "reveal": "<p>Use <code>getpeerinfo</code> for each peer and <code>getnetworkinfo</code> for the counts. Both are read-only, so checking them does not change the node.</p>"
+          }
+        }
+      ]
+    },
+    {
+      "id": "part3",
+      "label": "Part 3 · Peer discovery",
+      "title": "How a new node finds peers",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "A brand-new node knows no peers. Bitcoin Core gets its first addresses from **DNS seeds**, a saved list of peers, or fixed seed nodes built into the software. After it connects, it asks its peers for more addresses."
+        },
+        {
+          "type": "widget",
+          "id": "ex-first-source",
+          "name": "PathToggle",
+          "props": {
+            "label": "Exercise 3 · Where do first addresses come from?",
+            "icon": "target",
+            "question": "A brand-new Bitcoin Core node has no saved peers. Which source gives it its first addresses?",
+            "paths": {
+              "seeds": {
+                "button": "DNS seeds and built-in seed nodes",
+                "icon": "check",
+                "correct": true,
+                "feedback": "Correct. DNS seeds and seed nodes give the first list of addresses. After that, the node learns peers from the peers it connects to."
+              },
+              "company": {
+                "button": "A company server that every node must use",
+                "icon": "cross",
+                "correct": false,
+                "feedback": "No. Bitcoin has no company server. A node that depends on one would be easy to block."
+              },
+              "wallet": {
+                "button": "The wallet’s own transaction history",
+                "icon": "cross",
+                "correct": false,
+                "feedback": "Not quite. A wallet history lists payments, not network peers, so it cannot tell the node who to connect to."
+              }
+            }
+          }
+        },
+        {
+          "type": "widget",
+          "id": "ex-default-ports",
+          "name": "Checks",
+          "props": {
+            "key": "ex-default-ports",
+            "label": "Exercise 4 · Find the default ports",
+            "icon": "layers",
+            "intro": "Each network has its own default port. Open <a href=\"https://github.com/bitcoin/bitcoin/blob/master/src/kernel/chainparams.cpp\" target=\"_blank\" rel=\"noopener noreferrer\">chainparams.cpp in the Bitcoin Core source</a> and find <code>nDefaultPort</code> for each network.",
+            "steps": [
+              {
+                "label": "Mainnet port",
+                "type": "number",
+                "answer": "8333",
+                "hint": "The main network uses the lowest of these numbers."
+              },
+              {
+                "label": "Testnet4 port",
+                "type": "number",
+                "answer": "48333",
+                "hint": "It starts with 4."
+              },
+              {
+                "label": "Regtest port",
+                "type": "number",
+                "answer": "18444",
+                "hint": "Regtest uses the local-chain port."
+              }
+            ],
+            "button": "Check",
+            "done": "All three correct. A node on the wrong port finds the wrong network, so the port matters.",
+            "reveal": "<p>Mainnet 8333, testnet3 18333, testnet4 48333, signet 38333, regtest 18444. Node operators can change the port with <code>-port</code>.</p>"
+          }
+        },
+        {
+          "type": "widget",
+          "id": "ex-handshake",
+          "name": "SequenceTap",
+          "props": {
+            "label": "Exercise 5 · The first messages",
+            "icon": "layers",
+            "intro": "Node A connects to Node B. Tap the steps in the order they happen.",
+            "shown": [
+              "Node B replies with its own version message",
+              "Node A asks B for more addresses (getaddr)",
+              "Both nodes send verack",
+              "Node A sends its version message"
+            ],
+            "correct": [
+              "Node A sends its version message",
+              "Node B replies with its own version message",
+              "Both nodes send verack",
+              "Node A asks B for more addresses (getaddr)"
+            ],
+            "done": "Handshake first, then requests. A node asks for addresses only after both sides agree to talk."
+          }
+        }
+      ]
+    },
+    {
+      "id": "real",
+      "label": "Real life",
+      "title": "Why nobody controls the network",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Anyone can run a node. Nodes choose their own peers and can be run from homes, offices, or servers. The protocol is written down in the [Bitcoin developer guide](https://developer.bitcoin.org/devguide/p2p_network.html), so independent software can join."
+        },
+        {
+          "type": "aside",
+          "md": "**Who benefits?** Users get their transactions seen without trusting one company. Miners learn about new transactions quickly, from many directions."
+        }
+      ]
+    },
+    {
+      "id": "wrapup",
+      "label": "Wrap-up",
+      "title": "Now we can answer Aarav",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Aarav’s payment reaches the network because each node passes it to its peers. No single server is needed."
+        },
+        {
+          "type": "reflect",
+          "id": "reflect-p2p",
+          "prompt": "In one sentence, explain what would go wrong if every Bitcoin node had to connect to one central server.",
+          "placeholder": "If everything went through one server…",
+          "model": "One server would be a single point of failure and a point of control. If it went down or was blocked, transactions would stop spreading, and whoever ran it could decide what gets relayed."
+        },
+        {
+          "type": "next"
+        }
+      ]
+    }
+  ],
+  "next": {
+    "id": "10.2",
+    "title": "Propagation",
+    "teaser": "Aarav’s payment is on its way. Next, we trace how a transaction and a block spread from node to node."
+  }
+}
+    </script>
+    <script src="./figures.js"></script>
+    <script src="../../shared/lesson-engine.js"></script>
+    <script type="module" src="../../navigation.js"></script>
+  </body>
+</html>

@@ -725,7 +725,68 @@
           transition-duration: 0.01ms !important;
         }
       }
-    </style>
+    
+      /* Checks widget (from lesson 8.2) */
+      .hexgrid {
+        display: grid;
+        grid-template-columns: auto repeat(8, minmax(0, 1fr));
+        gap: 4px;
+        margin: 10px 0 18px;
+        font: 13px ui-monospace, Consolas, monospace;
+        text-align: center;
+      }
+      .hexgrid .row-label {
+        padding-right: 6px;
+        color: var(--mut);
+        font: 12px system-ui, sans-serif;
+        text-align: right;
+        white-space: nowrap;
+      }
+      .hexgrid .byte {
+        padding: 4px 0;
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        background: var(--bg);
+      }
+      .hexgrid.revealed .byte.r,
+      .tag-r {
+        background: color-mix(in srgb, var(--acc) 22%, var(--bg));
+      }
+      .hexgrid.revealed .byte.s,
+      .tag-s {
+        background: color-mix(in srgb, #3d7a4a 24%, var(--bg));
+      }
+      .mission-steps {
+        padding-left: 0;
+        list-style: none;
+      }
+      .match-item {
+        margin: 16px 0;
+      }
+      .match-item label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+      .match-item input,
+      .match-item select {
+        width: 100%;
+        max-width: 420px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: var(--bg);
+        color: var(--ink);
+        font: 16px system-ui, sans-serif;
+      }
+      .match-item input {
+        max-width: 160px;
+      }
+      .match-item input[aria-invalid="true"],
+      .match-item select[aria-invalid="true"] {
+        border-color: var(--acc);
+      }
+</style>
   </head>
   <body>
     <nav>
@@ -738,456 +799,579 @@
       <main id="lesson"></main>
     </div>
     <script type="application/json" id="lesson-data">
-      {
-        "id": "8.1",
-        "title": "Signatures",
-        "subtitle": "How Meera proves she owns a coin without ever showing her private key.",
-        "phase": "Bitcoin Foundations",
-        "module": "Module 8",
-        "minutes": 65,
-        "level": "Beginner",
-        "next": {
-          "id": "8.2",
-          "title": "Continuing Module 8",
-          "teaser": "Aarav now knows how a signature is made and checked. The next lesson continues Module 8 from here. Check your course outline for what Bitshala covers next."
+{
+  "id": "8.1",
+  "title": "Signatures",
+  "subtitle": "How Meera proves she owns a coin without ever showing her private key.",
+  "phase": "Bitcoin Foundations",
+  "module": "Module 8",
+  "minutes": 65,
+  "level": "Beginner",
+  "next": {
+    "id": "8.2",
+    "title": "Schnorr and Taproot",
+    "teaser": "Aarav now knows how signatures are made and checked. Next, he’ll see how Schnorr signatures combine and how Taproot uses them to commit to flexible spending conditions."
+  },
+  "sections": [
+    {
+      "id": "start",
+      "label": "The question",
+      "title": "Meera pays, and the wallet says ‘valid’",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Meera sends Aarav a payment. When Aarav looks at the transaction in his wallet, it shows a green tick next to the input and the word ‘valid’. Nothing in the transaction contains Meera’s private key.\n\n“So how does it know she’s allowed to spend that coin?” Aarav asks.\n\nMeera answers, “I didn’t show you my key. I showed you that I have it. That’s what a signature does.”"
+        }
+      ]
+    },
+    {
+      "id": "origin",
+      "label": "Part 0 · The story",
+      "title": "How the signature was born",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Before any maths, Meera tells Aarav a story. Turn the pages: each one has a small animated scene."
         },
-        "sections": [
-          {
-            "id": "start",
-            "label": "The question",
-            "title": "Meera pays, and the wallet says ‘valid’",
-            "blocks": [
+        {
+          "type": "widget",
+          "id": "w-story",
+          "name": "Storybook",
+          "props": {
+            "pages": [
               {
-                "type": "text",
-                "md": "Meera sends Aarav a payment. When Aarav looks at the transaction in his wallet, it shows a green tick next to the input and the word ‘valid’. Nothing in the transaction contains Meera’s private key.\n\n“So how does it know she’s allowed to spend that coin?” Aarav asks.\n\nMeera answers, “I didn’t show you my key. I showed you that I have it. That’s what a signature does.”"
+                "scene": "seal",
+                "year": "Long ago",
+                "title": "The ring that spoke for the king",
+                "text": "For centuries, a letter was closed with melted wax and pressed with a signet ring. Anyone could read it, but only the owner of the ring could leave that exact mark.\n\nWhen the wax was unbroken and the mark was right, the reader knew who had sent it.",
+                "moral": "**Moral:** proof of who wrote something comes from something only one person has."
               },
               {
-                "type": "text",
-                "md": "This lesson mixes a storybook, four hands-on labs, three coding exercises and a short note. You will see where signatures came from, watch one being made and checked, meet the websites and apps that already use them, and try to break one yourself. Then you will write the signing rule, the verification rule, and the range rules that Bitcoin applies to real signatures. The numbers are small, so you can follow every step by hand."
+                "scene": "copy",
+                "year": "Then came computers",
+                "title": "The signature that could be copied",
+                "text": "Imagine a clerk who scans her signature and pastes it under a contract. It looks perfect. It also looks perfect under a contract she has never seen.\n\nA picture of a signature proves nothing, because anyone can copy a picture.",
+                "moral": "**Moral:** a digital signature must change whenever the message changes."
+              },
+              {
+                "scene": "keys",
+                "year": "1976",
+                "title": "Two keys instead of one",
+                "text": "In 1976 Whitfield Diffie and Martin Hellman asked a question that sounds like a riddle: what if the key that makes the mark and the key that checks it were different?\n\nKeep the first one private. Hand the second to the whole world. Their paper described the idea of a digital signature. It did not yet say how to build a practical one.",
+                "moral": "**Moral:** anyone can check, but only one person can make."
+              },
+              {
+                "scene": "timeline",
+                "year": "1977 to the 1990s",
+                "title": "The recipes arrive",
+                "text": "A year later, Rivest, Shamir and Adleman published RSA, the first practical signature scheme. ElGamal (1985) and Schnorr (1989) followed, then DSA, proposed by the US standards body NIST in 1991 and published in 1994.\n\nDSA is the (r, s) recipe you will code in this lesson. Before the decade ended, ECDSA, the same recipe on an elliptic curve, had been standardised too.",
+                "moral": "**Moral:** ideas are tested in public for years before money depends on them."
+              },
+              {
+                "scene": "bitcoin",
+                "year": "2008 to 2009",
+                "title": "Money that answers to a signature",
+                "text": "When Bitcoin launched in 2009, every coin was locked to a public key. Spending it meant publishing a signature made with ECDSA on a curve called secp256k1.\n\nEvery node checks every signature. None of them ever sees a private key, and none of them has to trust Meera.",
+                "moral": "**Moral:** with signatures nobody has to be trusted, only checked."
+              },
+              {
+                "scene": "taproot",
+                "year": "2021",
+                "title": "A second seal",
+                "text": "In November 2021 the Taproot upgrade added Schnorr signatures (BIP 340) on the very same curve. Schnorr’s idea dates from 1989. Bitcoin waited until 2021 to use it.\n\nThe story is still being written, and you now know how its first chapters work.",
+                "moral": "**Moral:** the idea stays the same while the recipes improve."
               }
-            ]
-          },
-          {
-            "id": "origin",
-            "label": "Part 0 · The story",
-            "title": "How the signature was born",
-            "blocks": [
-              {
-                "type": "text",
-                "md": "Before any maths, Meera tells Aarav a story. Turn the pages: each one has a small animated scene."
-              },
-              {
-                "type": "widget",
-                "id": "w-story",
-                "name": "Storybook",
-                "props": {
-                  "pages": [
-                    {
-                      "scene": "seal",
-                      "year": "Long ago",
-                      "title": "The ring that spoke for the king",
-                      "text": "For centuries, a letter was closed with melted wax and pressed with a signet ring. Anyone could read it, but only the owner of the ring could leave that exact mark.\n\nWhen the wax was unbroken and the mark was right, the reader knew who had sent it.",
-                      "moral": "**Moral:** proof of who wrote something comes from something only one person has."
-                    },
-                    {
-                      "scene": "copy",
-                      "year": "Then came computers",
-                      "title": "The signature that could be copied",
-                      "text": "Imagine a clerk who scans her signature and pastes it under a contract. It looks perfect. It also looks perfect under a contract she has never seen.\n\nA picture of a signature proves nothing, because anyone can copy a picture.",
-                      "moral": "**Moral:** a digital signature must change whenever the message changes."
-                    },
-                    {
-                      "scene": "keys",
-                      "year": "1976",
-                      "title": "Two keys instead of one",
-                      "text": "In 1976 Whitfield Diffie and Martin Hellman asked a question that sounds like a riddle: what if the key that makes the mark and the key that checks it were different?\n\nKeep the first one private. Hand the second to the whole world. Their paper described the idea of a digital signature. It did not yet say how to build a practical one.",
-                      "moral": "**Moral:** anyone can check, but only one person can make."
-                    },
-                    {
-                      "scene": "timeline",
-                      "year": "1977 to the 1990s",
-                      "title": "The recipes arrive",
-                      "text": "A year later, Rivest, Shamir and Adleman published RSA, the first practical signature scheme. ElGamal (1985) and Schnorr (1989) followed, then DSA, proposed by the US standards body NIST in 1991 and published in 1994.\n\nDSA is the (r, s) recipe you will code in this lesson. Before the decade ended, ECDSA, the same recipe on an elliptic curve, had been standardised too.",
-                      "moral": "**Moral:** ideas are tested in public for years before money depends on them."
-                    },
-                    {
-                      "scene": "bitcoin",
-                      "year": "2008 to 2009",
-                      "title": "Money that answers to a signature",
-                      "text": "When Bitcoin launched in 2009, every coin was locked to a public key. Spending it meant publishing a signature made with ECDSA on a curve called secp256k1.\n\nEvery node checks every signature. None of them ever sees a private key, and none of them has to trust Meera.",
-                      "moral": "**Moral:** with signatures nobody has to be trusted, only checked."
-                    },
-                    {
-                      "scene": "taproot",
-                      "year": "2021",
-                      "title": "A second seal",
-                      "text": "In November 2021 the Taproot upgrade added Schnorr signatures (BIP 340) on the very same curve. Schnorr’s idea dates from 1989. Bitcoin waited until 2021 to use it.\n\nThe story is still being written, and you now know how its first chapters work.",
-                      "moral": "**Moral:** the idea stays the same while the recipes improve."
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "id": "signing",
-            "label": "Part 1 · Signing",
-            "title": "What happens when a transaction is signed",
-            "blocks": [
-              {
-                "type": "text",
-                "md": "A signature is never made over the transaction as a whole. The wallet first builds a short fingerprint of the transaction, a number called **z**, which is a hash of the parts that the signature commits to.\n\nThen the signer uses three things: their **private key** x, the fingerprint z, and a fresh random number **k** that is used once and then thrown away. The output of signing is a pair of numbers, **r** and **s**. Together they are the signature."
-              },
-              {
-                "type": "figure",
-                "asset": "signflow",
-                "caption": "Signing turns a transaction into a fingerprint z, then combines z with the private key x and a fresh random k to produce the signature (r, s)."
-              },
-              {
-                "type": "text",
-                "md": "Now watch it happen. The machine below uses our toy numbers: Meera’s private key is 7 and her public key is 8. Type a message, pick a nonce, and press the button."
-              },
-              {
-                "type": "widget",
-                "id": "w-machine",
-                "name": "SignMachine",
-                "props": {}
-              },
-              {
-                "type": "aside",
-                "md": "**Key idea:** the private key never leaves the wallet. Only the signature, which is built from it, is published."
-              }
-            ]
-          },
-          {
-            "id": "ex1",
-            "label": "Exercise 1 · Sign a fingerprint",
-            "title": "Write the signing rule",
-            "blocks": [
-              {
-                "type": "text",
-                "md": "The numbers here come from a small toy group: the modulus is 23, the order is 11, and the generator is 4. Bitcoin uses much larger numbers, but the rule is the same. Meera’s private key is 7, so her public key is 8. The starter code gives you two helpers, `modPow` and `modInv`."
-              },
-              {
-                "type": "widget",
-                "id": "w-sign",
-                "name": "CodeExercise",
-                "props": {
-                  "label": "sign(z, x, k)",
-                  "task": "Write `sign(z, x, k)`. Let `r = (G^k mod P) mod Q`, then `s = k⁻¹ · (z + x·r) mod Q`. Return the pair `[r, s]`. The helpers `modPow` and `modInv` are provided.",
-                  "fn": "sign",
-                  "starter": "const P = 23, Q = 11, G = 4;\n\nfunction modPow(b, e, m) {\n  let r = 1;\n  b %= m;\n  while (e > 0) {\n    if (e & 1) r = (r * b) % m;\n    b = (b * b) % m;\n    e >>= 1;\n  }\n  return r;\n}\n\nfunction modInv(a, m) {\n  for (let x = 1; x < m; x++) if ((a * x) % m === 1) return x;\n  return null;\n}\n\nfunction sign(z, x, k) {\n  \n}",
-                  "cases": [
-                    {
-                      "label": "fingerprint 5, key 7, nonce 3",
-                      "args": [5, 7, 3],
-                      "expect": [7, 7]
-                    },
-                    {
-                      "label": "fingerprint 2, key 3, nonce 5",
-                      "args": [2, 3, 5],
-                      "expect": [1, 1]
-                    },
-                    {
-                      "label": "fingerprint 9, key 7, nonce 4",
-                      "args": [9, 7, 4],
-                      "expect": [3, 2]
-                    },
-                    {
-                      "label": "fingerprint 7, key 7, nonce 4",
-                      "args": [7, 7, 4],
-                      "expect": [3, 7]
-                    }
-                  ],
-                  "done": "Every case passes. The signature is built from the fingerprint, the private key and the nonce, and nothing in it reveals the private key directly."
-                }
-              }
-            ]
-          },
-          {
-            "id": "verification",
-            "label": "Part 2 · Verification",
-            "title": "Anyone can check it, nobody can forge it",
-            "blocks": [
-              {
-                "type": "text",
-                "md": "Verification needs no secrets. A checker has the fingerprint z, the signature (r, s), and the **public key** y. The public key is computed from the private key, but it is not the private key. From these, the checker runs a short calculation and gets a value v. If v equals r, the signature is valid. If not, it is rejected.\n\nIf the fingerprint changes, the transaction has been tampered with, and the check fails. If the signature was made with another key, the check fails too."
-              },
-              {
-                "type": "figure",
-                "asset": "verifyflow",
-                "caption": "Verification uses only public information: the fingerprint, the signature and the public key. It never touches the private key."
-              },
-              {
-                "type": "text",
-                "md": "Now be the troublemaker. Below is Meera’s signed payment, already checked. Press the buttons to tamper with it and watch the check react."
-              },
-              {
-                "type": "widget",
-                "id": "w-verifylab",
-                "name": "VerifyLab",
-                "props": {}
-              }
-            ]
-          },
-          {
-            "id": "ex2",
-            "label": "Exercise 2 · Verify a signature",
-            "title": "Write the checking rule",
-            "blocks": [
-              {
-                "type": "text",
-                "md": "Write the verification rule. Compute `w = s⁻¹ mod Q`, then `u1 = z·w mod Q` and `u2 = r·w mod Q`. Then compute `v = ((G^u1 · y^u2) mod P) mod Q`. The signature is valid only when `v` equals `r`. A signature must also have `r` and `s` between 1 and Q−1, otherwise it is invalid."
-              },
-              {
-                "type": "widget",
-                "id": "w-verify",
-                "name": "CodeExercise",
-                "props": {
-                  "label": "verify(z, r, s, y)",
-                  "task": "Write `verify(z, r, s, y)`. Return `false` if `r` or `s` is outside 1 to Q−1. Otherwise compute `w`, `u1`, `u2` and `v` as described above, and return `true` only when `v` equals `r`. The helpers from Exercise 1 are still in scope if you keep them in the same box.",
-                  "fn": "verify",
-                  "starter": "const P = 23, Q = 11, G = 4;\n\nfunction modPow(b, e, m) {\n  let r = 1;\n  b %= m;\n  while (e > 0) {\n    if (e & 1) r = (r * b) % m;\n    b = (b * b) % m;\n    e >>= 1;\n  }\n  return r;\n}\n\nfunction modInv(a, m) {\n  for (let x = 1; x < m; x++) if ((a * x) % m === 1) return x;\n  return null;\n}\n\nfunction verify(z, r, s, y) {\n  \n}",
-                  "cases": [
-                    {
-                      "label": "Meera’s signature, correct message",
-                      "args": [5, 7, 7, 8],
-                      "expect": true
-                    },
-                    {
-                      "label": "another signature, another key (3)",
-                      "args": [2, 1, 1, 18],
-                      "expect": true
-                    },
-                    {
-                      "label": "Meera’s second signature",
-                      "args": [9, 3, 2, 8],
-                      "expect": true
-                    },
-                    {
-                      "label": "message changed after signing",
-                      "args": [6, 7, 7, 8],
-                      "expect": false
-                    },
-                    {
-                      "label": "wrong public key",
-                      "args": [5, 7, 7, 18],
-                      "expect": false
-                    },
-                    {
-                      "label": "r is zero",
-                      "args": [5, 0, 7, 8],
-                      "expect": false
-                    },
-                    {
-                      "label": "s was tampered with",
-                      "args": [5, 7, 8, 8],
-                      "expect": false
-                    }
-                  ],
-                  "done": "Every case passes. The checker never saw the private key, and it still tells a real signature from a forged or altered one."
-                }
-              }
-            ]
-          },
-          {
-            "id": "uses",
-            "label": "Part 3 · Signatures in the wild",
-            "title": "You have been using signatures all along",
-            "blocks": [
-              {
-                "type": "text",
-                "md": "Aarav is surprised to learn that signatures are not only a Bitcoin idea. Meera shows him that his phone, his browser and his favourite code site all verify signatures every day. Pick a tile to see who signs, what is signed, and who checks it. Most tiles end with a place you can go and look at a real one."
-              },
-              {
-                "type": "widget",
-                "id": "w-uses",
-                "name": "WhereUsed",
-                "props": {
-                  "items": [
-                    {
-                      "name": "The browser padlock",
-                      "signer": "A certificate authority",
-                      "signs": "A website’s certificate, which ties the site name to its public key",
-                      "checker": "Your browser, using the authority’s public key already built into your system",
-                      "line": "Every time you open an https page, a chain of signatures is checked before the page loads.",
-                      "tryit": "Click the padlock next to any web address and open the certificate details. You will see who signed it and which signature algorithm was used."
-                    },
-                    {
-                      "name": "Passkeys and passwordless login",
-                      "signer": "Your phone or laptop",
-                      "signs": "A random challenge sent by the website",
-                      "checker": "The website, using the public key it stored when you signed up",
-                      "line": "There is no password to send or leak. The site stores only a public key, which cannot be used to log in. You will try exactly this in the next lab.",
-                      "tryit": "Visit [webauthn.io](https://webauthn.io), a demo site where you can register and log in with a passkey."
-                    },
-                    {
-                      "name": "Verified commits",
-                      "signer": "A developer’s key",
-                      "signs": "A Git commit, so everyone knows who really made the change",
-                      "checker": "GitHub, which shows a ‘Verified’ badge when the signature matches a public key on the author’s account",
-                      "line": "Anyone can type another person’s name into a commit. Only the key holder can make it show ‘Verified’.",
-                      "tryit": "Read how it works in the [GitHub guide to commit signature verification](https://docs.github.com/en/authentication/managing-commit-signature-verification)."
-                    },
-                    {
-                      "name": "Software updates",
-                      "signer": "The software publisher",
-                      "signs": "The installer or update file",
-                      "checker": "Your device, before it installs anything",
-                      "line": "A tampered update fails the check, even if it came from a hijacked download server.",
-                      "tryit": "On Windows, right-click a downloaded installer, choose Properties, and look for the Digital Signatures tab."
-                    },
-                    {
-                      "name": "Bitcoin transactions",
-                      "signer": "The owner of the coin’s private key",
-                      "signs": "A fingerprint of the transaction",
-                      "checker": "Every Bitcoin node",
-                      "line": "This is the green tick from the start of the lesson, repeated by every node on the network.",
-                      "tryit": "Open any transaction on [mempool.space](https://mempool.space) and expand its details to see the signature data of each input."
-                    },
-                    {
-                      "name": "Nostr posts",
-                      "signer": "The author’s key",
-                      "signs": "Each post, which Nostr calls an event",
-                      "checker": "Any relay or app that receives it",
-                      "line": "Nostr uses the same secp256k1 curve as Bitcoin with Schnorr signatures, so one key can prove authorship across many apps without any company vouching for it.",
-                      "tryit": "Read about the protocol at [nostr.com](https://nostr.com)."
-                    },
-                    {
-                      "name": "Signed messages",
-                      "signer": "A wallet that holds the key for an address",
-                      "signs": "Any text, such as ‘I am Meera, 3 June’",
-                      "checker": "Anyone who knows the address",
-                      "line": "It proves you control an address without moving a single coin. Exchanges and counterparties use it to confirm ownership.",
-                      "tryit": "Bitcoin Core has `signmessage` and `verifymessage` commands. You met its command line in [Lesson 3.2](../../3.Lesson/3.2-bitcoin-core-rpc/)."
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "text",
-                "md": "The passkey idea is worth acting out. Below, shop.example knows only Meera’s public key. Log in once, then play Eve, who is listening on the wire, and see why copying a signature does not help her."
-              },
-              {
-                "type": "widget",
-                "id": "w-login",
-                "name": "LoginDemo",
-                "props": {}
-              }
-            ]
-          },
-          {
-            "id": "ecdsa",
-            "label": "Part 4 · ECDSA in Bitcoin",
-            "title": "The same idea, on a real curve",
-            "blocks": [
-              {
-                "type": "text",
-                "md": "Bitcoin uses **ECDSA** (Elliptic Curve Digital Signature Algorithm) on a curve called **secp256k1**. The shape of the calculation is the one you just wrote. The difference is that the numbers are about 256 bits long, and the multiplication is done on points of an elliptic curve instead of plain numbers modulo a prime.\n\nTwo details matter a great deal in practice:\n\n**The nonce k must be fresh and secret.** If the same k is ever used twice with the same key, the private key can be calculated from the two signatures. A famous example is the 2010 PlayStation 3 signing key, which was recovered for this reason."
-              },
-              {
-                "type": "text",
-                "md": "Do not take that on trust. In the lab below, Meera’s wallet has a bug and reuses its nonce. Play Eve and recover the private key step by step, then switch to a wallet that uses a fresh nonce and see what changes."
-              },
-              {
-                "type": "widget",
-                "id": "w-nonce",
-                "name": "NonceTrap",
-                "props": {}
-              },
-              {
-                "type": "text",
-                "md": "**Bitcoin nodes accept only ‘low-S’ signatures.** Because the signature (r, s) and the signature (r, −s) both verify, Bitcoin’s standard rules accept only the version where s is in the lower half of the range. This stops a third party from changing a transaction’s signature bytes and changing its ID."
-              },
-              {
-                "type": "aside",
-                "md": "**Key idea:** the curve gives the signature its size and security. The rule in your code gives it its meaning: only the owner of the private key can produce a value that passes."
-              }
-            ]
-          },
-          {
-            "id": "ex3",
-            "label": "Exercise 3 · Standard signature rules",
-            "title": "Which signatures do nodes accept?",
-            "blocks": [
-              {
-                "type": "text",
-                "md": "Write the range rules a node applies before it checks the maths. For this exercise the order is `n = 11`, so the low half of the range is 1 to 5. A signature is standard only if `r` is between 1 and n−1, and `s` is between 1 and the midpoint `floor(n/2)`."
-              },
-              {
-                "type": "widget",
-                "id": "w-standard",
-                "name": "CodeExercise",
-                "props": {
-                  "label": "isStandardSig(r, s, n)",
-                  "task": "Write `isStandardSig(r, s, n)`. Return `true` only if `r` is between 1 and n−1 inclusive, and `s` is between 1 and `Math.floor(n / 2)` inclusive. Otherwise return `false`.",
-                  "fn": "isStandardSig",
-                  "starter": "function isStandardSig(r, s, n) {\n  \n}",
-                  "cases": [
-                    {
-                      "label": "both in range",
-                      "args": [3, 5, 11],
-                      "expect": true
-                    },
-                    {
-                      "label": "s in the upper half",
-                      "args": [3, 6, 11],
-                      "expect": false
-                    },
-                    {
-                      "label": "r is zero",
-                      "args": [0, 2, 11],
-                      "expect": false
-                    },
-                    {
-                      "label": "r equal to n",
-                      "args": [11, 2, 11],
-                      "expect": false
-                    },
-                    { "label": "small s", "args": [4, 1, 11], "expect": true },
-                    {
-                      "label": "s equal to n",
-                      "args": [4, 11, 11],
-                      "expect": false
-                    }
-                  ],
-                  "done": "Correct. A node checks the range before it spends time on the maths. Real Bitcoin uses the same rule with a 256-bit order."
-                }
-              }
-            ]
-          },
-          {
-            "id": "report",
-            "label": "Final note",
-            "title": "Explain it to Aarav",
-            "blocks": [
-              {
-                "type": "reflect",
-                "id": "r-signatures",
-                "prompt": "In a short note to Aarav, explain what happens when a transaction is signed, how a checker verifies the signature against a public key without the private key, and what role ECDSA plays in Bitcoin. Mention why the random nonce must never be reused.",
-                "placeholder": "Explain it in your own words.",
-                "model": "Signing starts from a fingerprint of the transaction. The signer combines that fingerprint with the private key and a fresh random nonce k, and produces the pair (r, s). Verification uses only public values: the fingerprint, the signature and the public key. It performs a short calculation and accepts only if the result equals r, so the private key is never needed. Bitcoin uses ECDSA on the secp256k1 curve, with the same shape of calculation on much larger numbers. The nonce must be used once: reusing it lets anyone compute the private key from two signatures. Nodes also accept only low-S signatures, which removes the second valid form of the same signature."
-              }
-            ]
-          },
-          {
-            "id": "wrapup",
-            "label": "Where this leaves you",
-            "title": "A signature is proof, not a secret",
-            "blocks": [
-              {
-                "type": "text",
-                "md": "Aarav looks at the green tick again. It is not a password and it does not reveal Meera’s key. It is a short proof, built from a fresh random number and a fingerprint of the transaction, that only the holder of the key could have produced."
-              },
-              {
-                "type": "text",
-                "md": "**Keep exploring.** Read the Schnorr specification in [BIP 340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki), browse step-by-step explanations on [learnmeabitcoin.com](https://learnmeabitcoin.com), and look up real signatures on [mempool.space](https://mempool.space)."
-              },
-              { "type": "next" }
             ]
           }
-        ]
-      }
+        }
+      ]
+    },
+    {
+      "id": "signing",
+      "label": "Part 1 · Signing",
+      "title": "What happens when a transaction is signed",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "A signature is never made over the transaction as a whole. The wallet first builds a short fingerprint of the transaction, a number called **z**, which is a hash of the parts that the signature commits to.\n\nThen the signer uses three things: their **private key** x, the fingerprint z, and a fresh random number **k** that is used once and then thrown away. The output of signing is a pair of numbers, **r** and **s**. Together they are the signature."
+        },
+        {
+          "type": "figure",
+          "asset": "signflow",
+          "caption": "Signing turns a transaction into a fingerprint z, then combines z with the private key x and a fresh random k to produce the signature (r, s)."
+        },
+        {
+          "type": "text",
+          "md": "Now watch it happen. The machine below uses our toy numbers: Meera’s private key is 7 and her public key is 8. Type a message, pick a nonce, and press the button."
+        },
+        {
+          "type": "widget",
+          "id": "w-machine",
+          "name": "SignMachine",
+          "props": {}
+        },
+        {
+          "type": "aside",
+          "md": "**Key idea:** the private key never leaves the wallet. Only the signature, which is built from it, is published."
+        }
+      ]
+    },
+    {
+      "id": "ex1",
+      "label": "Exercise 1 · Sign a fingerprint",
+      "title": "Write the signing rule",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "The numbers here come from a small toy group: the modulus is 23, the order is 11, and the generator is 4. Bitcoin uses much larger numbers, but the rule is the same. Meera’s private key is 7, so her public key is 8. The starter code gives you two helpers, `modPow` and `modInv`."
+        },
+        {
+          "type": "widget",
+          "id": "w-sign",
+          "name": "CodeExercise",
+          "props": {
+            "label": "sign(z, x, k)",
+            "task": "Write `sign(z, x, k)`. Let `r = (G^k mod P) mod Q`, then `s = k⁻¹ · (z + x·r) mod Q`. Return the pair `[r, s]`. The helpers `modPow` and `modInv` are provided.",
+            "fn": "sign",
+            "starter": "const P = 23, Q = 11, G = 4;\n\nfunction modPow(b, e, m) {\n  let r = 1;\n  b %= m;\n  while (e > 0) {\n    if (e & 1) r = (r * b) % m;\n    b = (b * b) % m;\n    e >>= 1;\n  }\n  return r;\n}\n\nfunction modInv(a, m) {\n  for (let x = 1; x < m; x++) if ((a * x) % m === 1) return x;\n  return null;\n}\n\nfunction sign(z, x, k) {\n  \n}",
+            "cases": [
+              {
+                "label": "fingerprint 5, key 7, nonce 3",
+                "args": [
+                  5,
+                  7,
+                  3
+                ],
+                "expect": [
+                  7,
+                  7
+                ]
+              },
+              {
+                "label": "fingerprint 2, key 3, nonce 5",
+                "args": [
+                  2,
+                  3,
+                  5
+                ],
+                "expect": [
+                  1,
+                  1
+                ]
+              },
+              {
+                "label": "fingerprint 9, key 7, nonce 4",
+                "args": [
+                  9,
+                  7,
+                  4
+                ],
+                "expect": [
+                  3,
+                  2
+                ]
+              },
+              {
+                "label": "fingerprint 7, key 7, nonce 4",
+                "args": [
+                  7,
+                  7,
+                  4
+                ],
+                "expect": [
+                  3,
+                  7
+                ]
+              }
+            ],
+            "done": "Every case passes. The signature is built from the fingerprint, the private key and the nonce, and nothing in it reveals the private key directly."
+          }
+        }
+      ]
+    },
+    {
+      "id": "verification",
+      "label": "Part 2 · Verification",
+      "title": "Anyone can check it, nobody can forge it",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Verification needs no secrets. A checker has the fingerprint z, the signature (r, s), and the **public key** y. The public key is computed from the private key, but it is not the private key. From these, the checker runs a short calculation and gets a value v. If v equals r, the signature is valid. If not, it is rejected.\n\nIf the fingerprint changes, the transaction has been tampered with, and the check fails. If the signature was made with another key, the check fails too."
+        },
+        {
+          "type": "figure",
+          "asset": "verifyflow",
+          "caption": "Verification uses only public information: the fingerprint, the signature and the public key. It never touches the private key."
+        },
+        {
+          "type": "text",
+          "md": "Now be the troublemaker. Below is Meera’s signed payment, already checked. Press the buttons to tamper with it and watch the check react."
+        },
+        {
+          "type": "widget",
+          "id": "w-verifylab",
+          "name": "VerifyLab",
+          "props": {}
+        }
+      ]
+    },
+    {
+      "id": "ex2",
+      "label": "Exercise 2 · Verify a signature",
+      "title": "Write the checking rule",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Write the verification rule. Compute `w = s⁻¹ mod Q`, then `u1 = z·w mod Q` and `u2 = r·w mod Q`. Then compute `v = ((G^u1 · y^u2) mod P) mod Q`. The signature is valid only when `v` equals `r`. A signature must also have `r` and `s` between 1 and Q−1, otherwise it is invalid."
+        },
+        {
+          "type": "widget",
+          "id": "w-verify",
+          "name": "CodeExercise",
+          "props": {
+            "label": "verify(z, r, s, y)",
+            "task": "Write `verify(z, r, s, y)`. Return `false` if `r` or `s` is outside 1 to Q−1. Otherwise compute `w`, `u1`, `u2` and `v` as described above, and return `true` only when `v` equals `r`. The helpers from Exercise 1 are still in scope if you keep them in the same box.",
+            "fn": "verify",
+            "starter": "const P = 23, Q = 11, G = 4;\n\nfunction modPow(b, e, m) {\n  let r = 1;\n  b %= m;\n  while (e > 0) {\n    if (e & 1) r = (r * b) % m;\n    b = (b * b) % m;\n    e >>= 1;\n  }\n  return r;\n}\n\nfunction modInv(a, m) {\n  for (let x = 1; x < m; x++) if ((a * x) % m === 1) return x;\n  return null;\n}\n\nfunction verify(z, r, s, y) {\n  \n}",
+            "cases": [
+              {
+                "label": "Meera’s signature, correct message",
+                "args": [
+                  5,
+                  7,
+                  7,
+                  8
+                ],
+                "expect": true
+              },
+              {
+                "label": "another signature, another key (3)",
+                "args": [
+                  2,
+                  1,
+                  1,
+                  18
+                ],
+                "expect": true
+              },
+              {
+                "label": "Meera’s second signature",
+                "args": [
+                  9,
+                  3,
+                  2,
+                  8
+                ],
+                "expect": true
+              },
+              {
+                "label": "message changed after signing",
+                "args": [
+                  6,
+                  7,
+                  7,
+                  8
+                ],
+                "expect": false
+              },
+              {
+                "label": "wrong public key",
+                "args": [
+                  5,
+                  7,
+                  7,
+                  18
+                ],
+                "expect": false
+              },
+              {
+                "label": "r is zero",
+                "args": [
+                  5,
+                  0,
+                  7,
+                  8
+                ],
+                "expect": false
+              },
+              {
+                "label": "s was tampered with",
+                "args": [
+                  5,
+                  7,
+                  8,
+                  8
+                ],
+                "expect": false
+              }
+            ],
+            "done": "Every case passes. The checker never saw the private key, and it still tells a real signature from a forged or altered one."
+          }
+        }
+      ]
+    },
+    {
+      "id": "uses",
+      "label": "Part 3 · Signatures in the wild",
+      "title": "You have been using signatures all along",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Aarav is surprised to learn that signatures are not only a Bitcoin idea. Meera shows him that his phone, his browser and his favourite code site all verify signatures every day. Pick a tile to see who signs, what is signed, and who checks it. Most tiles end with a place you can go and look at a real one."
+        },
+        {
+          "type": "widget",
+          "id": "w-uses",
+          "name": "WhereUsed",
+          "props": {
+            "items": [
+              {
+                "name": "The browser padlock",
+                "signer": "A certificate authority",
+                "signs": "A website’s certificate, which ties the site name to its public key",
+                "checker": "Your browser, using the authority’s public key already built into your system",
+                "line": "Every time you open an https page, a chain of signatures is checked before the page loads.",
+                "tryit": "Click the padlock next to any web address and open the certificate details. You will see who signed it and which signature algorithm was used."
+              },
+              {
+                "name": "Passkeys and passwordless login",
+                "signer": "Your phone or laptop",
+                "signs": "A random challenge sent by the website",
+                "checker": "The website, using the public key it stored when you signed up",
+                "line": "There is no password to send or leak. The site stores only a public key, which cannot be used to log in. You will try exactly this in the next lab.",
+                "tryit": "Visit [webauthn.io](https://webauthn.io), a demo site where you can register and log in with a passkey."
+              },
+              {
+                "name": "Verified commits",
+                "signer": "A developer’s key",
+                "signs": "A Git commit, so everyone knows who really made the change",
+                "checker": "GitHub, which shows a ‘Verified’ badge when the signature matches a public key on the author’s account",
+                "line": "Anyone can type another person’s name into a commit. Only the key holder can make it show ‘Verified’.",
+                "tryit": "Read how it works in the [GitHub guide to commit signature verification](https://docs.github.com/en/authentication/managing-commit-signature-verification)."
+              },
+              {
+                "name": "Software updates",
+                "signer": "The software publisher",
+                "signs": "The installer or update file",
+                "checker": "Your device, before it installs anything",
+                "line": "A tampered update fails the check, even if it came from a hijacked download server.",
+                "tryit": "On Windows, right-click a downloaded installer, choose Properties, and look for the Digital Signatures tab."
+              },
+              {
+                "name": "Bitcoin transactions",
+                "signer": "The owner of the coin’s private key",
+                "signs": "A fingerprint of the transaction",
+                "checker": "Every Bitcoin node",
+                "line": "This is the green tick from the start of the lesson, repeated by every node on the network.",
+                "tryit": "Open any transaction on [mempool.space](https://mempool.space) and expand its details to see the signature data of each input."
+              },
+              {
+                "name": "Nostr posts",
+                "signer": "The author’s key",
+                "signs": "Each post, which Nostr calls an event",
+                "checker": "Any relay or app that receives it",
+                "line": "Nostr uses the same secp256k1 curve as Bitcoin with Schnorr signatures, so one key can prove authorship across many apps without any company vouching for it.",
+                "tryit": "Read about the protocol at [nostr.com](https://nostr.com)."
+              },
+              {
+                "name": "Signed messages",
+                "signer": "A wallet that holds the key for an address",
+                "signs": "Any text, such as ‘I am Meera, 3 June’",
+                "checker": "Anyone who knows the address",
+                "line": "It proves you control an address without moving a single coin. Exchanges and counterparties use it to confirm ownership.",
+                "tryit": "Bitcoin Core has `signmessage` and `verifymessage` commands. You met its command line in [Lesson 3.2](../../3.Lesson/3.2-bitcoin-core-rpc/)."
+              }
+            ]
+          }
+        },
+        {
+          "type": "text",
+          "md": "The passkey idea is worth acting out. Below, shop.example knows only Meera’s public key. Log in once, then play Eve, who is listening on the wire, and see why copying a signature does not help her."
+        },
+        {
+          "type": "widget",
+          "id": "w-login",
+          "name": "LoginDemo",
+          "props": {}
+        }
+      ]
+    },
+    {
+      "id": "ecdsa",
+      "label": "Part 4 · ECDSA in Bitcoin",
+      "title": "The same idea, on a real curve",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Bitcoin uses **ECDSA** (Elliptic Curve Digital Signature Algorithm) on a curve called **secp256k1**. The shape of the calculation is the one you just wrote. The difference is that the numbers are about 256 bits long, and the multiplication is done on points of an elliptic curve instead of plain numbers modulo a prime.\n\nTwo details matter a great deal in practice:\n\n**The nonce k must be fresh and secret.** If the same k is ever used twice with the same key, the private key can be calculated from the two signatures. A famous example is the 2010 PlayStation 3 signing key, which was recovered for this reason."
+        },
+        {
+          "type": "text",
+          "md": "Do not take that on trust. In the lab below, Meera’s wallet has a bug and reuses its nonce. Play Eve and recover the private key step by step, then switch to a wallet that uses a fresh nonce and see what changes."
+        },
+        {
+          "type": "widget",
+          "id": "w-nonce",
+          "name": "NonceTrap",
+          "props": {}
+        },
+        {
+          "type": "text",
+          "md": "**Bitcoin nodes accept only ‘low-S’ signatures.** Because the signature (r, s) and the signature (r, −s) both verify, Bitcoin’s standard rules accept only the version where s is in the lower half of the range. This stops a third party from changing a transaction’s signature bytes and changing its ID."
+        },
+        {
+          "type": "aside",
+          "md": "**Key idea:** the curve gives the signature its size and security. The rule in your code gives it its meaning: only the owner of the private key can produce a value that passes."
+        },
+        {
+          "type": "widget",
+          "id": "ex-real-sig",
+          "name": "Checks",
+          "props": {
+            "key": "ex-real-sig",
+            "label": "Exercise 4 · Read a real signature on the chain",
+            "icon": "box",
+            "intro": "This is the input of the first Bitcoin payment ever made, in <a href=\"https://mempool.space/tx/f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16\" target=\"_blank\" rel=\"noopener noreferrer\">transaction f4184fc5 on mempool.space</a>. Open the input and read its <b>scriptSig</b>. It begins with the push opcode 47 (hex).",
+            "steps": [
+              {
+                "label": "How many bytes does the signature push contain?",
+                "type": "number",
+                "answer": "71",
+                "hint": "The push opcode 0x47 means 71 bytes follow."
+              },
+              {
+                "label": "How many bytes is r inside the DER signature?",
+                "type": "number",
+                "answer": "32",
+                "hint": "The byte after 02 is the length of r."
+              },
+              {
+                "label": "The last byte of the push, in hex (the sighash flag)",
+                "type": "text",
+                "answer": "01",
+                "hint": "01 means SIGHASH_ALL."
+              }
+            ],
+            "button": "Check",
+            "done": "All correct. The 71 bytes are a DER signature (70 bytes) plus one sighash byte.",
+            "reveal": "<p>Early transactions use DER-encoded ECDSA signatures, with the sighash flag appended. Taproot later switched to 64-byte Schnorr signatures, which you just read.</p>"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ex3",
+      "label": "Exercise 3 · Standard signature rules",
+      "title": "Which signatures do nodes accept?",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Write the range rules a node applies before it checks the maths. For this exercise the order is `n = 11`, so the low half of the range is 1 to 5. A signature is standard only if `r` is between 1 and n−1, and `s` is between 1 and the midpoint `floor(n/2)`."
+        },
+        {
+          "type": "widget",
+          "id": "w-standard",
+          "name": "CodeExercise",
+          "props": {
+            "label": "isStandardSig(r, s, n)",
+            "task": "Write `isStandardSig(r, s, n)`. Return `true` only if `r` is between 1 and n−1 inclusive, and `s` is between 1 and `Math.floor(n / 2)` inclusive. Otherwise return `false`.",
+            "fn": "isStandardSig",
+            "starter": "function isStandardSig(r, s, n) {\n  \n}",
+            "cases": [
+              {
+                "label": "both in range",
+                "args": [
+                  3,
+                  5,
+                  11
+                ],
+                "expect": true
+              },
+              {
+                "label": "s in the upper half",
+                "args": [
+                  3,
+                  6,
+                  11
+                ],
+                "expect": false
+              },
+              {
+                "label": "r is zero",
+                "args": [
+                  0,
+                  2,
+                  11
+                ],
+                "expect": false
+              },
+              {
+                "label": "r equal to n",
+                "args": [
+                  11,
+                  2,
+                  11
+                ],
+                "expect": false
+              },
+              {
+                "label": "small s",
+                "args": [
+                  4,
+                  1,
+                  11
+                ],
+                "expect": true
+              },
+              {
+                "label": "s equal to n",
+                "args": [
+                  4,
+                  11,
+                  11
+                ],
+                "expect": false
+              }
+            ],
+            "done": "Correct. A node checks the range before it spends time on the maths. Real Bitcoin uses the same rule with a 256-bit order."
+          }
+        }
+      ]
+    },
+    {
+      "id": "report",
+      "label": "Final note",
+      "title": "Explain it to Aarav",
+      "blocks": [
+        {
+          "type": "reflect",
+          "id": "r-signatures",
+          "prompt": "In a short note to Aarav, explain what happens when a transaction is signed, how a checker verifies the signature against a public key without the private key, and what role ECDSA plays in Bitcoin. Mention why the random nonce must never be reused.",
+          "placeholder": "Explain it in your own words.",
+          "model": "Signing starts from a fingerprint of the transaction. The signer combines that fingerprint with the private key and a fresh random nonce k, and produces the pair (r, s). Verification uses only public values: the fingerprint, the signature and the public key. It performs a short calculation and accepts only if the result equals r, so the private key is never needed. Bitcoin uses ECDSA on the secp256k1 curve, with the same shape of calculation on much larger numbers. The nonce must be used once: reusing it lets anyone compute the private key from two signatures. Nodes also accept only low-S signatures, which removes the second valid form of the same signature."
+        }
+      ]
+    },
+    {
+      "id": "wrapup",
+      "label": "Where this leaves you",
+      "title": "A signature is proof, not a secret",
+      "blocks": [
+        {
+          "type": "text",
+          "md": "Aarav looks at the green tick again. It is not a password and it does not reveal Meera’s key. It is a short proof, built from a fresh random number and a fingerprint of the transaction, that only the holder of the key could have produced."
+        },
+        {
+          "type": "text",
+          "md": "**Keep exploring.** Read the Schnorr specification in [BIP 340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki), browse step-by-step explanations on [learnmeabitcoin.com](https://learnmeabitcoin.com), and look up real signatures on [mempool.space](https://mempool.space)."
+        },
+        {
+          "type": "next"
+        }
+      ]
+    }
+  ]
+}
     </script>
     <script type="module">
       const $ = (s, r = document) => r.querySelector(s);
@@ -1227,7 +1411,7 @@
       };
 
       const ASSETS = {
-        signflow: `<svg class="flow" viewBox="0 0 520 130" fill="none" stroke="currentColor" stroke-width="1.2"><defs><marker id="sfArr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs><rect x="10" y="30" width="100" height="58" fill="var(--soft)"/><text x="60" y="56" text-anchor="middle" stroke="none" font-size="11">transaction</text><text x="60" y="72" text-anchor="middle" stroke="none" font-size="9.5">inputs and outputs</text><path d="M112 59H130" marker-end="url(#sfArr)"/><rect x="132" y="30" width="100" height="58" fill="var(--soft)"/><text x="182" y="56" text-anchor="middle" stroke="none" font-size="11">fingerprint z</text><text x="182" y="72" text-anchor="middle" stroke="none" font-size="9.5">hash of the data</text><path d="M234 59H252" marker-end="url(#sfArr)"/><rect x="254" y="30" width="112" height="58" fill="var(--soft)"/><text x="310" y="52" text-anchor="middle" stroke="none" font-size="11">sign with</text><text x="310" y="68" text-anchor="middle" stroke="none" font-size="9.5">private key x</text><text x="310" y="81" text-anchor="middle" stroke="none" font-size="9.5">and random k</text><path d="M368 59H386" marker-end="url(#sfArr)"/><rect x="388" y="30" width="122" height="58" fill="none" stroke="var(--acc)" stroke-width="1.6"/><text x="449" y="56" text-anchor="middle" stroke="none" font-size="11" fill="var(--acc)">signature (r, s)</text><text x="449" y="72" text-anchor="middle" stroke="none" font-size="9.5" fill="var(--acc)">published</text><text x="10" y="118" stroke="none" font-size="9.5">k is used once, then thrown away. The private key x never appears in the output.</text></svg>`,
+        signflow: `<svg class="flow" viewBox="0 0 640 140" fill="none" stroke="currentColor" stroke-width="1.2" role="img" aria-label="Signing flow: transaction, fingerprint z, sign with x and k, signature published"><defs><marker id="sfArr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="var(--ink)"/></marker></defs><rect x="0" y="22" width="142" height="76" rx="6" fill="var(--soft)" stroke="var(--line)" stroke-width="1"/><text x="71" y="56" text-anchor="middle" stroke="none" font-size="13" font-weight="700">Transaction</text><text x="71" y="72" text-anchor="middle" stroke="none" font-size="12">inputs and outputs</text><path d="M146 60H162" stroke="var(--ink)" stroke-width="1.4" marker-end="url(#sfArr)"/><rect x="166" y="22" width="142" height="76" rx="6" fill="var(--soft)" stroke="var(--line)" stroke-width="1"/><text x="237" y="56" text-anchor="middle" stroke="none" font-size="13" font-weight="700">Fingerprint z</text><text x="237" y="72" text-anchor="middle" stroke="none" font-size="12">hash of the data</text><path d="M312 60H328" stroke="var(--ink)" stroke-width="1.4" marker-end="url(#sfArr)"/><rect x="332" y="22" width="142" height="76" rx="6" fill="var(--soft)" stroke="var(--line)" stroke-width="1"/><text x="403" y="48" text-anchor="middle" stroke="none" font-size="13" font-weight="700">Sign</text><text x="403" y="64" text-anchor="middle" stroke="none" font-size="12">private key x</text><text x="403" y="80" text-anchor="middle" stroke="none" font-size="12">and random k</text><path d="M478 60H494" stroke="var(--ink)" stroke-width="1.4" marker-end="url(#sfArr)"/><rect x="498" y="22" width="142" height="76" rx="6" fill="none" stroke="var(--acc)" stroke-width="1.6"/><text x="569" y="56" text-anchor="middle" stroke="none" font-size="13" font-weight="700" fill="var(--acc)">Signature</text><text x="569" y="72" text-anchor="middle" stroke="none" font-size="12" fill="var(--acc)">(r, s) published</text><text x="0" y="128" stroke="none" font-size="13" fill="var(--ink)">k is used once, then thrown away. The private key x never appears in the output.</text></svg>`,
         verifyflow: `<svg class="flow" viewBox="0 0 520 220" fill="none" stroke="currentColor" stroke-width="1.2"><defs><marker id="vfArr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="currentColor"/></marker></defs><rect x="10" y="18" width="150" height="40" fill="var(--soft)"/><text x="85" y="42" text-anchor="middle" stroke="none" font-size="11">fingerprint z</text><rect x="10" y="78" width="150" height="40" fill="var(--soft)"/><text x="85" y="102" text-anchor="middle" stroke="none" font-size="11">signature (r, s)</text><rect x="10" y="138" width="150" height="40" fill="var(--soft)"/><text x="85" y="162" text-anchor="middle" stroke="none" font-size="11">public key y</text><path d="M160 38L200 100" marker-end="url(#vfArr)"/><path d="M160 98L200 110" marker-end="url(#vfArr)"/><path d="M160 158L200 120" marker-end="url(#vfArr)"/><rect x="200" y="80" width="150" height="56" fill="var(--soft)"/><text x="275" y="104" text-anchor="middle" stroke="none" font-size="11">compute v from</text><text x="275" y="122" text-anchor="middle" stroke="none" font-size="10">z, r, s and y</text><path d="M350 108H378" marker-end="url(#vfArr)"/><rect x="380" y="80" width="130" height="56" fill="none" stroke="var(--acc)" stroke-width="1.6"/><text x="445" y="104" text-anchor="middle" stroke="none" font-size="11" fill="var(--acc)">is v equal to r?</text><text x="445" y="122" text-anchor="middle" stroke="none" font-size="10" fill="var(--acc)">yes: valid, no: rejected</text><text x="10" y="208" stroke="none" font-size="9.5">no private key is needed anywhere in this check</text></svg>`,
       };
 
@@ -1266,6 +1450,73 @@
       }
 
       const WIDGETS = {
+        // Numbered steps, each with an answer and a hint. Optional hex grid.
+        Checks(el, fin, p) {
+          el.classList.add("try", "lab");
+          const steps = p.steps,
+            id = p.key || "ck" + Math.random().toString(36).slice(2, 8);
+          el.innerHTML =
+            `<span class="label">${p.label}</span>` +
+            (p.intro ? `<p>${p.intro}</p>` : "") +
+            (p.helper
+              ? `<details class="helper"><summary>${p.helper.summary}</summary><p class="small">${p.helper.body}</p></details>`
+              : "") +
+            (p.grid ? `<div class="hexgrid" data-grid></div>` : "") +
+            `<ol class="mission-steps">` +
+            steps
+              .map(
+                (st, i) =>
+                  `<li class="match-item"><label for="${id}-${i}">${st.label}</label>` +
+                  (st.options
+                    ? `<select id="${id}-${i}">${st.options.map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}</select>`
+                    : `<input id="${id}-${i}" ${st.type === "number" ? 'type="number" min="1"' : ""} inputmode="${st.type === "number" ? "numeric" : "text"}" autocomplete="off" />`) +
+                  `</li>`,
+              )
+              .join("") +
+            `</ol>` +
+            `<div class="ctl"><button type="button" data-check>${p.button}</button></div>` +
+            `<p class="activity-status" data-status role="status" aria-live="polite"></p>` +
+            `<div data-reveal class="note" hidden>${p.reveal}</div>`;
+          const grid = $("[data-grid]", el);
+          if (p.grid) {
+            const per = p.grid.perRow;
+            p.grid.hex.match(/../g).forEach((byte, i) => {
+              if (i % per === 0) {
+                const label = document.createElement("span");
+                label.className = "row-label";
+                label.textContent = `${i + 1}–${i + per}`;
+                grid.append(label);
+              }
+              const cell = document.createElement("span");
+              cell.className = `byte ${i < p.grid.split ? "r" : "s"}`;
+              cell.textContent = byte;
+              cell.title = `byte ${i + 1}`;
+              grid.append(cell);
+            });
+          }
+          $("[data-check]", el).onclick = () => {
+            const hints = [];
+            steps.forEach((st, i) => {
+              const field = $(`#${id}-${i}`, el);
+              const ok =
+                field.value.trim().toLowerCase().replace(/\s+/g, "") ===
+                String(st.answer);
+              field.setAttribute("aria-invalid", String(!ok));
+              if (!ok) hints.push(st.hint);
+            });
+            const solved = hints.length === 0;
+            const status = $("[data-status]", el);
+            status.dataset.result = solved ? "good" : "bad";
+            status.textContent = solved
+              ? p.done
+              : `${steps.length - hints.length} of ${steps.length} correct. Hint: ${hints[0]}`;
+            $("[data-reveal]", el).hidden = !solved;
+            if (p.grid) grid.classList.toggle("revealed", solved);
+            if (solved) fin();
+          };
+        },
+
+        // Pick one path; only the correct one completes the question.
         CodeExercise(el, fin, p) {
           el.classList.add("try");
           el.innerHTML = `<span class="label">${escapeHTML(p.label)}</span>

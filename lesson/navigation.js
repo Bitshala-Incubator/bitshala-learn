@@ -52,12 +52,12 @@ const lessons = [
   {
     id: "6.1",
     title: "Transaction Structure",
-    path: "lesson/6.Lesson/6.1/index.html",
+    path: "lesson/6.Lesson/6.1-Transaction/index.html",
   },
   {
     id: "6.2",
     title: "SegWit and Serialization",
-    path: "lesson/6.Lesson/6.2/index.html",
+    path: "lesson/6.Lesson/6.2-SegWit and Serialization/index.html",
   },
   {
     id: "7.1",
@@ -73,6 +73,41 @@ const lessons = [
     id: "8.1",
     title: "Signatures",
     path: "lesson/8.Lesson/8.1-signatures/index.html",
+  },
+  {
+    id: "8.2",
+    title: "Schnorr and Taproot",
+    path: "lesson/8.Lesson/8.2-schnorr-and-taproot/index.html",
+  },
+  {
+    id: "9.1",
+    title: "Fees",
+    path: "lesson/9.Lesson/9.1-fees/index.html",
+  },
+  {
+    id: "9.2",
+    title: "Transaction Size",
+    path: "lesson/9.Lesson/9.2-transaction-size/index.html",
+  },
+  {
+    id: "10.1",
+    title: "P2P Network",
+    path: "lesson/10.Lesson/10.1-p2p-network/index.html",
+  },
+  {
+    id: "10.2",
+    title: "Propagation",
+    path: "lesson/10.Lesson/10.2-propagation/index.html",
+  },
+  {
+    id: "11.1",
+    title: "Blocks",
+    path: "lesson/11.Lesson/11.1-blocks/index.html",
+  },
+  {
+    id: "11.2",
+    title: "Blockchain Structure",
+    path: "lesson/11.Lesson/11.2-blockchain-structure/index.html",
   },
 ];
 
