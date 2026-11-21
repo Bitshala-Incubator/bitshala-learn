@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="../../../styles/global.css" />
     <link rel="stylesheet" href="../../../styles/lesson.css" />
     <link rel="stylesheet" href="../../../styles/widgets.css" />
-    
   </head>
   <body>
     <nav>
@@ -23,353 +22,353 @@
       <main id="lesson"></main>
     </div>
     <script type="application/json" id="lesson-data">
-{
-  "id": "11.1",
-  "title": "Blocks",
-  "subtitle": "What a block contains, how its header fixes it in place, and how the first block began the chain.",
-  "phase": "Bitcoin Foundations",
-  "module": "Module 11",
-  "minutes": 45,
-  "level": "Beginner",
-  "sections": [
-    {
-      "id": "question",
-      "label": "The question",
-      "title": "How does a payment become permanent?",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Aarav’s payment is now in a **block**. Meera asks how that makes it hard to undo. The answer starts with what a block is, and how each block is tied to the one before it."
-        },
-        {
-          "type": "text",
-          "md": "This lesson uses real blocks from the Bitcoin chain. Every number in the exercises can be checked on a block explorer such as [mempool.space](https://mempool.space), which shows the same fields Bitcoin Core stores."
-        }
-      ]
-    },
-    {
-      "id": "part1",
-      "label": "Part 1 · Blocks",
-      "title": "A block is a header plus transactions",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "A block has two parts: a **header** and a list of transactions. Each block stores the **hash** of the block before it, so changing an old block changes every hash after it."
-        },
-        {
-          "type": "figure",
-          "asset": "chain",
-          "caption": "Three real blocks. Each header stores the hash of the block before it, so the chain is a list of hashes pointing backwards."
-        },
-        {
-          "type": "text",
-          "md": "The **height** is a block’s position: the genesis block is height 0, the next is height 1, and so on."
-        },
-        {
-          "type": "widget",
-          "id": "ex-block-look",
-          "name": "Checks",
-          "props": {
-            "key": "ex-block-look",
-            "label": "Exercise 1 · Read two blocks on mempool.space",
-            "icon": "box",
-            "intro": "Open these pages in a new tab. The numbers are on the block page itself.<br>Block 170: <a href=\"https://mempool.space/block/00000000d1145790a8694403d4063f323d499e655c83426834d4ce2f8dd4a2ee\" target=\"_blank\" rel=\"noopener noreferrer\">mempool.space/block/…a2ee</a><br>Block 2: <a href=\"https://mempool.space/block/000000006a625f06636b8bb6ac7b960a8d03705d1ace08b1a19da3fdcc99ddbd\" target=\"_blank\" rel=\"noopener noreferrer\">mempool.space/block/…ddbd</a>",
-            "steps": [
+      {
+        "id": "11.1",
+        "title": "Blocks",
+        "subtitle": "What a block contains, how its header fixes it in place, and how the first block began the chain.",
+        "phase": "Bitcoin Foundations",
+        "module": "Module 11",
+        "minutes": 45,
+        "level": "Beginner",
+        "sections": [
+          {
+            "id": "question",
+            "label": "The question",
+            "title": "How does a payment become permanent?",
+            "blocks": [
               {
-                "label": "Block 170: how many transactions does the block hold?",
-                "type": "number",
-                "answer": "2",
-                "hint": "Look for the transaction count on the block page. The first one is always the coinbase."
-              },
-              {
-                "label": "Block 2: type the first 12 characters of its previous-block hash",
                 "type": "text",
-                "answer": "00000000839a",
-                "hint": "The previous block of block 2 is block 1. Its hash starts 00000000839a…"
-              }
-            ],
-            "button": "Check",
-            "done": "Both correct. You just followed the chain backwards one block at a time.",
-            "reveal": "<p>Each block’s header carries the previous block’s hash, so following the links from any block leads back to block 0.</p>"
-          }
-        }
-      ]
-    },
-    {
-      "id": "part2",
-      "label": "Part 2 · The header",
-      "title": "The header fixes the block",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "The header is a short, fixed-size record. Its hash is the block’s identity. Here is the real header of the genesis block, field by field."
-        },
-        {
-          "type": "figure",
-          "asset": "header",
-          "caption": "The six fields of the genesis block header, with the real values it was mined with (block 0, 3 January 2009). Check each one on <a href=\"https://mempool.space/block/000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\" target=\"_blank\" rel=\"noopener noreferrer\">the genesis block on mempool.space</a>."
-        },
-        {
-          "type": "widget",
-          "id": "ex-header-bytes",
-          "name": "Checks",
-          "props": {
-            "key": "ex-header-bytes",
-            "label": "Exercise 2 · Find the fields in the raw bytes",
-            "icon": "box",
-            "intro": "This is the genesis block’s header as raw bytes, copied from <a href=\"https://mempool.space/block/000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\" target=\"_blank\" rel=\"noopener noreferrer\">the genesis block on mempool.space</a>. Orange bytes are the version and previous-block hash. Green bytes are the rest. Count bytes from 1.",
-            "grid": {
-              "hex": "0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c",
-              "split": 36,
-              "perRow": 8
-            },
-            "steps": [
-              {
-                "label": "Which byte number is the first byte of the Merkle root?",
-                "type": "number",
-                "answer": "37",
-                "hint": "Version takes bytes 1 to 4, and the previous-block hash takes 32 bytes after that."
+                "md": "Aarav’s payment is now in a **block**. Meera asks how that makes it hard to undo. The answer starts with what a block is, and how each block is tied to the one before it."
               },
               {
-                "label": "Which byte number is the first byte of the Time field?",
-                "type": "number",
-                "answer": "69",
-                "hint": "The Merkle root is 32 bytes, so it ends at byte 68."
-              },
-              {
-                "label": "Which byte number is the last byte of the nonce?",
-                "type": "number",
-                "answer": "80",
-                "hint": "The nonce is the last field of the header."
-              }
-            ],
-            "button": "Check",
-            "done": "All three correct. The fixed layout means software can read any field by its position.",
-            "reveal": "<p>Version 1–4, previous hash 5–36, Merkle root 37–68, time 69–72, bits 73–76, nonce 77–80. A node that knows the layout reads any field without parsing anything else.</p>"
-          }
-        },
-        {
-          "type": "widget",
-          "id": "ex-nonce",
-          "name": "PathToggle",
-          "props": {
-            "label": "Exercise 3 · Try another guess",
-            "icon": "target",
-            "question": "A miner keeps the same transactions but wants a different block hash. Which field does the miner change first?",
-            "paths": {
-              "nonce": {
-                "button": "The nonce",
-                "icon": "check",
-                "correct": true,
-                "feedback": "Correct. The nonce is the number the miner sweeps through, one value after another, until the hash is low enough."
-              },
-              "prev": {
-                "button": "The previous-block hash",
-                "icon": "cross",
-                "correct": false,
-                "feedback": "Not quite. Changing it would link the block to a different parent, so the miner would be building a different chain."
-              },
-              "root": {
-                "button": "The Merkle root",
-                "icon": "cross",
-                "correct": false,
-                "feedback": "Not quite. The Merkle root only changes when the transactions change, and the miner is keeping them the same."
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "id": "part3",
-      "label": "Part 3 · Height and halvings",
-      "title": "Counting up from the first block",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Height counts blocks from genesis. The block reward also changes with height: it is cut in half every **210,000 blocks**. Those cuts are called halvings. The first halving happened at block 210,000, where the reward fell from 50 BTC to 25 BTC."
-        },
-        {
-          "type": "widget",
-          "id": "ex-height",
-          "name": "Checks",
-          "props": {
-            "key": "ex-height",
-            "label": "Exercise 4 · Read a block at height 840,000",
-            "icon": "layers",
-            "intro": "Open <a href=\"https://mempool.space/block/0000000000000000000320283a032748cef8227873ff4872689bf23f1cda83a5\" target=\"_blank\" rel=\"noopener noreferrer\">block 840,000 on mempool.space</a>. Look at its height and its first transaction, the coinbase.",
-            "steps": [
-              {
-                "label": "How many halvings have happened by height 840,000?",
-                "type": "number",
-                "answer": "4",
-                "hint": "Count the multiples of 210,000 up to 840,000: 210,000, 420,000, 630,000 and 840,000."
-              },
-              {
-                "label": "What is the subsidy (new coins, not fees) per block at height 840,000, in BTC?",
                 "type": "text",
-                "answer": "3.125",
-                "hint": "Start at 50 BTC and halve it once for each halving you counted."
+                "md": "This lesson uses real blocks from the Bitcoin chain. Every number in the exercises can be checked on a block explorer such as [mempool.space](https://mempool.space), which shows the same fields Bitcoin Core stores."
               }
-            ],
-            "button": "Check",
-            "done": "Both correct. The reward has been halved four times: 50 → 25 → 12.5 → 6.25 → 3.125.",
-            "reveal": "<p>The subsidy is a formula of height. Block 840,000 is the fourth halving, so its subsidy is 50 ÷ 2⁴ = 3.125 BTC. Fees are paid on top of this, which the next lessons cover.</p>"
-          }
-        },
-        {
-          "type": "text",
-          "md": "The **genesis block** is the first block, mined on 3 January 2009. Its reward of 50 BTC cannot be spent: the Bitcoin software never adds it to the spendable coins. Its coinbase text reads “The Times 03/Jan/2009 Chancellor on brink of second bailout for banks.” Sources: [Blockstream glossary: genesis block](https://help.blockstream.com/education/glossary/genesis-block) and [Mapping Bitcoin: genesis block](https://mappingbitcoin.com/wiki/glossary/genesis-block)."
-        },
-        {
-          "type": "widget",
-          "id": "ex-genesis",
-          "name": "PathToggle",
-          "props": {
-            "label": "Exercise 5 · Explore the genesis block",
-            "icon": "target",
-            "question": "Why can nobody spend the 50 BTC reward from the genesis block?",
-            "paths": {
-              "never": {
-                "button": "Never added to spendable coins",
-                "icon": "check",
-                "correct": true,
-                "feedback": "Correct. The Bitcoin software never made that reward spendable, so no key can unlock it."
-              },
-              "lost": {
-                "button": "The key was lost",
-                "icon": "cross",
-                "correct": false,
-                "feedback": "Not quite. The reward was never made spendable, so no key controls it. A lost key would mean spendable coins that nobody can reach."
-              },
-              "burned": {
-                "button": "A miner burned it",
-                "icon": "cross",
-                "correct": false,
-                "feedback": "Not quite. Nobody burned it. It was never added to the spendable coins."
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "id": "part4",
-      "label": "Part 4 · Transactions",
-      "title": "One hash for every transaction",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "A block lists its transactions. The header does not store them, only one hash that sums them up: the **Merkle root**. If one transaction changes, the Merkle root changes."
-        },
-        {
-          "type": "figure",
-          "asset": "merkle",
-          "caption": "Block 170 has two transactions. Its Merkle root is the double SHA-256 of the two txids joined together. The real values come from [block 170 on mempool.space](https://mempool.space/block/00000000d1145790a8694403d4063f323d499e655c83426834d4ce2f8dd4a2ee)."
-        },
-        {
-          "type": "widget",
-          "id": "ex-merkle-root",
-          "name": "Checks",
-          "props": {
-            "key": "ex-merkle-root",
-            "label": "Exercise 6 · Find block 170’s Merkle root",
-            "icon": "layers",
-            "intro": "On the <a href=\"https://mempool.space/block/00000000d1145790a8694403d4063f323d499e655c83426834d4ce2f8dd4a2ee\" target=\"_blank\" rel=\"noopener noreferrer\">block 170 page on mempool.space</a>, look at the header section for the Merkle root. Then look at the transaction list.",
-            "steps": [
+            ]
+          },
+          {
+            "id": "part1",
+            "label": "Part 1 · Blocks",
+            "title": "A block is a header plus transactions",
+            "blocks": [
               {
-                "label": "First 8 hex characters of block 170’s Merkle root",
                 "type": "text",
-                "answer": "7dac2c56",
-                "hint": "It starts with 7dac. The header field is in the same section as the block hash."
+                "md": "A block has two parts: a **header** and a list of transactions. Each block stores the **hash** of the block before it, so changing an old block changes every hash after it."
               },
               {
-                "label": "How many txids does Bitcoin combine to make that root?",
-                "type": "number",
-                "answer": "2",
-                "hint": "Count the transactions on the block page."
-              }
-            ],
-            "button": "Check",
-            "done": "Both correct. Two txids make one Merkle root, and that root is what the header stores.",
-            "reveal": "<p>With an odd number of txids, Bitcoin repeats the last one to make a pair. With two txids, the root is one double-SHA-256 hash, not two.</p>"
-          }
-        },
-        {
-          "type": "widget",
-          "id": "ex-edit-block",
-          "name": "PathToggle",
-          "props": {
-            "label": "Exercise 7 · Change one transaction",
-            "icon": "clock",
-            "question": "Someone edits one byte of a transaction in block 170, without touching the header. What changes, and what stays the same?",
-            "paths": {
-              "chain": {
-                "button": "The txid, the Merkle root and the block hash all change",
-                "icon": "check",
-                "correct": true,
-                "feedback": "Correct. The txid changes, which changes the Merkle root, which is inside the header. The header changes, so the block hash changes too."
+                "type": "figure",
+                "asset": "chain",
+                "caption": "Three real blocks. Each header stores the hash of the block before it, so the chain is a list of hashes pointing backwards."
               },
-              "txonly": {
-                "button": "Only the txid changes",
-                "icon": "cross",
-                "correct": false,
-                "feedback": "Not quite. The txid is in the Merkle root, and the Merkle root is in the header. Changing one changes the next."
+              {
+                "type": "text",
+                "md": "The **height** is a block’s position: the genesis block is height 0, the next is height 1, and so on."
               },
-              "hashonly": {
-                "button": "Only the block hash changes",
-                "icon": "cross",
-                "correct": false,
-                "feedback": "Not quite. The block hash is made from the header, and the header holds the Merkle root. The change has to pass through the Merkle root first."
+              {
+                "type": "widget",
+                "id": "ex-block-look",
+                "name": "Checks",
+                "props": {
+                  "key": "ex-block-look",
+                  "label": "Exercise 1 · Read two blocks on mempool.space",
+                  "icon": "box",
+                  "intro": "Open these pages in a new tab. The numbers are on the block page itself.<br>Block 170: <a href=\"https://mempool.space/block/00000000d1145790a8694403d4063f323d499e655c83426834d4ce2f8dd4a2ee\" target=\"_blank\" rel=\"noopener noreferrer\">mempool.space/block/…a2ee</a><br>Block 2: <a href=\"https://mempool.space/block/000000006a625f06636b8bb6ac7b960a8d03705d1ace08b1a19da3fdcc99ddbd\" target=\"_blank\" rel=\"noopener noreferrer\">mempool.space/block/…ddbd</a>",
+                  "steps": [
+                    {
+                      "label": "Block 170: how many transactions does the block hold?",
+                      "type": "number",
+                      "answer": "2",
+                      "hint": "Look for the transaction count on the block page. The first one is always the coinbase."
+                    },
+                    {
+                      "label": "Block 2: type the first 12 characters of its previous-block hash",
+                      "type": "text",
+                      "answer": "00000000839a",
+                      "hint": "The previous block of block 2 is block 1. Its hash starts 00000000839a…"
+                    }
+                  ],
+                  "button": "Check",
+                  "done": "Both correct. You just followed the chain backwards one block at a time.",
+                  "reveal": "<p>Each block’s header carries the previous block’s hash, so following the links from any block leads back to block 0.</p>"
+                }
               }
-            }
+            ]
+          },
+          {
+            "id": "part2",
+            "label": "Part 2 · The header",
+            "title": "The header fixes the block",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "The header is a short, fixed-size record. Its hash is the block’s identity. Here is the real header of the genesis block, field by field."
+              },
+              {
+                "type": "figure",
+                "asset": "header",
+                "caption": "The six fields of the genesis block header, with the real values it was mined with (block 0, 3 January 2009). Check each one on <a href=\"https://mempool.space/block/000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\" target=\"_blank\" rel=\"noopener noreferrer\">the genesis block on mempool.space</a>."
+              },
+              {
+                "type": "widget",
+                "id": "ex-header-bytes",
+                "name": "Checks",
+                "props": {
+                  "key": "ex-header-bytes",
+                  "label": "Exercise 2 · Find the fields in the raw bytes",
+                  "icon": "box",
+                  "intro": "This is the genesis block’s header as raw bytes, copied from <a href=\"https://mempool.space/block/000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\" target=\"_blank\" rel=\"noopener noreferrer\">the genesis block on mempool.space</a>. Orange bytes are the version and previous-block hash. Green bytes are the rest. Count bytes from 1.",
+                  "grid": {
+                    "hex": "0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c",
+                    "split": 36,
+                    "perRow": 8
+                  },
+                  "steps": [
+                    {
+                      "label": "Which byte number is the first byte of the Merkle root?",
+                      "type": "number",
+                      "answer": "37",
+                      "hint": "Version takes bytes 1 to 4, and the previous-block hash takes 32 bytes after that."
+                    },
+                    {
+                      "label": "Which byte number is the first byte of the Time field?",
+                      "type": "number",
+                      "answer": "69",
+                      "hint": "The Merkle root is 32 bytes, so it ends at byte 68."
+                    },
+                    {
+                      "label": "Which byte number is the last byte of the nonce?",
+                      "type": "number",
+                      "answer": "80",
+                      "hint": "The nonce is the last field of the header."
+                    }
+                  ],
+                  "button": "Check",
+                  "done": "All three correct. The fixed layout means software can read any field by its position.",
+                  "reveal": "<p>Version 1–4, previous hash 5–36, Merkle root 37–68, time 69–72, bits 73–76, nonce 77–80. A node that knows the layout reads any field without parsing anything else.</p>"
+                }
+              },
+              {
+                "type": "widget",
+                "id": "ex-nonce",
+                "name": "PathToggle",
+                "props": {
+                  "label": "Exercise 3 · Try another guess",
+                  "icon": "target",
+                  "question": "A miner keeps the same transactions but wants a different block hash. Which field does the miner change first?",
+                  "paths": {
+                    "nonce": {
+                      "button": "The nonce",
+                      "icon": "check",
+                      "correct": true,
+                      "feedback": "Correct. The nonce is the number the miner sweeps through, one value after another, until the hash is low enough."
+                    },
+                    "prev": {
+                      "button": "The previous-block hash",
+                      "icon": "cross",
+                      "correct": false,
+                      "feedback": "Not quite. Changing it would link the block to a different parent, so the miner would be building a different chain."
+                    },
+                    "root": {
+                      "button": "The Merkle root",
+                      "icon": "cross",
+                      "correct": false,
+                      "feedback": "Not quite. The Merkle root only changes when the transactions change, and the miner is keeping them the same."
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "part3",
+            "label": "Part 3 · Height and halvings",
+            "title": "Counting up from the first block",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Height counts blocks from genesis. The block reward also changes with height: it is cut in half every **210,000 blocks**. Those cuts are called halvings. The first halving happened at block 210,000, where the reward fell from 50 BTC to 25 BTC."
+              },
+              {
+                "type": "widget",
+                "id": "ex-height",
+                "name": "Checks",
+                "props": {
+                  "key": "ex-height",
+                  "label": "Exercise 4 · Read a block at height 840,000",
+                  "icon": "layers",
+                  "intro": "Open <a href=\"https://mempool.space/block/0000000000000000000320283a032748cef8227873ff4872689bf23f1cda83a5\" target=\"_blank\" rel=\"noopener noreferrer\">block 840,000 on mempool.space</a>. Look at its height and its first transaction, the coinbase.",
+                  "steps": [
+                    {
+                      "label": "How many halvings have happened by height 840,000?",
+                      "type": "number",
+                      "answer": "4",
+                      "hint": "Count the multiples of 210,000 up to 840,000: 210,000, 420,000, 630,000 and 840,000."
+                    },
+                    {
+                      "label": "What is the subsidy (new coins, not fees) per block at height 840,000, in BTC?",
+                      "type": "text",
+                      "answer": "3.125",
+                      "hint": "Start at 50 BTC and halve it once for each halving you counted."
+                    }
+                  ],
+                  "button": "Check",
+                  "done": "Both correct. The reward has been halved four times: 50 → 25 → 12.5 → 6.25 → 3.125.",
+                  "reveal": "<p>The subsidy is a formula of height. Block 840,000 is the fourth halving, so its subsidy is 50 ÷ 2⁴ = 3.125 BTC. Fees are paid on top of this, which the next lessons cover.</p>"
+                }
+              },
+              {
+                "type": "text",
+                "md": "The **genesis block** is the first block, mined on 3 January 2009. Its reward of 50 BTC cannot be spent: the Bitcoin software never adds it to the spendable coins. Its coinbase text reads “The Times 03/Jan/2009 Chancellor on brink of second bailout for banks.” Sources: [Blockstream glossary: genesis block](https://help.blockstream.com/education/glossary/genesis-block) and [Mapping Bitcoin: genesis block](https://mappingbitcoin.com/wiki/glossary/genesis-block)."
+              },
+              {
+                "type": "widget",
+                "id": "ex-genesis",
+                "name": "PathToggle",
+                "props": {
+                  "label": "Exercise 5 · Explore the genesis block",
+                  "icon": "target",
+                  "question": "Why can nobody spend the 50 BTC reward from the genesis block?",
+                  "paths": {
+                    "never": {
+                      "button": "Never added to spendable coins",
+                      "icon": "check",
+                      "correct": true,
+                      "feedback": "Correct. The Bitcoin software never made that reward spendable, so no key can unlock it."
+                    },
+                    "lost": {
+                      "button": "The key was lost",
+                      "icon": "cross",
+                      "correct": false,
+                      "feedback": "Not quite. The reward was never made spendable, so no key controls it. A lost key would mean spendable coins that nobody can reach."
+                    },
+                    "burned": {
+                      "button": "A miner burned it",
+                      "icon": "cross",
+                      "correct": false,
+                      "feedback": "Not quite. Nobody burned it. It was never added to the spendable coins."
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "part4",
+            "label": "Part 4 · Transactions",
+            "title": "One hash for every transaction",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "A block lists its transactions. The header does not store them, only one hash that sums them up: the **Merkle root**. If one transaction changes, the Merkle root changes."
+              },
+              {
+                "type": "figure",
+                "asset": "merkle",
+                "caption": "Block 170 has two transactions. Its Merkle root is the double SHA-256 of the two txids joined together. The real values come from [block 170 on mempool.space](https://mempool.space/block/00000000d1145790a8694403d4063f323d499e655c83426834d4ce2f8dd4a2ee)."
+              },
+              {
+                "type": "widget",
+                "id": "ex-merkle-root",
+                "name": "Checks",
+                "props": {
+                  "key": "ex-merkle-root",
+                  "label": "Exercise 6 · Find block 170’s Merkle root",
+                  "icon": "layers",
+                  "intro": "On the <a href=\"https://mempool.space/block/00000000d1145790a8694403d4063f323d499e655c83426834d4ce2f8dd4a2ee\" target=\"_blank\" rel=\"noopener noreferrer\">block 170 page on mempool.space</a>, look at the header section for the Merkle root. Then look at the transaction list.",
+                  "steps": [
+                    {
+                      "label": "First 8 hex characters of block 170’s Merkle root",
+                      "type": "text",
+                      "answer": "7dac2c56",
+                      "hint": "It starts with 7dac. The header field is in the same section as the block hash."
+                    },
+                    {
+                      "label": "How many txids does Bitcoin combine to make that root?",
+                      "type": "number",
+                      "answer": "2",
+                      "hint": "Count the transactions on the block page."
+                    }
+                  ],
+                  "button": "Check",
+                  "done": "Both correct. Two txids make one Merkle root, and that root is what the header stores.",
+                  "reveal": "<p>With an odd number of txids, Bitcoin repeats the last one to make a pair. With two txids, the root is one double-SHA-256 hash, not two.</p>"
+                }
+              },
+              {
+                "type": "widget",
+                "id": "ex-edit-block",
+                "name": "PathToggle",
+                "props": {
+                  "label": "Exercise 7 · Change one transaction",
+                  "icon": "clock",
+                  "question": "Someone edits one byte of a transaction in block 170, without touching the header. What changes, and what stays the same?",
+                  "paths": {
+                    "chain": {
+                      "button": "The txid, the Merkle root and the block hash all change",
+                      "icon": "check",
+                      "correct": true,
+                      "feedback": "Correct. The txid changes, which changes the Merkle root, which is inside the header. The header changes, so the block hash changes too."
+                    },
+                    "txonly": {
+                      "button": "Only the txid changes",
+                      "icon": "cross",
+                      "correct": false,
+                      "feedback": "Not quite. The txid is in the Merkle root, and the Merkle root is in the header. Changing one changes the next."
+                    },
+                    "hashonly": {
+                      "button": "Only the block hash changes",
+                      "icon": "cross",
+                      "correct": false,
+                      "feedback": "Not quite. The block hash is made from the header, and the header holds the Merkle root. The change has to pass through the Merkle root first."
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "real",
+            "label": "Real life",
+            "title": "Why the header is so small",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Nodes can check every block’s header quickly. The header is small, so headers can be sent and stored cheaply, and the full transactions are only needed when a node checks them."
+              },
+              {
+                "type": "aside",
+                "md": "**Who benefits?** Light wallets can check headers without downloading every transaction. Miners can change the nonce quickly while building a block. A block at height 840,000 was 2.3 MB and held 3,050 transactions, but its header has the same fixed layout as the [genesis block’s](https://mempool.space/block/000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f)."
+              }
+            ]
+          },
+          {
+            "id": "wrapup",
+            "label": "Wrap-up",
+            "title": "Now we can answer Meera",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav’s payment is in a block. Changing it would change that block’s Merkle root and its hash, which would break every block that follows."
+              },
+              {
+                "type": "reflect",
+                "id": "reflect-block",
+                "prompt": "In one sentence, explain why changing a transaction in an old block is hard, using the header.",
+                "placeholder": "Changing a transaction changes…",
+                "model": "Changing a transaction changes the Merkle root, which changes the block’s hash, so the next block’s stored hash no longer matches and every later block would have to be redone."
+              },
+              {
+                "type": "next"
+              }
+            ]
           }
+        ],
+        "next": {
+          "id": "11.2",
+          "title": "Blockchain Structure",
+          "teaser": "A block is fixed by its header. Next, we see how hashes link blocks, how Merkle trees summarise transactions, and which test networks developers use."
         }
-      ]
-    },
-    {
-      "id": "real",
-      "label": "Real life",
-      "title": "Why the header is so small",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Nodes can check every block’s header quickly. The header is small, so headers can be sent and stored cheaply, and the full transactions are only needed when a node checks them."
-        },
-        {
-          "type": "aside",
-          "md": "**Who benefits?** Light wallets can check headers without downloading every transaction. Miners can change the nonce quickly while building a block. A block at height 840,000 was 2.3 MB and held 3,050 transactions, but its header has the same fixed layout as the [genesis block’s](https://mempool.space/block/000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f)."
-        }
-      ]
-    },
-    {
-      "id": "wrapup",
-      "label": "Wrap-up",
-      "title": "Now we can answer Meera",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Aarav’s payment is in a block. Changing it would change that block’s Merkle root and its hash, which would break every block that follows."
-        },
-        {
-          "type": "reflect",
-          "id": "reflect-block",
-          "prompt": "In one sentence, explain why changing a transaction in an old block is hard, using the header.",
-          "placeholder": "Changing a transaction changes…",
-          "model": "Changing a transaction changes the Merkle root, which changes the block’s hash, so the next block’s stored hash no longer matches and every later block would have to be redone."
-        },
-        {
-          "type": "next"
-        }
-      ]
-    }
-  ],
-  "next": {
-    "id": "11.2",
-    "title": "Blockchain Structure",
-    "teaser": "A block is fixed by its header. Next, we see how hashes link blocks, how Merkle trees summarise transactions, and which test networks developers use."
-  }
-}
+      }
     </script>
     <script src="./figures.js"></script>
     <script src="../../shared/lesson-engine.js"></script>

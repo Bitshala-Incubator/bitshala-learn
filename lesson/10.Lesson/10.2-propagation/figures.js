@@ -1,6 +1,6 @@
 /* Figures for this lesson. Read by lesson-engine.js through window.LESSON_ASSETS. */
 window.LESSON_ASSETS = {
-        hop: `<svg viewBox="0 0 580 240" role="img" aria-labelledby="hop-title hop-desc">
+  hop: `<svg viewBox="0 0 580 240" role="img" aria-labelledby="hop-title hop-desc">
               <title id="hop-title">One hop of a transaction between two peers</title>
               <desc id="hop-desc">Node A sends inv to node B. B replies with getdata. A then sends the full tx. Three messages for one hop.</desc>
               <rect x="40" y="14" width="160" height="40" rx="6" fill="var(--soft)" stroke="var(--acc)" stroke-width="2" />

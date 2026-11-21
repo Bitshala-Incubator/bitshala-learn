@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="../../../styles/global.css" />
     <link rel="stylesheet" href="../../../styles/lesson.css" />
     <link rel="stylesheet" href="../../../styles/widgets.css" />
-    
   </head>
   <body>
     <nav>
@@ -23,637 +22,611 @@
       <main id="lesson"></main>
     </div>
     <script type="application/json" id="lesson-data">
-{
-  "id": "9.1",
-  "title": "Fees",
-  "subtitle": "Why a transaction pays a fee, how a fee rate is measured in vbytes, and how a wallet chooses one.",
-  "phase": "Bitcoin Foundations",
-  "module": "Module 9",
-  "minutes": 40,
-  "level": "Beginner",
-  "sections": [
-    {
-      "id": "question",
-      "label": "The question",
-      "title": "Which speed should Aarav pick?",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Aarav opens his wallet to pay Meera. The send screen shows three choices: **Fast**, **Normal**, and **Slow**. Each one changes a number called the fee, and he is not sure what he is paying for."
-        },
-        {
-          "type": "text",
-          "md": "Meera laughs. “You are paying for space. A block has room for about 4 million weight units, and miners fill it with the transactions that pay the most per unit of space.”"
-        },
-        {
-          "type": "text",
-          "md": "We will work through four steps: what the fee is, how a fee rate is measured, how a wallet picks one, and what to do when the network is busy."
-        }
-      ]
-    },
-    {
-      "id": "part1",
-      "label": "Part 1 · The fee",
-      "title": "The fee is what is left over",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "A transaction does not say “fee: 1,500 sat”. It only lists **inputs** (coins being spent) and **outputs** (new coins created). The fee is the difference:"
-        },
-        {
-          "type": "aside",
-          "md": "**Fee = total inputs − total outputs**"
-        },
-        {
-          "type": "figure",
-          "asset": "fee",
-          "caption": "The miner receives whatever the inputs do not pay out."
-        },
-        {
-          "type": "widget",
-          "id": "ex-builder",
-          "name": "FeeBuilder",
-          "props": {
-            "label": "Build the fee",
-            "intro": "Move the two sliders so the fee lands on the target. The outputs take what they get; the fee is whatever is left.",
-            "inputs": 100000,
-            "target": 2000,
-            "outputs": [
+      {
+        "id": "9.1",
+        "title": "Fees",
+        "subtitle": "Why a transaction pays a fee, how a fee rate is measured in vbytes, and how a wallet chooses one.",
+        "phase": "Bitcoin Foundations",
+        "module": "Module 9",
+        "minutes": 40,
+        "level": "Beginner",
+        "sections": [
+          {
+            "id": "question",
+            "label": "The question",
+            "title": "Which speed should Aarav pick?",
+            "blocks": [
               {
-                "label": "Meera",
-                "start": 60000,
-                "icon": "box"
-              },
-              {
-                "label": "Change",
-                "start": 40000,
-                "icon": "arrow"
-              }
-            ],
-            "done": "Fee hit: 2,000 sat"
-          }
-        }
-      ]
-    },
-    {
-      "id": "part2",
-      "label": "Part 2 · Fee rate",
-      "title": "Fee rate: pay per byte of space",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Block space is measured in **vbytes** (virtual bytes). SegWit transactions count their witness data at a discount, so the size used for fees is the *virtual size*, not the raw file size (see lesson 6.2 on [SegWit and serialization](../../6.Lesson/6.2-SegWit%20and%20Serialization/index.html))."
-        },
-        {
-          "type": "aside",
-          "md": "**Fee rate = fee ÷ vsize**, measured in sat/vB."
-        },
-        {
-          "type": "text",
-          "md": "Three transactions are waiting in the mempool. Each one pays a different amount:"
-        },
-        {
-          "type": "table",
-          "headers": [
-            "Transaction",
-            "Fee (sat)",
-            "vsize (vB)"
-          ],
-          "rows": [
-            [
-              "Tx A",
-              "1,000",
-              "200"
-            ],
-            [
-              "Tx B",
-              "2,000",
-              "250"
-            ],
-            [
-              "Tx C",
-              "600",
-              "100"
-            ]
-          ]
-        },
-        {
-          "type": "figure",
-          "asset": "scatter",
-          "caption": "Each dashed line is one fee rate. Tx B sits on the highest line, so it pays the most per vbyte."
-        },
-        {
-          "type": "widget",
-          "id": "ex-compare",
-          "name": "SortBids",
-          "props": {
-            "label": "Be the miner",
-            "intro": "Each card is a payment: its fee and size. Tap them in the order a miner should take them, best deal per vbyte first.",
-            "bids": [
-              {
-                "id": "A",
-                "fee": 1000,
-                "vsize": 200
-              },
-              {
-                "id": "B",
-                "fee": 2000,
-                "vsize": 250
-              },
-              {
-                "id": "C",
-                "fee": 600,
-                "vsize": 100
-              }
-            ],
-            "done": "Queue complete. C pays less than A in total, but more per vbyte, so C goes ahead of A."
-          }
-        },
-        {
-          "type": "widget",
-          "id": "ex-real-tx-rate",
-          "name": "Checks",
-          "props": {
-            "key": "ex-real-tx-rate",
-            "label": "Exercise 8 · Read a real fee rate",
-            "icon": "box",
-            "intro": "Open <a href=\"https://mempool.space/tx/8f7f7d662261dd304961f693e156107353cbd527e390cc987046a7b88bddcc4e\" target=\"_blank\" rel=\"noopener noreferrer\">this payment on mempool.space</a>. It has one input and two outputs. Read the fee and the size on the page.",
-            "steps": [
-              {
-                "label": "Fee, in satoshis",
-                "type": "number",
-                "answer": "5529",
-                "hint": "It is listed with the transaction’s totals."
-              },
-              {
-                "label": "Virtual size, in vbytes",
-                "type": "number",
-                "answer": "141",
-                "hint": "The page lists the weight too: divide it by 4 and round up."
-              },
-              {
-                "label": "Fee rate in sat/vB, rounded down to a whole number",
-                "type": "number",
-                "answer": "39",
-                "hint": "fee ÷ vsize."
-              }
-            ],
-            "button": "Check",
-            "done": "All three correct. Rate = fee ÷ vsize = 5,529 ÷ 141, about 39.2 sat/vB.",
-            "reveal": "<p>The page shows the rate with decimals, which is what a wallet compares. Rounding down here still gives the same answer: 39.</p>"
-          }
-        }
-      ]
-    },
-    {
-      "id": "part3",
-      "label": "Part 3 · Fee selection",
-      "title": "How a wallet picks a rate",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Each node keeps a **mempool**: its own list of unconfirmed transactions. When the mempool fills up, the lowest-paying transactions wait or get dropped. A wallet estimates a rate that should confirm within a target time, using the rates that recent blocks actually paid."
-        },
-        {
-          "type": "text",
-          "md": "Fast, Normal and Slow are just different targets: a higher rate for a sooner block, a lower rate for a later one."
-        },
-        {
-          "type": "figure",
-          "asset": "queue",
-          "caption": "Miners fill the block from the top of the queue until it is full. Tx T5 would push the total past 1,000 vB, so it waits."
-        },
-        {
-          "type": "heading",
-          "text": "Exercise 3 · Fill a block"
-        },
-        {
-          "type": "widget",
-          "id": "ex-block",
-          "name": "BlockFill",
-          "props": {
-            "label": "Fill a block",
-            "intro": "Tap transactions to add or remove them. Start with the ones that pay the most per vbyte, and stop once you reach the goal.",
-            "capacity": 1000,
-            "goal": 7500,
-            "txs": [
-              {
-                "id": "T1",
-                "fee": 4000,
-                "vsize": 400
-              },
-              {
-                "id": "T2",
-                "fee": 1500,
-                "vsize": 250
-              },
-              {
-                "id": "T3",
-                "fee": 2400,
-                "vsize": 300
-              },
-              {
-                "id": "T4",
-                "fee": 900,
-                "vsize": 300
-              },
-              {
-                "id": "T5",
-                "fee": 1200,
-                "vsize": 200
-              },
-              {
-                "id": "T6",
-                "fee": 600,
-                "vsize": 150
-              }
-            ],
-            "done": "Goal reached"
-          }
-        },
-        {
-          "type": "heading",
-          "text": "Micro-exercise · A simple fee"
-        },
-        {
-          "type": "widget",
-          "id": "micro-fee",
-          "name": "Checks",
-          "props": {
-            "key": "micro-fee",
-            "label": "Simple fee",
-            "icon": "coin",
-            "intro": "Fee = rate × size. Here the rate is 12 sat/vB and the size is 141 vB.",
-            "steps": [
-              {
-                "label": "Fee (sat)",
-                "type": "number",
-                "answer": "1692",
-                "hint": "12 × 141"
-              }
-            ],
-            "button": "Check",
-            "done": "1,692 sat",
-            "reveal": "<p>Rate × size = fee.</p>"
-          }
-        },
-        {
-          "type": "heading",
-          "text": "Exercise 4 · Pay the right fee"
-        },
-        {
-          "type": "widget",
-          "id": "ex-race",
-          "name": "BlockRace",
-          "props": {
-            "label": "Pay the right fee",
-            "icon": "clock",
-            "lead": "Aarav is about to send a payment. Many other payments are already waiting in line. Pick the fee rate he pays and see whether he makes the next block.",
-            "howto": [
-              {
-                "icon": "target",
-                "title": "Pick a rate",
-                "text": "Choose how many sat per vbyte Aarav pays."
-              },
-              {
-                "icon": "layers",
-                "title": "Miner fills the block",
-                "text": "Highest rates go in first until the block is full."
-              },
-              {
-                "icon": "check",
-                "title": "Read the result",
-                "text": "Is Aarav in, and what does he pay?"
-              }
-            ],
-            "capacity": 1000,
-            "size": 200,
-            "choices": [
-              5,
-              12,
-              16,
-              30
-            ],
-            "others": [
-              {
-                "name": "Payment A",
-                "rate": 25,
-                "vsize": 400
-              },
-              {
-                "name": "Payment B",
-                "rate": 18,
-                "vsize": 300
-              },
-              {
-                "name": "Payment C",
-                "rate": 14,
-                "vsize": 200
-              },
-              {
-                "name": "Payment D",
-                "rate": 11,
-                "vsize": 100
-              },
-              {
-                "name": "Payment E",
-                "rate": 7,
-                "vsize": 250
-              },
-              {
-                "name": "Payment F",
-                "rate": 3,
-                "vsize": 200
-              }
-            ],
-            "done": "You have seen a payment get in and one miss the block."
-          }
-        },
-        {
-          "type": "heading",
-          "text": "Exercise 5 · Analyse fee selection scenarios"
-        },
-        {
-          "type": "text",
-          "md": "Choose the best option in each scenario. Only the right choice completes it."
-        },
-        {
-          "type": "widget",
-          "id": "scenario-quiet",
-          "name": "PathToggle",
-          "props": {
-            "label": "Quiet mempool",
-            "icon": "clock",
-            "question": "Not urgent. Next-block estimate: 1 sat/vB.",
-            "paths": {
-              "low": {
-                "button": "1 sat/vB",
-                "icon": "check",
-                "correct": true,
-                "feedback": "Confirms within a few blocks."
-              },
-              "high": {
-                "button": "100 sat/vB",
-                "icon": "warn",
-                "correct": false,
-                "feedback": "Pays far more than needed."
-              },
-              "zero": {
-                "button": "0 sat/vB",
-                "icon": "cross",
-                "correct": false,
-                "feedback": "Nodes will not relay it."
-              }
-            }
-          }
-        },
-        {
-          "type": "widget",
-          "id": "scenario-busy",
-          "name": "PathToggle",
-          "props": {
-            "label": "Busy mempool",
-            "icon": "warn",
-            "question": "Deadline today. Next-block estimate: 20 sat/vB.",
-            "paths": {
-              "near": {
-                "button": "20 sat/vB",
-                "icon": "target",
-                "correct": true,
-                "feedback": "Competitive: matches what miners take now."
-              },
-              "min": {
-                "button": "1 sat/vB",
-                "icon": "clock",
-                "correct": false,
-                "feedback": "Waits behind every higher rate."
-              },
-              "wait": {
-                "button": "Wait",
-                "icon": "clock",
-                "correct": false,
-                "feedback": "Misses the deadline if the mempool stays full."
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "id": "explore",
-      "label": "Explore · A real block",
-      "title": "Read the fees in block 840,000",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Block 840,000 is a real block, mined at the April 2024 halving. Its coinbase transaction pays the miner the new coins (the subsidy) plus every fee in the block. You can add those up yourself on the explorer."
-        },
-        {
-          "type": "widget",
-          "id": "ex-block-840",
-          "name": "Checks",
-          "props": {
-            "key": "ex-block-840",
-            "label": "Exercise 7 · Add up the coinbase",
-            "icon": "layers",
-            "intro": "Open <a href=\"https://mempool.space/block/0000000000000000000320283a032748cef8227873ff4872689bf23f1cda83a5\" target=\"_blank\" rel=\"noopener noreferrer\">block 840,000 on mempool.space</a>. Its coinbase pays out 40.75 BTC in total. The subsidy for this height is 3.125 BTC.",
-            "steps": [
-              {
-                "label": "Total fees in block 840,000, in BTC (two decimals)",
                 "type": "text",
-                "answer": "37.63",
-                "hint": "Total coinbase payout minus the subsidy."
+                "md": "Aarav opens his wallet to pay Meera. The send screen shows three choices: **Fast**, **Normal**, and **Slow**. Each one changes a number called the fee, and he is not sure what he is paying for."
               },
               {
-                "label": "Fees as a percentage of the whole reward, rounded to a whole number",
-                "type": "number",
-                "answer": "92",
-                "hint": "fees ÷ (fees + subsidy), times 100."
+                "type": "text",
+                "md": "Meera laughs. “You are paying for space. A block has room for about 4 million weight units, and miners fill it with the transactions that pay the most per unit of space.”"
+              },
+              {
+                "type": "text",
+                "md": "We will work through four steps: what the fee is, how a fee rate is measured, how a wallet picks one, and what to do when the network is busy."
               }
-            ],
-            "button": "Check",
-            "done": "Both correct. Most of that block’s reward came from fees, not from new coins.",
-            "reveal": "<p>The block’s 40.75 BTC payout is 3.125 BTC of new coins plus about 37.63 BTC of fees. Fees are what miners earn beyond the subsidy, and their share can change a lot from block to block.</p>"
-          }
-        }
-      ]
-    },
-    {
-      "id": "real",
-      "label": "Real life",
-      "title": "Who gets the fee, and what overpaying buys",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Bitcoin has no price list. Senders bid with fees, and miners fill each block with the highest bids first. Background: [Blockstream: why Bitcoin has fees](https://help.blockstream.com/education/transactions/transaction-basics/why-does-bitcoin-have-fees) and [Bitcoin wiki: Miner fees](https://en.bitcoin.it/wiki/Miner_fees)."
-        },
-        {
-          "type": "aside",
-          "md": "**Who gets the money?** The miner who finds the block collects every fee in it. Block 840,000 is a real example: its fees were about 92% of the reward, see the Explore section above."
-        },
-        {
-          "type": "text",
-          "md": "**Who benefits?** Miners earn the fees. Senders in a hurry pay more to get in. Wallets and sites such as [mempool.space](https://mempool.space) help users read the queue, but they cannot promise a confirmation time."
-        },
-        {
-          "type": "text",
-          "md": "**What if you pay above the price?** The next block still arrives whenever it arrives, so an extra fee does not bring it sooner. The extra simply goes to the miner. mempool.space says its own fee suggestions [are estimates and do not guarantee a time](https://api.mempool.space/docs/api)."
-        },
-        {
-          "type": "text",
-          "md": "**What if you pay too little?** Your transaction waits in each node’s mempool. If the queue stays full, nodes can drop it, and you may need to raise the fee or resend it."
-        }
-      ]
-    },
-    {
-      "id": "live",
-      "label": "Try it here",
-      "title": "Read the block view yourself",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Real fee tools show a **block view**: the next few blocks a miner could build, filled from the highest rate down. Here is the same view with sample payments, so you can try it without leaving the lesson."
-        },
-        {
-          "type": "widget",
-          "id": "mempool-view",
-          "name": "Mempool",
-          "props": {
-            "label": "Block view",
-            "intro": "Each box is one block of 1,000 vB. Tap a box to see what is in it. Then pick a rate for your own 200 vB payment to see which block it lands in.",
-            "capacity": 1000,
-            "size": 200,
-            "choices": [
-              5,
-              12,
-              16,
-              22
-            ],
-            "queue": [
+            ]
+          },
+          {
+            "id": "part1",
+            "label": "Part 1 · The fee",
+            "title": "The fee is what is left over",
+            "blocks": [
               {
-                "name": "Payment 1",
-                "rate": 22,
-                "vsize": 180
+                "type": "text",
+                "md": "A transaction does not say “fee: 1,500 sat”. It only lists **inputs** (coins being spent) and **outputs** (new coins created). The fee is the difference:"
               },
               {
-                "name": "Payment 2",
-                "rate": 20,
-                "vsize": 240
+                "type": "aside",
+                "md": "**Fee = total inputs − total outputs**"
               },
               {
-                "name": "Payment 3",
-                "rate": 18,
-                "vsize": 150
+                "type": "figure",
+                "asset": "fee",
+                "caption": "The miner receives whatever the inputs do not pay out."
               },
               {
-                "name": "Payment 4",
-                "rate": 16,
-                "vsize": 300
+                "type": "widget",
+                "id": "ex-builder",
+                "name": "FeeBuilder",
+                "props": {
+                  "label": "Build the fee",
+                  "intro": "Move the two sliders so the fee lands on the target. The outputs take what they get; the fee is whatever is left.",
+                  "inputs": 100000,
+                  "target": 2000,
+                  "outputs": [
+                    {
+                      "label": "Meera",
+                      "start": 60000,
+                      "icon": "box"
+                    },
+                    {
+                      "label": "Change",
+                      "start": 40000,
+                      "icon": "arrow"
+                    }
+                  ],
+                  "done": "Fee hit: 2,000 sat"
+                }
+              }
+            ]
+          },
+          {
+            "id": "part2",
+            "label": "Part 2 · Fee rate",
+            "title": "Fee rate: pay per byte of space",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Block space is measured in **vbytes** (virtual bytes). SegWit transactions count their witness data at a discount, so the size used for fees is the *virtual size*, not the raw file size (see lesson 6.2 on [SegWit and serialization](../../6.Lesson/6.2-SegWit%20and%20Serialization/index.html))."
               },
               {
-                "name": "Payment 5",
-                "rate": 15,
-                "vsize": 120
+                "type": "aside",
+                "md": "**Fee rate = fee ÷ vsize**, measured in sat/vB."
               },
               {
-                "name": "Payment 6",
-                "rate": 14,
-                "vsize": 200
+                "type": "text",
+                "md": "Three transactions are waiting in the mempool. Each one pays a different amount:"
               },
               {
-                "name": "Payment 7",
-                "rate": 12,
-                "vsize": 160
+                "type": "table",
+                "headers": ["Transaction", "Fee (sat)", "vsize (vB)"],
+                "rows": [
+                  ["Tx A", "1,000", "200"],
+                  ["Tx B", "2,000", "250"],
+                  ["Tx C", "600", "100"]
+                ]
               },
               {
-                "name": "Payment 8",
-                "rate": 11,
-                "vsize": 250
+                "type": "figure",
+                "asset": "scatter",
+                "caption": "Each dashed line is one fee rate. Tx B sits on the highest line, so it pays the most per vbyte."
               },
               {
-                "name": "Payment 9",
-                "rate": 10,
-                "vsize": 140
+                "type": "widget",
+                "id": "ex-compare",
+                "name": "SortBids",
+                "props": {
+                  "label": "Be the miner",
+                  "intro": "Each card is a payment: its fee and size. Tap them in the order a miner should take them, best deal per vbyte first.",
+                  "bids": [
+                    {
+                      "id": "A",
+                      "fee": 1000,
+                      "vsize": 200
+                    },
+                    {
+                      "id": "B",
+                      "fee": 2000,
+                      "vsize": 250
+                    },
+                    {
+                      "id": "C",
+                      "fee": 600,
+                      "vsize": 100
+                    }
+                  ],
+                  "done": "Queue complete. C pays less than A in total, but more per vbyte, so C goes ahead of A."
+                }
               },
               {
-                "name": "Payment 10",
-                "rate": 9,
-                "vsize": 300
+                "type": "widget",
+                "id": "ex-real-tx-rate",
+                "name": "Checks",
+                "props": {
+                  "key": "ex-real-tx-rate",
+                  "label": "Exercise 8 · Read a real fee rate",
+                  "icon": "box",
+                  "intro": "Open <a href=\"https://mempool.space/tx/8f7f7d662261dd304961f693e156107353cbd527e390cc987046a7b88bddcc4e\" target=\"_blank\" rel=\"noopener noreferrer\">this payment on mempool.space</a>. It has one input and two outputs. Read the fee and the size on the page.",
+                  "steps": [
+                    {
+                      "label": "Fee, in satoshis",
+                      "type": "number",
+                      "answer": "5529",
+                      "hint": "It is listed with the transaction’s totals."
+                    },
+                    {
+                      "label": "Virtual size, in vbytes",
+                      "type": "number",
+                      "answer": "141",
+                      "hint": "The page lists the weight too: divide it by 4 and round up."
+                    },
+                    {
+                      "label": "Fee rate in sat/vB, rounded down to a whole number",
+                      "type": "number",
+                      "answer": "39",
+                      "hint": "fee ÷ vsize."
+                    }
+                  ],
+                  "button": "Check",
+                  "done": "All three correct. Rate = fee ÷ vsize = 5,529 ÷ 141, about 39.2 sat/vB.",
+                  "reveal": "<p>The page shows the rate with decimals, which is what a wallet compares. Rounding down here still gives the same answer: 39.</p>"
+                }
+              }
+            ]
+          },
+          {
+            "id": "part3",
+            "label": "Part 3 · Fee selection",
+            "title": "How a wallet picks a rate",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Each node keeps a **mempool**: its own list of unconfirmed transactions. When the mempool fills up, the lowest-paying transactions wait or get dropped. A wallet estimates a rate that should confirm within a target time, using the rates that recent blocks actually paid."
               },
               {
-                "name": "Payment 11",
-                "rate": 8,
-                "vsize": 180
+                "type": "text",
+                "md": "Fast, Normal and Slow are just different targets: a higher rate for a sooner block, a lower rate for a later one."
               },
               {
-                "name": "Payment 12",
-                "rate": 7,
-                "vsize": 220
+                "type": "figure",
+                "asset": "queue",
+                "caption": "Miners fill the block from the top of the queue until it is full. Tx T5 would push the total past 1,000 vB, so it waits."
               },
               {
-                "name": "Payment 13",
-                "rate": 6,
-                "vsize": 260
+                "type": "heading",
+                "text": "Exercise 3 · Fill a block"
               },
               {
-                "name": "Payment 14",
-                "rate": 5,
-                "vsize": 200
+                "type": "widget",
+                "id": "ex-block",
+                "name": "BlockFill",
+                "props": {
+                  "label": "Fill a block",
+                  "intro": "Tap transactions to add or remove them. Start with the ones that pay the most per vbyte, and stop once you reach the goal.",
+                  "capacity": 1000,
+                  "goal": 7500,
+                  "txs": [
+                    {
+                      "id": "T1",
+                      "fee": 4000,
+                      "vsize": 400
+                    },
+                    {
+                      "id": "T2",
+                      "fee": 1500,
+                      "vsize": 250
+                    },
+                    {
+                      "id": "T3",
+                      "fee": 2400,
+                      "vsize": 300
+                    },
+                    {
+                      "id": "T4",
+                      "fee": 900,
+                      "vsize": 300
+                    },
+                    {
+                      "id": "T5",
+                      "fee": 1200,
+                      "vsize": 200
+                    },
+                    {
+                      "id": "T6",
+                      "fee": 600,
+                      "vsize": 150
+                    }
+                  ],
+                  "done": "Goal reached"
+                }
               },
               {
-                "name": "Payment 15",
-                "rate": 4,
-                "vsize": 240
+                "type": "heading",
+                "text": "Micro-exercise · A simple fee"
               },
               {
-                "name": "Payment 16",
-                "rate": 2,
-                "vsize": 300
+                "type": "widget",
+                "id": "micro-fee",
+                "name": "Checks",
+                "props": {
+                  "key": "micro-fee",
+                  "label": "Simple fee",
+                  "icon": "coin",
+                  "intro": "Fee = rate × size. Here the rate is 12 sat/vB and the size is 141 vB.",
+                  "steps": [
+                    {
+                      "label": "Fee (sat)",
+                      "type": "number",
+                      "answer": "1692",
+                      "hint": "12 × 141"
+                    }
+                  ],
+                  "button": "Check",
+                  "done": "1,692 sat",
+                  "reveal": "<p>Rate × size = fee.</p>"
+                }
+              },
+              {
+                "type": "heading",
+                "text": "Exercise 4 · Pay the right fee"
+              },
+              {
+                "type": "widget",
+                "id": "ex-race",
+                "name": "BlockRace",
+                "props": {
+                  "label": "Pay the right fee",
+                  "icon": "clock",
+                  "lead": "Aarav is about to send a payment. Many other payments are already waiting in line. Pick the fee rate he pays and see whether he makes the next block.",
+                  "howto": [
+                    {
+                      "icon": "target",
+                      "title": "Pick a rate",
+                      "text": "Choose how many sat per vbyte Aarav pays."
+                    },
+                    {
+                      "icon": "layers",
+                      "title": "Miner fills the block",
+                      "text": "Highest rates go in first until the block is full."
+                    },
+                    {
+                      "icon": "check",
+                      "title": "Read the result",
+                      "text": "Is Aarav in, and what does he pay?"
+                    }
+                  ],
+                  "capacity": 1000,
+                  "size": 200,
+                  "choices": [5, 12, 16, 30],
+                  "others": [
+                    {
+                      "name": "Payment A",
+                      "rate": 25,
+                      "vsize": 400
+                    },
+                    {
+                      "name": "Payment B",
+                      "rate": 18,
+                      "vsize": 300
+                    },
+                    {
+                      "name": "Payment C",
+                      "rate": 14,
+                      "vsize": 200
+                    },
+                    {
+                      "name": "Payment D",
+                      "rate": 11,
+                      "vsize": 100
+                    },
+                    {
+                      "name": "Payment E",
+                      "rate": 7,
+                      "vsize": 250
+                    },
+                    {
+                      "name": "Payment F",
+                      "rate": 3,
+                      "vsize": 200
+                    }
+                  ],
+                  "done": "You have seen a payment get in and one miss the block."
+                }
+              },
+              {
+                "type": "heading",
+                "text": "Exercise 5 · Analyse fee selection scenarios"
+              },
+              {
+                "type": "text",
+                "md": "Choose the best option in each scenario. Only the right choice completes it."
+              },
+              {
+                "type": "widget",
+                "id": "scenario-quiet",
+                "name": "PathToggle",
+                "props": {
+                  "label": "Quiet mempool",
+                  "icon": "clock",
+                  "question": "Not urgent. Next-block estimate: 1 sat/vB.",
+                  "paths": {
+                    "low": {
+                      "button": "1 sat/vB",
+                      "icon": "check",
+                      "correct": true,
+                      "feedback": "Confirms within a few blocks."
+                    },
+                    "high": {
+                      "button": "100 sat/vB",
+                      "icon": "warn",
+                      "correct": false,
+                      "feedback": "Pays far more than needed."
+                    },
+                    "zero": {
+                      "button": "0 sat/vB",
+                      "icon": "cross",
+                      "correct": false,
+                      "feedback": "Nodes will not relay it."
+                    }
+                  }
+                }
+              },
+              {
+                "type": "widget",
+                "id": "scenario-busy",
+                "name": "PathToggle",
+                "props": {
+                  "label": "Busy mempool",
+                  "icon": "warn",
+                  "question": "Deadline today. Next-block estimate: 20 sat/vB.",
+                  "paths": {
+                    "near": {
+                      "button": "20 sat/vB",
+                      "icon": "target",
+                      "correct": true,
+                      "feedback": "Competitive: matches what miners take now."
+                    },
+                    "min": {
+                      "button": "1 sat/vB",
+                      "icon": "clock",
+                      "correct": false,
+                      "feedback": "Waits behind every higher rate."
+                    },
+                    "wait": {
+                      "button": "Wait",
+                      "icon": "clock",
+                      "correct": false,
+                      "feedback": "Misses the deadline if the mempool stays full."
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "explore",
+            "label": "Explore · A real block",
+            "title": "Read the fees in block 840,000",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Block 840,000 is a real block, mined at the April 2024 halving. Its coinbase transaction pays the miner the new coins (the subsidy) plus every fee in the block. You can add those up yourself on the explorer."
+              },
+              {
+                "type": "widget",
+                "id": "ex-block-840",
+                "name": "Checks",
+                "props": {
+                  "key": "ex-block-840",
+                  "label": "Exercise 7 · Add up the coinbase",
+                  "icon": "layers",
+                  "intro": "Open <a href=\"https://mempool.space/block/0000000000000000000320283a032748cef8227873ff4872689bf23f1cda83a5\" target=\"_blank\" rel=\"noopener noreferrer\">block 840,000 on mempool.space</a>. Its coinbase pays out 40.75 BTC in total. The subsidy for this height is 3.125 BTC.",
+                  "steps": [
+                    {
+                      "label": "Total fees in block 840,000, in BTC (two decimals)",
+                      "type": "text",
+                      "answer": "37.63",
+                      "hint": "Total coinbase payout minus the subsidy."
+                    },
+                    {
+                      "label": "Fees as a percentage of the whole reward, rounded to a whole number",
+                      "type": "number",
+                      "answer": "92",
+                      "hint": "fees ÷ (fees + subsidy), times 100."
+                    }
+                  ],
+                  "button": "Check",
+                  "done": "Both correct. Most of that block’s reward came from fees, not from new coins.",
+                  "reveal": "<p>The block’s 40.75 BTC payout is 3.125 BTC of new coins plus about 37.63 BTC of fees. Fees are what miners earn beyond the subsidy, and their share can change a lot from block to block.</p>"
+                }
+              }
+            ]
+          },
+          {
+            "id": "real",
+            "label": "Real life",
+            "title": "Who gets the fee, and what overpaying buys",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Bitcoin has no price list. Senders bid with fees, and miners fill each block with the highest bids first. Background: [Blockstream: why Bitcoin has fees](https://help.blockstream.com/education/transactions/transaction-basics/why-does-bitcoin-have-fees) and [Bitcoin wiki: Miner fees](https://en.bitcoin.it/wiki/Miner_fees)."
+              },
+              {
+                "type": "aside",
+                "md": "**Who gets the money?** The miner who finds the block collects every fee in it. Block 840,000 is a real example: its fees were about 92% of the reward, see the Explore section above."
+              },
+              {
+                "type": "text",
+                "md": "**Who benefits?** Miners earn the fees. Senders in a hurry pay more to get in. Wallets and sites such as [mempool.space](https://mempool.space) help users read the queue, but they cannot promise a confirmation time."
+              },
+              {
+                "type": "text",
+                "md": "**What if you pay above the price?** The next block still arrives whenever it arrives, so an extra fee does not bring it sooner. The extra simply goes to the miner. mempool.space says its own fee suggestions [are estimates and do not guarantee a time](https://api.mempool.space/docs/api)."
+              },
+              {
+                "type": "text",
+                "md": "**What if you pay too little?** Your transaction waits in each node’s mempool. If the queue stays full, nodes can drop it, and you may need to raise the fee or resend it."
+              }
+            ]
+          },
+          {
+            "id": "live",
+            "label": "Try it here",
+            "title": "Read the block view yourself",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Real fee tools show a **block view**: the next few blocks a miner could build, filled from the highest rate down. Here is the same view with sample payments, so you can try it without leaving the lesson."
+              },
+              {
+                "type": "widget",
+                "id": "mempool-view",
+                "name": "Mempool",
+                "props": {
+                  "label": "Block view",
+                  "intro": "Each box is one block of 1,000 vB. Tap a box to see what is in it. Then pick a rate for your own 200 vB payment to see which block it lands in.",
+                  "capacity": 1000,
+                  "size": 200,
+                  "choices": [5, 12, 16, 22],
+                  "queue": [
+                    {
+                      "name": "Payment 1",
+                      "rate": 22,
+                      "vsize": 180
+                    },
+                    {
+                      "name": "Payment 2",
+                      "rate": 20,
+                      "vsize": 240
+                    },
+                    {
+                      "name": "Payment 3",
+                      "rate": 18,
+                      "vsize": 150
+                    },
+                    {
+                      "name": "Payment 4",
+                      "rate": 16,
+                      "vsize": 300
+                    },
+                    {
+                      "name": "Payment 5",
+                      "rate": 15,
+                      "vsize": 120
+                    },
+                    {
+                      "name": "Payment 6",
+                      "rate": 14,
+                      "vsize": 200
+                    },
+                    {
+                      "name": "Payment 7",
+                      "rate": 12,
+                      "vsize": 160
+                    },
+                    {
+                      "name": "Payment 8",
+                      "rate": 11,
+                      "vsize": 250
+                    },
+                    {
+                      "name": "Payment 9",
+                      "rate": 10,
+                      "vsize": 140
+                    },
+                    {
+                      "name": "Payment 10",
+                      "rate": 9,
+                      "vsize": 300
+                    },
+                    {
+                      "name": "Payment 11",
+                      "rate": 8,
+                      "vsize": 180
+                    },
+                    {
+                      "name": "Payment 12",
+                      "rate": 7,
+                      "vsize": 220
+                    },
+                    {
+                      "name": "Payment 13",
+                      "rate": 6,
+                      "vsize": 260
+                    },
+                    {
+                      "name": "Payment 14",
+                      "rate": 5,
+                      "vsize": 200
+                    },
+                    {
+                      "name": "Payment 15",
+                      "rate": 4,
+                      "vsize": 240
+                    },
+                    {
+                      "name": "Payment 16",
+                      "rate": 2,
+                      "vsize": 300
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "reflect",
+                "id": "reflect-live",
+                "prompt": "Which rate would get your 200 vB payment into the first block, and why would paying more than that not help?",
+                "placeholder": "The first block needs at least…",
+                "model": "The first block's lowest rate is the cheapest that gets in now. Paying more does not move the payment to an earlier block, because the first block is already the next one a miner builds."
+              }
+            ]
+          },
+          {
+            "id": "wrapup",
+            "label": "Wrap-up",
+            "title": "Now we can answer Aarav",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav’s three buttons are not magic. Each one is a fee rate, paid per vbyte, chosen from what the mempool is doing right now."
+              },
+              {
+                "type": "reflect",
+                "id": "reflect-fees",
+                "prompt": "In one sentence, tell Aarav what he is paying for when he chooses Fast.",
+                "placeholder": "When Aarav chooses Fast, he pays…",
+                "model": "He pays a higher fee rate, in sat per vbyte. Miners fill blocks with the transactions that pay the most per unit of space, so a higher rate gets his transaction included sooner."
+              },
+              {
+                "type": "next"
+              },
+              {
+                "type": "text",
+                "md": "Specification: [BIP125 · Opt-in Replace-by-Fee](https://bips.dev/125/)."
               }
             ]
           }
-        },
-        {
-          "type": "reflect",
-          "id": "reflect-live",
-          "prompt": "Which rate would get your 200 vB payment into the first block, and why would paying more than that not help?",
-          "placeholder": "The first block needs at least…",
-          "model": "The first block's lowest rate is the cheapest that gets in now. Paying more does not move the payment to an earlier block, because the first block is already the next one a miner builds."
+        ],
+        "next": {
+          "id": "9.2",
+          "title": "Transaction Size",
+          "teaser": "Aarav sees that fees follow virtual bytes, not raw bytes. Next, he works out the weight of a transaction and how SegWit changes its size."
         }
-      ]
-    },
-    {
-      "id": "wrapup",
-      "label": "Wrap-up",
-      "title": "Now we can answer Aarav",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Aarav’s three buttons are not magic. Each one is a fee rate, paid per vbyte, chosen from what the mempool is doing right now."
-        },
-        {
-          "type": "reflect",
-          "id": "reflect-fees",
-          "prompt": "In one sentence, tell Aarav what he is paying for when he chooses Fast.",
-          "placeholder": "When Aarav chooses Fast, he pays…",
-          "model": "He pays a higher fee rate, in sat per vbyte. Miners fill blocks with the transactions that pay the most per unit of space, so a higher rate gets his transaction included sooner."
-        },
-        {
-          "type": "next"
-        },
-        {
-          "type": "text",
-          "md": "Specification: [BIP125 · Opt-in Replace-by-Fee](https://bips.dev/125/)."
-        }
-      ]
-    }
-  ],
-  "next": {
-    "id": "9.2",
-    "title": "Transaction Size",
-    "teaser": "Aarav sees that fees follow virtual bytes, not raw bytes. Next, he works out the weight of a transaction and how SegWit changes its size."
-  }
-}
+      }
     </script>
     <script src="./figures.js"></script>
     <script src="../../shared/lesson-engine.js"></script>

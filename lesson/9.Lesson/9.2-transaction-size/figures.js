@@ -1,6 +1,6 @@
 /* Figures for this lesson. Read by lesson-engine.js through window.LESSON_ASSETS. */
 window.LESSON_ASSETS = {
-        bytes: `<svg
+  bytes: `<svg
               viewBox="0 0 580 200"
               role="img"
               aria-labelledby="bytes-title bytes-desc"

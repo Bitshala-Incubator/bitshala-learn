@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="../../../styles/global.css" />
     <link rel="stylesheet" href="../../../styles/lesson.css" />
     <link rel="stylesheet" href="../../../styles/widgets.css" />
-    
   </head>
   <body>
     <nav>
@@ -23,497 +22,467 @@
       <main id="lesson"></main>
     </div>
     <script type="application/json" id="lesson-data">
-{
-  "id": "8.2",
-  "title": "Schnorr and Taproot",
-  "subtitle": "One signature on the outside. A whole set of spending possibilities underneath.",
-  "phase": "Bitcoin Foundations",
-  "module": "Module 8",
-  "minutes": 60,
-  "level": "Beginner",
-  "next": {
-    "id": "9.1",
-    "title": "Fees",
-    "teaser": "Aarav can now see how signatures are built and combined. Next, he’ll look at what it costs to get a transaction confirmed: how fees are calculated, how a fee rate is chosen, and how different choices compare."
-  },
-  "sections": [
-    {
-      "id": "question",
-      "label": "The question",
-      "title": "Where did the second signature go?",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Aarav remembers the shared savings coin from lesson 7.2: a 2-of-3 lock. Spending it put two signatures and all three public keys on chain. Now Meera shows him a Taproot coin that also needs both of them, yet its witness holds just one signature and the coin shows one key."
+      {
+        "id": "8.2",
+        "title": "Schnorr and Taproot",
+        "subtitle": "One signature on the outside. A whole set of spending possibilities underneath.",
+        "phase": "Bitcoin Foundations",
+        "module": "Module 8",
+        "minutes": 60,
+        "level": "Beginner",
+        "next": {
+          "id": "9.1",
+          "title": "Fees",
+          "teaser": "Aarav can now see how signatures are built and combined. Next, he’ll look at what it costs to get a transaction confirmed: how fees are calculated, how a fee rate is chosen, and how different choices compare."
         },
-        {
-          "type": "text",
-          "md": "“Did one of us give up control?” he asks. Meera shakes her head. “No. The signature scheme changed how we can combine proofs. And Taproot lets the outside of a coin reveal less about the rules inside.”"
-        },
-        {
-          "type": "text",
-          "md": "We will follow that connection in three steps: **Schnorr** is the signature idea, **BIP340** specifies Bitcoin’s Schnorr signatures, and **Taproot** uses them in a new way to commit to spending conditions."
-        }
-      ]
-    },
-    {
-      "id": "schnorr",
-      "label": "Part 1 · The signature idea",
-      "title": "Schnorr: a check that balances",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "In lesson 8.1 you built ECDSA signatures. Signing used a private key, a fresh nonce, and a *modular inverse*: s = k⁻¹·(z + x·r). That inverse is what makes ECDSA signatures hard to combine. Schnorr does the same job with a simpler formula. Nothing is divided; the parts are only multiplied and added."
-        },
-        {
-          "type": "heading",
-          "text": "The pieces, in curve language and toy language"
-        },
-        {
-          "type": "text",
-          "md": "On Bitcoin’s curve, secp256k1, **G** is a fixed starting point that everyone agrees on. **n** is how many different points you can reach from G (about 2<sup>256</sup>). Writing **kG** means “add G to itself k times.” Going forward is easy. Going backwards, from the point kG to the number k, is the hard problem that keeps private keys safe."
-        },
-        {
-          "type": "text",
-          "md": "The toy group from 8.1 plays the same game with small numbers, so you can do it on paper:"
-        },
-        {
-          "type": "table",
-          "headers": [
-            "Idea",
-            "Bitcoin curve",
-            "Toy group (8.1)"
-          ],
-          "rows": [
-            [
-              "Starting point",
-              "G",
-              "4"
-            ],
-            [
-              "Number of steps before repeating",
-              "n ≈ 2<sup>256</sup>",
-              "11"
-            ],
-            [
-              "“k times the start”",
-              "kG",
-              "4<sup>k</sup> mod 23"
-            ],
-            [
-              "Combining two points",
-              "A + B",
-              "A · B mod 23"
-            ],
-            [
-              "Meera’s key pair",
-              "d, P = dG",
-              "d = 7, P = 4<sup>7</sup> mod 23 = 8"
-            ]
-          ]
-        },
-        {
-          "type": "figure",
-          "asset": "ring",
-          "caption": "Each step multiplies by 4 mod 23. After 11 steps the sequence repeats, which is why the toy group has order 11."
-        },
-        {
-          "type": "heading",
-          "text": "Signing and checking"
-        },
-        {
-          "type": "aside",
-          "md": "**1. Pick a secret nonce** k and publish `R = kG`.<br>**2. Make the challenge** `e = hash(R, P, message)`, reduced mod n.<br>**3. Respond** with `s = k + e·d (mod n)`. The signature is the pair **(R, s)**.<br>**Verify:** accept only if `sG = R + eP`."
-        },
-        {
-          "type": "text",
-          "md": "Why does an honest signature always pass? Expand the left side: `sG = (k + e·d)G = kG + e·(dG) = R + eP`. The verifier never learns d. It only uses the public values R, P, s and the message, which it hashes to rebuild e."
-        },
-        {
-          "type": "text",
-          "md": "The challenge e is what makes a signature impossible to fake or move. It hashes the message, so a changed message gives a different e. It also hashes R, so the signer has to commit to the nonce before knowing the challenge."
-        },
-        {
-          "type": "figure",
-          "asset": "balance",
-          "caption": "If the message, signature, and public key belong together, both sides describe the same point."
-        },
-        {
-          "type": "widget",
-          "id": "lab-sign",
-          "name": "Checks",
-          "props": {
-            "key": "lab-sign",
-            "label": "Lab 1 · Sign and verify with toy numbers",
-            "intro": "Meera signs the message “pay Aarav 1 coin”. Her private key is <b>d = 7</b> and her public key is <b>P = 8</b>. Her wallet picks the nonce <b>k = 3</b>, and hashing (R, P, message) gives the challenge <b>e = 5</b>. Work out each number, then check.",
-            "helper": {
-              "summary": "Helper: powers mod 23",
-              "body": "4<sup>1..10</sup> mod 23 = 4, 16, 18, 3, 12, 2, 8, 9, 13, 6<br />8<sup>1..6</sup> mod 23 = 8, 18, 6, 2, 16, 13"
-            },
-            "steps": [
+        "sections": [
+          {
+            "id": "question",
+            "label": "The question",
+            "title": "Where did the second signature go?",
+            "blocks": [
               {
-                "label": "Signer: nonce point R = 4<sup>k</sup> mod 23",
-                "answer": "18",
-                "hint": "Find 4^3 in the helper table, or reduce 64 mod 23."
-              },
-              {
-                "label": "Signer: s = k + e·d mod 11",
-                "answer": "5",
-                "hint": "s = 3 + 5·7 = 38. Now take the remainder after dividing by 11."
-              },
-              {
-                "label": "Verifier, left side: 4<sup>s</sup> mod 23",
-                "answer": "12",
-                "hint": "Look up 4^5 in the helper table."
-              },
-              {
-                "label": "Verifier, right side: R · P<sup>e</sup> mod 23",
-                "answer": "12",
-                "hint": "8^5 mod 23 = 16, so the right side is 18 · 16 mod 23."
-              },
-              {
-                "label": "Aarav changes the message to “pay Aarav 9 coins”, so the challenge becomes e = 6. Same R and s. New right side R · P<sup>6</sup> mod 23?",
-                "answer": "4",
-                "hint": "8^6 mod 23 = 13, so compute 18 · 13 mod 23."
-              }
-            ],
-            "button": "Check my numbers",
-            "done": "All correct. You signed and verified a Schnorr signature by hand.",
-            "reveal": "<div class=\"equation\"><span>Left: 4<sup>5</sup> = 12</span><span>Right: 18 · 8<sup>5</sup> = 12</span></div><p>The signature (R, s) = (18, 5) balances for the real message. For the edited message the right side becomes 4, but the left side is still 12, so every verifier rejects it. Aarav cannot fix this without d: a new e needs a new s = k + e·d.</p>"
-          }
-        }
-      ]
-    },
-    {
-      "id": "aggregate",
-      "label": "Part 1b · Why Schnorr can combine signers",
-      "title": "Why “simpler” matters: adding signatures",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Look again at `s = k + e·d`. It is *linear*: nonces add, keys add, and so responses add. If two people each hold a key, they can combine their public keys into one, combine their nonce points into one, and add their two responses. The result is a single ordinary-looking signature for the combined key. ECDSA’s k⁻¹ prevents this."
-        },
-        {
-          "type": "figure",
-          "asset": "flow",
-          "caption": "Two signers, one key, one signature. Nothing on chain shows that two people took part."
-        },
-        {
-          "type": "widget",
-          "id": "lab-aggregate",
-          "name": "Checks",
-          "props": {
-            "key": "lab-aggregate",
-            "label": "Lab 2 · Two keys, one signature",
-            "intro": "Aarav (d<sub>A</sub> = 3, P<sub>A</sub> = 18) and Meera (d<sub>M</sub> = 7, P<sub>M</sub> = 8) want a coin that needs both of them. Their nonces are k<sub>A</sub> = 2 (R<sub>A</sub> = 16) and k<sub>M</sub> = 5 (R<sub>M</sub> = 12). The challenge for the combined key and nonce is <b>e = 2</b>. (In real signatures e is a hash; here it is given so the arithmetic stays small.)",
-            "steps": [
-              {
-                "label": "Combined key P = P<sub>A</sub> · P<sub>M</sub> mod 23",
-                "answer": "6",
-                "hint": "Multiply 18 · 8, then subtract 23 until it is below 23."
-              },
-              {
-                "label": "Combined nonce R = R<sub>A</sub> · R<sub>M</sub> mod 23",
-                "answer": "8",
-                "hint": "Multiply 16 · 12, then reduce mod 23."
-              },
-              {
-                "label": "Aarav’s part s<sub>A</sub> = k<sub>A</sub> + e·d<sub>A</sub> mod 11",
-                "answer": "8",
-                "hint": "Put k_A = 2, e = 2 and d_A = 3 into k + e·d."
-              },
-              {
-                "label": "Meera’s part s<sub>M</sub> = k<sub>M</sub> + e·d<sub>M</sub> mod 11",
-                "answer": "8",
-                "hint": "5 + 2·7 = 19. Reduce it mod 11."
-              },
-              {
-                "label": "Final s = s<sub>A</sub> + s<sub>M</sub> mod 11",
-                "answer": "5",
-                "hint": "Add the two parts, then reduce mod 11."
-              },
-              {
-                "label": "Verifier: 4<sup>s</sup> is 12. Compute R · P<sup>e</sup> mod 23. It must match.",
-                "answer": "12",
-                "hint": "R · P^2 = 8 · 36. Reduce 36 mod 23 first, then multiply."
-              }
-            ],
-            "button": "Check my numbers",
-            "done": "All correct. Two signers produced one valid signature for one key.",
-            "reveal": "<p>The verifier saw <b>one</b> public key (6) and <b>one</b> signature (8, 5). Nothing on-chain says two people signed. That is where Aarav’s “second signature” went: it was folded into the first.</p>"
-          }
-        },
-        {
-          "type": "aside",
-          "md": "**Warning: this lab is the idea, not a safe protocol.** If keys are simply multiplied together (added, on the curve), a dishonest partner can choose a key that cancels yours. Real wallets use **MuSig2** (BIP327), which weights each key and uses two nonces per signer."
-        },
-        {
-          "type": "text",
-          "md": "The nonce rule from 8.1 still applies. Because `s = k + e·d`, two signatures that share a k reveal d. BIP340 tells wallets to derive k from the private key, the message and fresh randomness, so a nonce is never reused."
-        }
-      ]
-    },
-    {
-      "id": "bip340",
-      "label": "Part 2 · Bitcoin’s exact rules",
-      "title": "BIP340: Schnorr in a Bitcoin-shaped package",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Schnorr describes a family of signature schemes. **BIP340** is the specification Bitcoin uses for Schnorr signatures over secp256k1. It defines exact encodings and hash steps so independent implementations agree on what is valid."
-        },
-        {
-          "type": "table",
-          "headers": [
-            "Item",
-            "First 32 bytes",
-            "Second 32 bytes"
-          ],
-          "rows": [
-            [
-              "Signature (64 bytes)",
-              "x-coordinate of R",
-              "scalar s"
-            ],
-            [
-              "Public key (32 bytes)",
-              "x-only public key",
-              "No second part. The even-y rule picks one point for each x."
-            ]
-          ]
-        },
-        {
-          "type": "text",
-          "md": "“X-only” means the public key encoding contains an x-coordinate, not both coordinates. BIP340 defines how to lift it to the corresponding curve point with an even y-coordinate. This gives signers and verifiers one consistent interpretation."
-        },
-        {
-          "type": "text",
-          "md": "BIP340 also uses **tagged hashes**: a hash is prefixed with a label for its purpose, such as the challenge or nonce. Think of that label as writing “challenge” on an envelope before sealing it. The specification—not a wallet author’s guess—defines the exact bytes and steps."
-        },
-        {
-          "type": "heading",
-          "text": "Before the mission: reading bytes"
-        },
-        {
-          "type": "text",
-          "md": "Signatures and keys are usually shown as **hex**. Each hex character (0–9, A–F) stands for 4 bits, so **two characters make one byte**. A 32-byte value is 64 characters long; a 64-byte value is 128 characters long."
-        },
-        {
-          "type": "text",
-          "md": "In 8.1, ECDSA signatures were wrapped in an extra container format called **DER**. It adds type and length markers, so the size varies, usually 70–72 bytes, and starts with the byte `30`. BIP340 drops that wrapper. Every Schnorr signature is two fixed 32-byte numbers placed side by side:"
-        },
-        {
-          "type": "text",
-          "md": "**R.x**, the x-coordinate of the one-time nonce point `R = kG`. The verifier rebuilds R from it."
-        },
-        {
-          "type": "text",
-          "md": "**s**, the response `k + e·d` from Part 1. This is the number the verifier puts into `sG = R + eP`."
-        },
-        {
-          "type": "text",
-          "md": "Because nothing marks where one number ends, software finds them by position alone. That is why the length must be exact."
-        },
-        {
-          "type": "figure",
-          "asset": "lengths",
-          "caption": "BIP340 drops the wrapper. The length is fixed, so the bytes can be split by position alone."
-        },
-        {
-          "type": "widget",
-          "id": "ex-real-signature",
-          "name": "Checks",
-          "props": {
-            "key": "ex-real-signature",
-            "label": "Mission · Take a real signature apart",
-            "icon": "box",
-            "intro": "This is the signature from <a href=\"https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv\" target=\"_blank\" rel=\"noopener noreferrer\">BIP340 test vector 0</a>: a secret key of 3 signing an all-zero message. Read the 64 bytes. Orange bytes are R.x, green bytes are s.",
-            "grid": {
-              "hex": "E907831F80848D1069A5371B402410364BDF1C5F8307B0084C55F1CE2DCA821525F66A4A85EA8B71E482A74F382D2CE5EBEEE8FDB2172F477DF4900D310536C0",
-              "split": 32,
-              "perRow": 8
-            },
-            "steps": [
-              {
-                "label": "How many bytes long is this signature?",
-                "type": "number",
-                "answer": "64",
-                "hint": "128 hex characters, two per byte."
-              },
-              {
-                "label": "Which byte number is the first byte of s?",
-                "type": "number",
-                "answer": "33",
-                "hint": "R.x fills bytes 1 to 32."
-              },
-              {
-                "label": "Which byte number is the last byte of R.x?",
-                "type": "number",
-                "answer": "32",
-                "hint": "R.x is 32 bytes long."
-              },
-              {
-                "label": "Does a 64-byte signature prove the signature is valid? (yes or no)",
                 "type": "text",
-                "answer": "no",
-                "hint": "Length tells you the format. Validity comes from the check on the next lesson step."
-              }
-            ],
-            "button": "Check",
-            "done": "All correct. The layout tells you the format; only the verification maths tells you whether it is valid.",
-            "reveal": "<p>Every BIP340 signature is exactly 64 bytes, so software reads R.x and s by position. A wrong signature can still be 64 bytes long.</p>"
-          }
-        }
-      ]
-    },
-    {
-      "id": "taproot",
-      "label": "Part 3 · A new way to spend",
-      "title": "Taproot: one output, two paths",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Taproot (BIP341) commits to an **internal key** and, optionally, a Merkle tree of spending scripts. A tweak combines the internal key with that commitment to create the output key. Schnorr’s additive structure makes this key tweak compatible with key-path signing."
-        },
-        {
-          "type": "figure",
-          "asset": "tree",
-          "caption": "The output commits to the tree. A script-path spend can reveal the leaf it uses and its proof, not every other leaf."
-        },
-        {
-          "type": "widget",
-          "id": "taproot-paths",
-          "name": "PathToggle",
-          "props": {
-            "label": "Explore · Choose a Taproot spending path",
-            "question": "<b>Question:</b> which spend path reveals part of the script tree? Click a path to check your answer.",
-            "paths": {
-              "key": {
-                "button": "Key path",
-                "title": "Key path · satisfy the output key",
-                "body": "Provide a Schnorr signature for the tweaked output key. This can represent one signer or a group that securely combined their keys and signatures.",
-                "reveals": "a signature, not the hidden script tree.",
-                "correct": false,
-                "feedback": "Not quite. The key path reveals only one Schnorr signature. No script leaf is shown."
+                "md": "Aarav remembers the shared savings coin from lesson 7.2: a 2-of-3 lock. Spending it put two signatures and all three public keys on chain. Now Meera shows him a Taproot coin that also needs both of them, yet its witness holds just one signature and the coin shows one key."
               },
-              "script": {
-                "button": "Script path",
-                "title": "Script path · satisfy one committed leaf",
-                "body": "Provide the script leaf that is being executed, its control block (which proves its place in the committed tree), and the required witness data.",
-                "reveals": "the executed leaf and proof, not unused leaves.",
-                "correct": true,
-                "feedback": "Correct. The script path reveals the executed leaf and its control proof. Unused leaves stay hidden."
+              {
+                "type": "text",
+                "md": "“Did one of us give up control?” he asks. Meera shakes her head. “No. The signature scheme changed how we can combine proofs. And Taproot lets the outside of a coin reveal less about the rules inside.”"
+              },
+              {
+                "type": "text",
+                "md": "We will follow that connection in three steps: **Schnorr** is the signature idea, **BIP340** specifies Bitcoin’s Schnorr signatures, and **Taproot** uses them in a new way to commit to spending conditions."
               }
-            }
-          }
-        },
-        {
-          "type": "text",
-          "md": "Taproot’s script-path rules are called **Tapscript** (BIP342). They include changes to how signatures are checked and support constructions such as a script using `OP_CHECKSIGADD`."
-        },
-        {
-          "type": "table",
-          "headers": [
-            "Concept",
-            "Role"
-          ],
-          "rows": [
-            [
-              "Schnorr",
-              "The signature scheme and its linear structure."
-            ],
-            [
-              "BIP340",
-              "The Bitcoin Schnorr signature encoding and verification rules."
-            ],
-            [
-              "Taproot / BIP341",
-              "Commits to an output key and optional script tree; defines key- and script-path spends."
-            ],
-            [
-              "Tapscript / BIP342",
-              "Rules for executing Taproot script-path spends."
-            ],
-            [
-              "MuSig2 / BIP327",
-              "A secure protocol for multiple signers to produce one Schnorr signature."
             ]
-          ]
-        }
-      ]
-    },
-    {
-      "id": "check",
-      "label": "Check your understanding",
-      "title": "Match each concept to its role",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Select the best description for each term. This is the lesson’s main goal: know what Schnorr, BIP340, and Taproot each contribute."
-        },
-        {
-          "type": "widget",
-          "id": "ex-standards",
-          "name": "Checks",
-          "props": {
-            "key": "ex-standards",
-            "label": "Check your understanding · Look up the standards",
-            "icon": "layers",
-            "intro": "Each part of this lesson has a BIP number. Look them up on <a href=\"https://bips.dev\" target=\"_blank\" rel=\"noopener noreferrer\">bips.dev</a> or in the <a href=\"https://github.com/bitcoin/bips\" target=\"_blank\" rel=\"noopener noreferrer\">BIPs repository</a>.",
-            "steps": [
+          },
+          {
+            "id": "schnorr",
+            "label": "Part 1 · The signature idea",
+            "title": "Schnorr: a check that balances",
+            "blocks": [
               {
-                "label": "BIP number for Schnorr signatures in Bitcoin",
-                "type": "number",
-                "answer": "340",
-                "hint": "The rules for the 64-byte signature you just read."
+                "type": "text",
+                "md": "In lesson 8.1 you built ECDSA signatures. Signing used a private key, a fresh nonce, and a *modular inverse*: s = k⁻¹·(z + x·r). That inverse is what makes ECDSA signatures hard to combine. Schnorr does the same job with a simpler formula. Nothing is divided; the parts are only multiplied and added."
               },
               {
-                "label": "BIP number for Taproot",
-                "type": "number",
-                "answer": "341",
-                "hint": "The output type with a key path and script paths."
+                "type": "heading",
+                "text": "The pieces, in curve language and toy language"
               },
               {
-                "label": "BIP number for Tapscript",
-                "type": "number",
-                "answer": "342",
-                "hint": "The script rules used on a Taproot script path."
+                "type": "text",
+                "md": "On Bitcoin’s curve, secp256k1, **G** is a fixed starting point that everyone agrees on. **n** is how many different points you can reach from G (about 2<sup>256</sup>). Writing **kG** means “add G to itself k times.” Going forward is easy. Going backwards, from the point kG to the number k, is the hard problem that keeps private keys safe."
+              },
+              {
+                "type": "text",
+                "md": "The toy group from 8.1 plays the same game with small numbers, so you can do it on paper:"
+              },
+              {
+                "type": "table",
+                "headers": ["Idea", "Bitcoin curve", "Toy group (8.1)"],
+                "rows": [
+                  ["Starting point", "G", "4"],
+                  [
+                    "Number of steps before repeating",
+                    "n ≈ 2<sup>256</sup>",
+                    "11"
+                  ],
+                  ["“k times the start”", "kG", "4<sup>k</sup> mod 23"],
+                  ["Combining two points", "A + B", "A · B mod 23"],
+                  [
+                    "Meera’s key pair",
+                    "d, P = dG",
+                    "d = 7, P = 4<sup>7</sup> mod 23 = 8"
+                  ]
+                ]
+              },
+              {
+                "type": "figure",
+                "asset": "ring",
+                "caption": "Each step multiplies by 4 mod 23. After 11 steps the sequence repeats, which is why the toy group has order 11."
+              },
+              {
+                "type": "heading",
+                "text": "Signing and checking"
+              },
+              {
+                "type": "aside",
+                "md": "**1. Pick a secret nonce** k and publish `R = kG`.<br>**2. Make the challenge** `e = hash(R, P, message)`, reduced mod n.<br>**3. Respond** with `s = k + e·d (mod n)`. The signature is the pair **(R, s)**.<br>**Verify:** accept only if `sG = R + eP`."
+              },
+              {
+                "type": "text",
+                "md": "Why does an honest signature always pass? Expand the left side: `sG = (k + e·d)G = kG + e·(dG) = R + eP`. The verifier never learns d. It only uses the public values R, P, s and the message, which it hashes to rebuild e."
+              },
+              {
+                "type": "text",
+                "md": "The challenge e is what makes a signature impossible to fake or move. It hashes the message, so a changed message gives a different e. It also hashes R, so the signer has to commit to the nonce before knowing the challenge."
+              },
+              {
+                "type": "figure",
+                "asset": "balance",
+                "caption": "If the message, signature, and public key belong together, both sides describe the same point."
+              },
+              {
+                "type": "widget",
+                "id": "lab-sign",
+                "name": "Checks",
+                "props": {
+                  "key": "lab-sign",
+                  "label": "Lab 1 · Sign and verify with toy numbers",
+                  "intro": "Meera signs the message “pay Aarav 1 coin”. Her private key is <b>d = 7</b> and her public key is <b>P = 8</b>. Her wallet picks the nonce <b>k = 3</b>, and hashing (R, P, message) gives the challenge <b>e = 5</b>. Work out each number, then check.",
+                  "helper": {
+                    "summary": "Helper: powers mod 23",
+                    "body": "4<sup>1..10</sup> mod 23 = 4, 16, 18, 3, 12, 2, 8, 9, 13, 6<br />8<sup>1..6</sup> mod 23 = 8, 18, 6, 2, 16, 13"
+                  },
+                  "steps": [
+                    {
+                      "label": "Signer: nonce point R = 4<sup>k</sup> mod 23",
+                      "answer": "18",
+                      "hint": "Find 4^3 in the helper table, or reduce 64 mod 23."
+                    },
+                    {
+                      "label": "Signer: s = k + e·d mod 11",
+                      "answer": "5",
+                      "hint": "s = 3 + 5·7 = 38. Now take the remainder after dividing by 11."
+                    },
+                    {
+                      "label": "Verifier, left side: 4<sup>s</sup> mod 23",
+                      "answer": "12",
+                      "hint": "Look up 4^5 in the helper table."
+                    },
+                    {
+                      "label": "Verifier, right side: R · P<sup>e</sup> mod 23",
+                      "answer": "12",
+                      "hint": "8^5 mod 23 = 16, so the right side is 18 · 16 mod 23."
+                    },
+                    {
+                      "label": "Aarav changes the message to “pay Aarav 9 coins”, so the challenge becomes e = 6. Same R and s. New right side R · P<sup>6</sup> mod 23?",
+                      "answer": "4",
+                      "hint": "8^6 mod 23 = 13, so compute 18 · 13 mod 23."
+                    }
+                  ],
+                  "button": "Check my numbers",
+                  "done": "All correct. You signed and verified a Schnorr signature by hand.",
+                  "reveal": "<div class=\"equation\"><span>Left: 4<sup>5</sup> = 12</span><span>Right: 18 · 8<sup>5</sup> = 12</span></div><p>The signature (R, s) = (18, 5) balances for the real message. For the edited message the right side becomes 4, but the left side is still 12, so every verifier rejects it. Aarav cannot fix this without d: a new e needs a new s = k + e·d.</p>"
+                }
               }
-            ],
-            "button": "Check",
-            "done": "All three correct. Schnorr is 340, Taproot is 341, and Tapscript is 342.",
-            "reveal": "<p>BIP340 defines the signature, BIP341 defines Taproot outputs, and BIP342 defines Tapscript. Each one builds on the one before it.</p>"
+            ]
+          },
+          {
+            "id": "aggregate",
+            "label": "Part 1b · Why Schnorr can combine signers",
+            "title": "Why “simpler” matters: adding signatures",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Look again at `s = k + e·d`. It is *linear*: nonces add, keys add, and so responses add. If two people each hold a key, they can combine their public keys into one, combine their nonce points into one, and add their two responses. The result is a single ordinary-looking signature for the combined key. ECDSA’s k⁻¹ prevents this."
+              },
+              {
+                "type": "figure",
+                "asset": "flow",
+                "caption": "Two signers, one key, one signature. Nothing on chain shows that two people took part."
+              },
+              {
+                "type": "widget",
+                "id": "lab-aggregate",
+                "name": "Checks",
+                "props": {
+                  "key": "lab-aggregate",
+                  "label": "Lab 2 · Two keys, one signature",
+                  "intro": "Aarav (d<sub>A</sub> = 3, P<sub>A</sub> = 18) and Meera (d<sub>M</sub> = 7, P<sub>M</sub> = 8) want a coin that needs both of them. Their nonces are k<sub>A</sub> = 2 (R<sub>A</sub> = 16) and k<sub>M</sub> = 5 (R<sub>M</sub> = 12). The challenge for the combined key and nonce is <b>e = 2</b>. (In real signatures e is a hash; here it is given so the arithmetic stays small.)",
+                  "steps": [
+                    {
+                      "label": "Combined key P = P<sub>A</sub> · P<sub>M</sub> mod 23",
+                      "answer": "6",
+                      "hint": "Multiply 18 · 8, then subtract 23 until it is below 23."
+                    },
+                    {
+                      "label": "Combined nonce R = R<sub>A</sub> · R<sub>M</sub> mod 23",
+                      "answer": "8",
+                      "hint": "Multiply 16 · 12, then reduce mod 23."
+                    },
+                    {
+                      "label": "Aarav’s part s<sub>A</sub> = k<sub>A</sub> + e·d<sub>A</sub> mod 11",
+                      "answer": "8",
+                      "hint": "Put k_A = 2, e = 2 and d_A = 3 into k + e·d."
+                    },
+                    {
+                      "label": "Meera’s part s<sub>M</sub> = k<sub>M</sub> + e·d<sub>M</sub> mod 11",
+                      "answer": "8",
+                      "hint": "5 + 2·7 = 19. Reduce it mod 11."
+                    },
+                    {
+                      "label": "Final s = s<sub>A</sub> + s<sub>M</sub> mod 11",
+                      "answer": "5",
+                      "hint": "Add the two parts, then reduce mod 11."
+                    },
+                    {
+                      "label": "Verifier: 4<sup>s</sup> is 12. Compute R · P<sup>e</sup> mod 23. It must match.",
+                      "answer": "12",
+                      "hint": "R · P^2 = 8 · 36. Reduce 36 mod 23 first, then multiply."
+                    }
+                  ],
+                  "button": "Check my numbers",
+                  "done": "All correct. Two signers produced one valid signature for one key.",
+                  "reveal": "<p>The verifier saw <b>one</b> public key (6) and <b>one</b> signature (8, 5). Nothing on-chain says two people signed. That is where Aarav’s “second signature” went: it was folded into the first.</p>"
+                }
+              },
+              {
+                "type": "aside",
+                "md": "**Warning: this lab is the idea, not a safe protocol.** If keys are simply multiplied together (added, on the curve), a dishonest partner can choose a key that cancels yours. Real wallets use **MuSig2** (BIP327), which weights each key and uses two nonces per signer."
+              },
+              {
+                "type": "text",
+                "md": "The nonce rule from 8.1 still applies. Because `s = k + e·d`, two signatures that share a k reveal d. BIP340 tells wallets to derive k from the private key, the message and fresh randomness, so a nonce is never reused."
+              }
+            ]
+          },
+          {
+            "id": "bip340",
+            "label": "Part 2 · Bitcoin’s exact rules",
+            "title": "BIP340: Schnorr in a Bitcoin-shaped package",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Schnorr describes a family of signature schemes. **BIP340** is the specification Bitcoin uses for Schnorr signatures over secp256k1. It defines exact encodings and hash steps so independent implementations agree on what is valid."
+              },
+              {
+                "type": "table",
+                "headers": ["Item", "First 32 bytes", "Second 32 bytes"],
+                "rows": [
+                  ["Signature (64 bytes)", "x-coordinate of R", "scalar s"],
+                  [
+                    "Public key (32 bytes)",
+                    "x-only public key",
+                    "No second part. The even-y rule picks one point for each x."
+                  ]
+                ]
+              },
+              {
+                "type": "text",
+                "md": "“X-only” means the public key encoding contains an x-coordinate, not both coordinates. BIP340 defines how to lift it to the corresponding curve point with an even y-coordinate. This gives signers and verifiers one consistent interpretation."
+              },
+              {
+                "type": "text",
+                "md": "BIP340 also uses **tagged hashes**: a hash is prefixed with a label for its purpose, such as the challenge or nonce. Think of that label as writing “challenge” on an envelope before sealing it. The specification—not a wallet author’s guess—defines the exact bytes and steps."
+              },
+              {
+                "type": "heading",
+                "text": "Before the mission: reading bytes"
+              },
+              {
+                "type": "text",
+                "md": "Signatures and keys are usually shown as **hex**. Each hex character (0–9, A–F) stands for 4 bits, so **two characters make one byte**. A 32-byte value is 64 characters long; a 64-byte value is 128 characters long."
+              },
+              {
+                "type": "text",
+                "md": "In 8.1, ECDSA signatures were wrapped in an extra container format called **DER**. It adds type and length markers, so the size varies, usually 70–72 bytes, and starts with the byte `30`. BIP340 drops that wrapper. Every Schnorr signature is two fixed 32-byte numbers placed side by side:"
+              },
+              {
+                "type": "text",
+                "md": "**R.x**, the x-coordinate of the one-time nonce point `R = kG`. The verifier rebuilds R from it."
+              },
+              {
+                "type": "text",
+                "md": "**s**, the response `k + e·d` from Part 1. This is the number the verifier puts into `sG = R + eP`."
+              },
+              {
+                "type": "text",
+                "md": "Because nothing marks where one number ends, software finds them by position alone. That is why the length must be exact."
+              },
+              {
+                "type": "figure",
+                "asset": "lengths",
+                "caption": "BIP340 drops the wrapper. The length is fixed, so the bytes can be split by position alone."
+              },
+              {
+                "type": "widget",
+                "id": "ex-real-signature",
+                "name": "Checks",
+                "props": {
+                  "key": "ex-real-signature",
+                  "label": "Mission · Take a real signature apart",
+                  "icon": "box",
+                  "intro": "This is the signature from <a href=\"https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv\" target=\"_blank\" rel=\"noopener noreferrer\">BIP340 test vector 0</a>: a secret key of 3 signing an all-zero message. Read the 64 bytes. Orange bytes are R.x, green bytes are s.",
+                  "grid": {
+                    "hex": "E907831F80848D1069A5371B402410364BDF1C5F8307B0084C55F1CE2DCA821525F66A4A85EA8B71E482A74F382D2CE5EBEEE8FDB2172F477DF4900D310536C0",
+                    "split": 32,
+                    "perRow": 8
+                  },
+                  "steps": [
+                    {
+                      "label": "How many bytes long is this signature?",
+                      "type": "number",
+                      "answer": "64",
+                      "hint": "128 hex characters, two per byte."
+                    },
+                    {
+                      "label": "Which byte number is the first byte of s?",
+                      "type": "number",
+                      "answer": "33",
+                      "hint": "R.x fills bytes 1 to 32."
+                    },
+                    {
+                      "label": "Which byte number is the last byte of R.x?",
+                      "type": "number",
+                      "answer": "32",
+                      "hint": "R.x is 32 bytes long."
+                    },
+                    {
+                      "label": "Does a 64-byte signature prove the signature is valid? (yes or no)",
+                      "type": "text",
+                      "answer": "no",
+                      "hint": "Length tells you the format. Validity comes from the check on the next lesson step."
+                    }
+                  ],
+                  "button": "Check",
+                  "done": "All correct. The layout tells you the format; only the verification maths tells you whether it is valid.",
+                  "reveal": "<p>Every BIP340 signature is exactly 64 bytes, so software reads R.x and s by position. A wrong signature can still be 64 bytes long.</p>"
+                }
+              }
+            ]
+          },
+          {
+            "id": "taproot",
+            "label": "Part 3 · A new way to spend",
+            "title": "Taproot: one output, two paths",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Taproot (BIP341) commits to an **internal key** and, optionally, a Merkle tree of spending scripts. A tweak combines the internal key with that commitment to create the output key. Schnorr’s additive structure makes this key tweak compatible with key-path signing."
+              },
+              {
+                "type": "figure",
+                "asset": "tree",
+                "caption": "The output commits to the tree. A script-path spend can reveal the leaf it uses and its proof, not every other leaf."
+              },
+              {
+                "type": "widget",
+                "id": "taproot-paths",
+                "name": "PathToggle",
+                "props": {
+                  "label": "Explore · Choose a Taproot spending path",
+                  "question": "<b>Question:</b> which spend path reveals part of the script tree? Click a path to check your answer.",
+                  "paths": {
+                    "key": {
+                      "button": "Key path",
+                      "title": "Key path · satisfy the output key",
+                      "body": "Provide a Schnorr signature for the tweaked output key. This can represent one signer or a group that securely combined their keys and signatures.",
+                      "reveals": "a signature, not the hidden script tree.",
+                      "correct": false,
+                      "feedback": "Not quite. The key path reveals only one Schnorr signature. No script leaf is shown."
+                    },
+                    "script": {
+                      "button": "Script path",
+                      "title": "Script path · satisfy one committed leaf",
+                      "body": "Provide the script leaf that is being executed, its control block (which proves its place in the committed tree), and the required witness data.",
+                      "reveals": "the executed leaf and proof, not unused leaves.",
+                      "correct": true,
+                      "feedback": "Correct. The script path reveals the executed leaf and its control proof. Unused leaves stay hidden."
+                    }
+                  }
+                }
+              },
+              {
+                "type": "text",
+                "md": "Taproot’s script-path rules are called **Tapscript** (BIP342). They include changes to how signatures are checked and support constructions such as a script using `OP_CHECKSIGADD`."
+              },
+              {
+                "type": "table",
+                "headers": ["Concept", "Role"],
+                "rows": [
+                  ["Schnorr", "The signature scheme and its linear structure."],
+                  [
+                    "BIP340",
+                    "The Bitcoin Schnorr signature encoding and verification rules."
+                  ],
+                  [
+                    "Taproot / BIP341",
+                    "Commits to an output key and optional script tree; defines key- and script-path spends."
+                  ],
+                  [
+                    "Tapscript / BIP342",
+                    "Rules for executing Taproot script-path spends."
+                  ],
+                  [
+                    "MuSig2 / BIP327",
+                    "A secure protocol for multiple signers to produce one Schnorr signature."
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "id": "check",
+            "label": "Check your understanding",
+            "title": "Match each concept to its role",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Select the best description for each term. This is the lesson’s main goal: know what Schnorr, BIP340, and Taproot each contribute."
+              },
+              {
+                "type": "widget",
+                "id": "ex-standards",
+                "name": "Checks",
+                "props": {
+                  "key": "ex-standards",
+                  "label": "Check your understanding · Look up the standards",
+                  "icon": "layers",
+                  "intro": "Each part of this lesson has a BIP number. Look them up on <a href=\"https://bips.dev\" target=\"_blank\" rel=\"noopener noreferrer\">bips.dev</a> or in the <a href=\"https://github.com/bitcoin/bips\" target=\"_blank\" rel=\"noopener noreferrer\">BIPs repository</a>.",
+                  "steps": [
+                    {
+                      "label": "BIP number for Schnorr signatures in Bitcoin",
+                      "type": "number",
+                      "answer": "340",
+                      "hint": "The rules for the 64-byte signature you just read."
+                    },
+                    {
+                      "label": "BIP number for Taproot",
+                      "type": "number",
+                      "answer": "341",
+                      "hint": "The output type with a key path and script paths."
+                    },
+                    {
+                      "label": "BIP number for Tapscript",
+                      "type": "number",
+                      "answer": "342",
+                      "hint": "The script rules used on a Taproot script path."
+                    }
+                  ],
+                  "button": "Check",
+                  "done": "All three correct. Schnorr is 340, Taproot is 341, and Tapscript is 342.",
+                  "reveal": "<p>BIP340 defines the signature, BIP341 defines Taproot outputs, and BIP342 defines Tapscript. Each one builds on the one before it.</p>"
+                }
+              }
+            ]
+          },
+          {
+            "id": "wrapup",
+            "label": "Wrap-up",
+            "title": "Now we can answer Aarav",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "The second signature did not disappear from the rules. Schnorr makes secure signature aggregation possible; BIP340 tells Bitcoin exactly how Schnorr signatures are encoded and checked; and Taproot lets a spend use either a key-path signature or one revealed script path."
+              },
+              {
+                "type": "reflect",
+                "id": "reflect-taproot",
+                "prompt": "In one sentence, explain to Aarav why a Taproot transaction can show one signature even when more than one person had to agree.",
+                "placeholder": "Schnorr makes it possible to…",
+                "model": "When participants use a secure aggregation protocol such as MuSig2, they can combine their signing contributions into one Schnorr signature for the Taproot output key, so the blockchain sees one key-path signature rather than each participant’s separate signature."
+              },
+              {
+                "type": "next"
+              },
+              {
+                "type": "text",
+                "md": "Specifications: [BIP340 · Schnorr signatures](https://bips.dev/340/), [BIP341 · Taproot](https://bips.dev/341/), [BIP342 · Tapscript](https://bips.dev/342/), and [BIP327 · MuSig2](https://bips.dev/327/)."
+              }
+            ]
           }
-        }
-      ]
-    },
-    {
-      "id": "wrapup",
-      "label": "Wrap-up",
-      "title": "Now we can answer Aarav",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "The second signature did not disappear from the rules. Schnorr makes secure signature aggregation possible; BIP340 tells Bitcoin exactly how Schnorr signatures are encoded and checked; and Taproot lets a spend use either a key-path signature or one revealed script path."
-        },
-        {
-          "type": "reflect",
-          "id": "reflect-taproot",
-          "prompt": "In one sentence, explain to Aarav why a Taproot transaction can show one signature even when more than one person had to agree.",
-          "placeholder": "Schnorr makes it possible to…",
-          "model": "When participants use a secure aggregation protocol such as MuSig2, they can combine their signing contributions into one Schnorr signature for the Taproot output key, so the blockchain sees one key-path signature rather than each participant’s separate signature."
-        },
-        {
-          "type": "next"
-        },
-        {
-          "type": "text",
-          "md": "Specifications: [BIP340 · Schnorr signatures](https://bips.dev/340/), [BIP341 · Taproot](https://bips.dev/341/), [BIP342 · Tapscript](https://bips.dev/342/), and [BIP327 · MuSig2](https://bips.dev/327/)."
-        }
-      ]
-    }
-  ]
-}
+        ]
+      }
     </script>
     <script src="./figures.js"></script>
     <script src="../../shared/lesson-engine.js"></script>

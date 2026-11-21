@@ -1,6 +1,6 @@
 /* Figures for this lesson. Read by lesson-engine.js through window.LESSON_ASSETS. */
 window.LESSON_ASSETS = {
-        mesh: `<svg viewBox="0 0 580 240" role="img" aria-labelledby="mesh-title mesh-desc">
+  mesh: `<svg viewBox="0 0 580 240" role="img" aria-labelledby="mesh-title mesh-desc">
               <title id="mesh-title">A mesh of Bitcoin nodes</title>
               <desc id="mesh-desc">Six nodes labelled A to F, each linked to some of the others. Node A is highlighted. Every node can reach every other one by hopping through peers.</desc>
               <line x1="100" y1="120" x2="250" y2="50" stroke="var(--line)" stroke-width="2" />
@@ -23,7 +23,7 @@ window.LESSON_ASSETS = {
               <circle cx="540" cy="130" r="22" fill="var(--bg)" stroke="var(--ink)" stroke-width="2" />
               <text x="540" y="137" text-anchor="middle" style="font:700 16px system-ui">F</text>
             </svg>`,
-        direction: `<svg viewBox="0 0 580 200" role="img" aria-labelledby="dir-title dir-desc">
+  direction: `<svg viewBox="0 0 580 200" role="img" aria-labelledby="dir-title dir-desc">
               <title id="dir-title">Outbound and inbound connections</title>
               <desc id="dir-desc">Your node sits in the middle. An outbound connection is one your node opened to a peer it chose. An inbound connection is one a peer opened to your node.</desc>
               <rect x="20" y="70" width="150" height="60" rx="6" fill="var(--soft)" stroke="var(--acc)" stroke-width="2" />

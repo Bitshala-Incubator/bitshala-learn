@@ -1,6 +1,6 @@
 /* Figures for this lesson. Read by lesson-engine.js through window.LESSON_ASSETS. */
 window.LESSON_ASSETS = {
-        scatter: `<svg
+  scatter: `<svg
               viewBox="0 0 600 366"
               role="img"
               aria-labelledby="scatter-title scatter-desc"
@@ -18,7 +18,7 @@ window.LESSON_ASSETS = {
               <text x="60" y="357" class="accent" font-size="13">Dashed lines:</text>
               <line x1="200" y1="352" x2="226" y2="352" stroke="var(--mut)" stroke-width="2" stroke-dasharray="6 5" opacity="0.7" /><text x="234" y="357">5 sat/vB</text><line x1="320" y1="352" x2="346" y2="352" stroke="var(--mut)" stroke-width="2" stroke-dasharray="6 5" opacity="0.7" /><text x="354" y="357">6 sat/vB</text><line x1="440" y1="352" x2="466" y2="352" stroke="var(--mut)" stroke-width="2" stroke-dasharray="6 5" opacity="0.7" /><text x="474" y="357">8 sat/vB</text>
             </svg>`,
-        queue: `<svg
+  queue: `<svg
               viewBox="0 0 580 200"
               role="img"
               aria-labelledby="queue-title queue-desc"
@@ -34,7 +34,7 @@ window.LESSON_ASSETS = {
               <text x="150" y="172" text-anchor="middle">in the block</text>
               <text x="450" y="172" text-anchor="middle">waits for the next block</text>
             </svg>`,
-        fee: `<svg
+  fee: `<svg
               viewBox="0 0 580 200"
               role="img"
               aria-labelledby="fee-title fee-desc"
@@ -62,7 +62,7 @@ window.LESSON_ASSETS = {
               <text class="accent" x="477" y="145" text-anchor="middle">Fee 1,500 sat</text>
               <text x="290" y="188" text-anchor="middle">The fee is never written down. It is the gap.</text>
             </svg>`,
-        bars: `<svg
+  bars: `<svg
               viewBox="0 0 580 230"
               role="img"
               aria-labelledby="bars-title bars-desc"

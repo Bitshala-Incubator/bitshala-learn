@@ -1,6 +1,6 @@
 /* Figures for this lesson. Read by lesson-engine.js through window.LESSON_ASSETS. */
 window.LESSON_ASSETS = {
-        chain: `<svg viewBox="0 0 580 200" role="img" aria-labelledby="chain-title chain-desc">
+  chain: `<svg viewBox="0 0 580 200" role="img" aria-labelledby="chain-title chain-desc">
               <title id="chain-title">Three real blocks linked by previous-block hashes</title>
               <desc id="chain-desc">Block 0, block 1 and block 2. Each block stores the hash of the block before it, shown by arrows pointing backwards.</desc>
               <rect x="10" y="24" width="160" height="150" rx="6" fill="var(--bg)" stroke="var(--line)" stroke-width="1.5" />
@@ -29,7 +29,7 @@ window.LESSON_ASSETS = {
               <path d="M410 96 H380" fill="none" stroke="var(--ink)" stroke-width="2" />
               <polygon points="370,96 380,90 380,102" fill="var(--ink)" />
             </svg>`,
-        header: `<svg viewBox="0 0 580 175" role="img" aria-labelledby="header-title header-desc">
+  header: `<svg viewBox="0 0 580 175" role="img" aria-labelledby="header-title header-desc">
               <title id="header-title">The six fields of the genesis block header</title>
               <desc id="header-desc">The genesis block header has six fields: version, previous block hash, Merkle root, time, bits and nonce. Real values are shown.</desc>
               <rect x="6" y="18" width="88" height="124" rx="4" fill="var(--bg)" stroke="var(--line)" />
@@ -58,7 +58,7 @@ window.LESSON_ASSETS = {
               <text x="530" y="126" text-anchor="middle" style="font-size:13px">4 bytes</text>
               <a href="https://mempool.space/block/000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f" target="_blank" rel="noopener noreferrer"><text x="290" y="164" text-anchor="middle" class="accent">Read these fields on the genesis block page</text></a>
             </svg>`,
-        merkle: `<svg viewBox="0 0 580 230" role="img" aria-labelledby="merkle-title merkle-desc">
+  merkle: `<svg viewBox="0 0 580 230" role="img" aria-labelledby="merkle-title merkle-desc">
               <title id="merkle-title">Block 170 Merkle root from two transaction IDs</title>
               <desc id="merkle-desc">Two txids, b1fea524 and f4184fc5, are hashed as a pair. The result is the Merkle root stored in the block header: 7dac2c56.</desc>
               <rect x="20" y="14" width="240" height="56" rx="6" fill="var(--bg)" stroke="var(--line)" />

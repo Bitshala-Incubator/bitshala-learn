@@ -1,6 +1,6 @@
 /* Figures for this lesson. Read by lesson-engine.js through window.LESSON_ASSETS. */
 window.LESSON_ASSETS = {
-        hashflow: `<svg viewBox="0 0 580 130" role="img" aria-labelledby="hf-title hf-desc">
+  hashflow: `<svg viewBox="0 0 580 130" role="img" aria-labelledby="hf-title hf-desc">
               <title id="hf-title">From header to block hash</title>
               <desc id="hf-desc">The 80-byte header goes into SHA-256, then SHA-256 again. The output is the block hash, shown as 000000000019d668 for the genesis block.</desc>
               <rect x="10" y="30" width="120" height="60" rx="6" fill="var(--bg)" stroke="var(--line)" />
@@ -20,7 +20,7 @@ window.LESSON_ASSETS = {
               <text x="513" y="56" text-anchor="middle" style="font-size:13px">Block hash</text>
               <text x="513" y="76" text-anchor="middle" style="font:12px ui-monospace,Consolas,monospace">000000000019d668…</text>
             </svg>`,
-        merkle4: `<svg viewBox="0 0 580 240" role="img" aria-labelledby="m4-title m4-desc">
+  merkle4: `<svg viewBox="0 0 580 240" role="img" aria-labelledby="m4-title m4-desc">
               <title id="m4-title">A Merkle tree over four transactions</title>
               <desc id="m4-desc">Transactions A, B, C and D are hashed in pairs into two hashes, which are hashed together into one Merkle root.</desc>
               <rect x="20" y="14" width="110" height="44" rx="6" fill="var(--bg)" stroke="var(--line)" />

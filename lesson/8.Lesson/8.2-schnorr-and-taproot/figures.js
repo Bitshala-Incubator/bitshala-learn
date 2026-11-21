@@ -1,6 +1,6 @@
 /* Figures for this lesson. Read by lesson-engine.js through window.LESSON_ASSETS. */
 window.LESSON_ASSETS = {
-        balance: `<svg
+  balance: `<svg
               viewBox="0 0 580 170"
               role="img"
               aria-labelledby="balance-title balance-desc"
@@ -20,7 +20,7 @@ window.LESSON_ASSETS = {
               <text x="440" y="110" text-anchor="middle">from public data: R, P, message</text>
               <text x="290" y="150" text-anchor="middle">Equal sides mean a valid signature.</text>
             </svg>`,
-        ring: `<svg
+  ring: `<svg
               viewBox="0 0 580 330"
               role="img"
               aria-labelledby="ring-title ring-desc"
@@ -56,7 +56,7 @@ window.LESSON_ASSETS = {
               <text x="207.8" y="37.1" text-anchor="middle">4<tspan dy="-5" font-size="10">10</tspan><tspan dy="5"> = 6</tspan></text>
               <text x="290" y="165" text-anchor="middle" class="accent">11 steps, then back to 1</text>
             </svg>`,
-        flow: `<svg
+  flow: `<svg
               viewBox="0 0 580 260"
               role="img"
               aria-labelledby="flow-title flow-desc"
@@ -82,7 +82,7 @@ window.LESSON_ASSETS = {
               <text x="290" y="216" text-anchor="middle">On chain: one key (6)</text>
               <text x="290" y="234" text-anchor="middle">one signature (R = 8, s = 5)</text>
             </svg>`,
-        lengths: `<svg
+  lengths: `<svg
               viewBox="0 0 580 170"
               role="img"
               aria-labelledby="len-title len-desc"
@@ -100,7 +100,7 @@ window.LESSON_ASSETS = {
               <text x="136" y="130" text-anchor="middle">R.x (32)</text>
               <text x="328" y="130" text-anchor="middle">s (32)</text>
             </svg>`,
-        tree: `<svg
+  tree: `<svg
               viewBox="0 0 600 230"
               role="img"
               aria-labelledby="tree-title tree-desc"

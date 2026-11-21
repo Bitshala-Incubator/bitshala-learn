@@ -9,13 +9,13 @@ figure {
 
 .exercise-table code {
   font-size: 12px;
-          word-break: break-all;
+  word-break: break-all;
 }
 
 .codebox {
   min-height: 190px;
-          width: 100%;
-          box-sizing: border-box;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 :root {
@@ -34,111 +34,111 @@ figure {
 
 @keyframes fade {
   from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes pop {
   from {
-            opacity: 0;
-            transform: scale(0);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes dash {
   to {
-            stroke-dashoffset: -9;
-          }
+    stroke-dashoffset: -9;
+  }
 }
 
 .flow path[marker-end] {
   stroke-dasharray: 5 4;
-          animation: dash 1s linear infinite;
+  animation: dash 1s linear infinite;
 }
 
 /* storybook */
-      .book {
+.book {
   padding: 0;
-          overflow: hidden;
+  overflow: hidden;
 }
 
 .book-scene {
   background-color: var(--bg);
-          background-image: radial-gradient(var(--line) 1px, transparent 1.2px);
-          background-size: 16px 16px;
-          border-bottom: 1px solid var(--line);
-          padding: 14px 12px 8px;
+  background-image: radial-gradient(var(--line) 1px, transparent 1.2px);
+  background-size: 16px 16px;
+  border-bottom: 1px solid var(--line);
+  padding: 14px 12px 8px;
 }
 
 .book-scene svg {
   max-height: 250px;
-          width: 100%;
-          stroke-linecap: round;
-          stroke-linejoin: round;
+  width: 100%;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .book-text {
   padding: 18px 22px 6px;
-          min-height: 300px;
+  min-height: 300px;
 }
 
 .book-year {
   font:
-            600 12px system-ui,
-            sans-serif;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          color: var(--acc);
+    600 12px system-ui,
+    sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--acc);
 }
 
 .book-text h3 {
   font-size: 26px;
-          line-height: 1.25;
-          margin: 0.2em 0 0.5em;
-          font-weight: 600;
+  line-height: 1.25;
+  margin: 0.2em 0 0.5em;
+  font-weight: 600;
 }
 
 .book-text p {
   font-size: 18px;
-          line-height: 1.65;
-          margin: 0 0 0.8em;
+  line-height: 1.65;
+  margin: 0 0 0.8em;
 }
 
 .book-text .moral {
   font-style: italic;
-          color: var(--mut);
-          border-left: 2px solid var(--acc);
-          padding-left: 14px;
+  color: var(--mut);
+  border-left: 2px solid var(--acc);
+  padding-left: 14px;
 }
 
 .book-nav {
   display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 10px;
-          padding: 10px 22px 18px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 22px 18px;
 }
 
 .dots {
   display: flex;
-          gap: 8px;
+  gap: 8px;
 }
 
 .dots button {
   width: 12px;
-          height: 12px;
-          padding: 0;
-          margin: 0;
-          border: 0;
-          border-radius: 50%;
-          background: var(--line);
+  height: 12px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--line);
 }
 
 .dots button[aria-current="true"] {
@@ -151,18 +151,18 @@ figure {
 
 @keyframes pageIn {
   from {
-            opacity: 0;
-            transform: translateX(18px);
-          }
-          to {
-            opacity: 1;
-            transform: none;
-          }
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 button:disabled {
   opacity: 0.4;
-          cursor: default;
+  cursor: default;
 }
 
 .book-scene svg text {
@@ -171,10 +171,10 @@ button:disabled {
 
 .book-scene svg text.cap {
   font:
-            italic 15px Charter,
-            Georgia,
-            serif;
-          fill: var(--mut);
+    italic 15px Charter,
+    Georgia,
+    serif;
+  fill: var(--mut);
 }
 
 .book-scene svg text.cap.a {
@@ -183,25 +183,25 @@ button:disabled {
 
 .book-scene svg text.hand {
   font:
-            italic 15px Charter,
-            Georgia,
-            serif;
-          fill: var(--ink);
+    italic 15px Charter,
+    Georgia,
+    serif;
+  fill: var(--ink);
 }
 
 .book-scene svg text.yr {
   font:
-            12px system-ui,
-            sans-serif;
-          letter-spacing: 0.1em;
-          fill: var(--mut);
+    12px system-ui,
+    sans-serif;
+  letter-spacing: 0.1em;
+  fill: var(--mut);
 }
 
 .book-scene svg text.nm {
   font:
-            500 15px system-ui,
-            sans-serif;
-          fill: var(--ink);
+    500 15px system-ui,
+    sans-serif;
+  fill: var(--ink);
 }
 
 .book-scene svg text.nm.a {
@@ -210,19 +210,19 @@ button:disabled {
 
 .book-scene svg text.seal {
   font:
-            600 22px Charter,
-            Georgia,
-            serif;
-          fill: var(--bg);
+    600 22px Charter,
+    Georgia,
+    serif;
+  fill: var(--bg);
 }
 
 .book-scene svg text.mono {
   font:
-            600 13px ui-monospace,
-            Menlo,
-            Consolas,
-            monospace;
-          fill: var(--bg);
+    600 13px ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+  fill: var(--bg);
 }
 
 .sc-fade {
@@ -231,8 +231,8 @@ button:disabled {
 
 .sc-pop {
   transform-box: fill-box;
-          transform-origin: center;
-          animation: pop 0.5s both cubic-bezier(0.3, 1.6, 0.5, 1);
+  transform-origin: center;
+  animation: pop 0.5s both cubic-bezier(0.3, 1.6, 0.5, 1);
 }
 
 .sc-stamp {
@@ -241,20 +241,20 @@ button:disabled {
 
 @keyframes stampDown {
   0% {
-            transform: translateY(-80px);
-            opacity: 0;
-          }
-          30% {
-            opacity: 1;
-          }
-          50%,
-          65% {
-            transform: translateY(0);
-          }
-          100% {
-            transform: translateY(-80px);
-            opacity: 0;
-          }
+    transform: translateY(-80px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  50%,
+  65% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-80px);
+    opacity: 0;
+  }
 }
 
 .sc-clone {
@@ -263,11 +263,11 @@ button:disabled {
 
 @keyframes cloneMove {
   from {
-            transform: translate(0, 0);
-          }
-          to {
-            transform: translate(282px, 6px);
-          }
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(282px, 6px);
+  }
 }
 
 .sc-left {
@@ -280,32 +280,32 @@ button:disabled {
 
 @keyframes splitL {
   from {
-            transform: translateX(100px);
-          }
-          to {
-            transform: none;
-          }
+    transform: translateX(100px);
+  }
+  to {
+    transform: none;
+  }
 }
 
 @keyframes splitR {
   from {
-            transform: translateX(-100px);
-          }
-          to {
-            transform: none;
-          }
+    transform: translateX(-100px);
+  }
+  to {
+    transform: none;
+  }
 }
 
 .sc-draw {
   stroke-dasharray: 440;
-          stroke-dashoffset: 440;
-          animation: draw 2.6s ease-out forwards;
+  stroke-dashoffset: 440;
+  animation: draw 2.6s ease-out forwards;
 }
 
 @keyframes draw {
   to {
-            stroke-dashoffset: 0;
-          }
+    stroke-dashoffset: 0;
+  }
 }
 
 .sc-fly {
@@ -314,98 +314,98 @@ button:disabled {
 
 @keyframes fly {
   from {
-            transform: translateX(0);
-          }
-          to {
-            transform: translateX(140px);
-          }
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(140px);
+  }
 }
 
 /* labs */
-      .lab .ctl {
+.lab .ctl {
   display: flex;
-          flex-wrap: wrap;
-          gap: 10px 14px;
-          align-items: end;
-          margin: 10px 0;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: end;
+  margin: 10px 0;
 }
 
 .lab label.f {
   font:
-            13px system-ui,
-            sans-serif;
-          color: var(--mut);
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
+    13px system-ui,
+    sans-serif;
+  color: var(--mut);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .lab input[type="text"],
-      .lab select {
+.lab select {
   font:
-            15px system-ui,
-            sans-serif;
-          background: var(--bg);
-          color: var(--ink);
-          border: 1px solid var(--line);
-          border-radius: 4px;
-          padding: 7px 10px;
+    15px system-ui,
+    sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 7px 10px;
 }
 
 .lab .small {
   font:
-            13px system-ui,
-            sans-serif;
-          color: var(--mut);
+    13px system-ui,
+    sans-serif;
+  color: var(--mut);
 }
 
 .lab button.ghost[aria-pressed="true"] {
   background: var(--acc);
-          border-color: var(--acc);
-          color: var(--bg);
+  border-color: var(--acc);
+  color: var(--bg);
 }
 
 .stations {
   display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 8px;
-          margin: 14px 0;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 14px 0;
 }
 
 .st {
   border: 1px solid var(--line);
-          background: var(--bg);
-          border-radius: 6px;
-          padding: 10px;
-          min-height: 88px;
-          font:
-            13px/1.35 system-ui,
-            sans-serif;
-          transition:
-            border-color 0.3s,
-            transform 0.3s,
-            background 0.3s;
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 10px;
+  min-height: 88px;
+  font:
+    13px/1.35 system-ui,
+    sans-serif;
+  transition:
+    border-color 0.3s,
+    transform 0.3s,
+    background 0.3s;
 }
 
 .st b {
   display: block;
-          font-size: 11px;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          color: var(--mut);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mut);
 }
 
 .st code {
   display: block;
-          margin-top: 6px;
-          font-size: 13px;
-          word-break: break-word;
+  margin-top: 6px;
+  font-size: 13px;
+  word-break: break-word;
 }
 
 .st.on {
   border-color: var(--acc);
-          background: var(--soft);
-          transform: translateY(-3px);
+  background: var(--soft);
+  transform: translateY(-3px);
 }
 
 .st.done {
@@ -418,54 +418,54 @@ button:disabled {
 
 @keyframes flip {
   from {
-            opacity: 0;
-            transform: rotateX(90deg);
-          }
-          to {
-            opacity: 1;
-            transform: none;
-          }
+    opacity: 0;
+    transform: rotateX(90deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .steplog {
   margin: 8px 0 0;
-          padding: 0;
-          list-style: none;
+  padding: 0;
+  list-style: none;
 }
 
 .steplog p,
-      .steplog li {
+.steplog li {
   font:
-            15px/1.55 system-ui,
-            sans-serif;
-          margin: 0.4em 0;
-          animation: fade 0.5s both;
+    15px/1.55 system-ui,
+    sans-serif;
+  margin: 0.4em 0;
+  animation: fade 0.5s both;
 }
 
 .vpaper {
   background: var(--bg);
-          border: 1px solid var(--line);
-          border-radius: 6px;
-          padding: 14px 16px;
-          font:
-            15px system-ui,
-            sans-serif;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 14px 16px;
+  font:
+    15px system-ui,
+    sans-serif;
 }
 
 .vp-msg {
   font:
-            600 19px Charter,
-            Georgia,
-            serif;
-          margin-bottom: 8px;
+    600 19px Charter,
+    Georgia,
+    serif;
+  margin-bottom: 8px;
 }
 
 .vp-row {
   display: flex;
-          justify-content: space-between;
-          gap: 12px;
-          padding: 5px 0;
-          border-top: 1px dashed var(--line);
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 0;
+  border-top: 1px dashed var(--line);
 }
 
 .vp-row span {
@@ -474,10 +474,10 @@ button:disabled {
 
 .vp-row b {
   font:
-            600 14px ui-monospace,
-            Menlo,
-            Consolas,
-            monospace;
+    600 14px ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
 }
 
 .bad {
@@ -486,20 +486,20 @@ button:disabled {
 
 .verdict {
   min-height: 70px;
-          margin-top: 12px;
+  margin-top: 12px;
 }
 
 .stamp {
   display: inline-block;
-          font:
-            700 22px system-ui,
-            sans-serif;
-          letter-spacing: 0.12em;
-          border: 3px solid;
-          border-radius: 6px;
-          padding: 6px 16px;
-          transform: rotate(-4deg);
-          animation: stampIn 0.45s both;
+  font:
+    700 22px system-ui,
+    sans-serif;
+  letter-spacing: 0.12em;
+  border: 3px solid;
+  border-radius: 6px;
+  padding: 6px 16px;
+  transform: rotate(-4deg);
+  animation: stampIn 0.45s both;
 }
 
 .stamp.ok {
@@ -512,72 +512,72 @@ button:disabled {
 
 @keyframes stampIn {
   0% {
-            opacity: 0;
-            transform: scale(2.2) rotate(-12deg);
-          }
-          70% {
-            opacity: 1;
-            transform: scale(0.95) rotate(-4deg);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1) rotate(-4deg);
-          }
+    opacity: 0;
+    transform: scale(2.2) rotate(-12deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.95) rotate(-4deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-4deg);
+  }
 }
 
 .login-grid {
   display: grid;
-          grid-template-columns: 1fr minmax(90px, 1.2fr) 1fr;
-          gap: 8px;
-          align-items: center;
-          margin: 12px 0;
+  grid-template-columns: 1fr minmax(90px, 1.2fr) 1fr;
+  gap: 8px;
+  align-items: center;
+  margin: 12px 0;
 }
 
 .peer {
   border: 1px solid var(--line);
-          border-radius: 6px;
-          background: var(--bg);
-          padding: 10px;
-          text-align: center;
-          font:
-            14px/1.4 system-ui,
-            sans-serif;
+  border-radius: 6px;
+  background: var(--bg);
+  padding: 10px;
+  text-align: center;
+  font:
+    14px/1.4 system-ui,
+    sans-serif;
 }
 
 .peer small {
   display: block;
-          color: var(--mut);
+  color: var(--mut);
 }
 
 .lane {
   position: relative;
-          height: 34px;
+  height: 34px;
 }
 
 .lane::before {
   content: "";
-          position: absolute;
-          left: 0;
-          right: 0;
-          top: 50%;
-          border-top: 1px dashed var(--line);
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  border-top: 1px dashed var(--line);
 }
 
 .fly {
   position: absolute;
-          top: 4px;
-          left: 0;
-          opacity: 0;
-          white-space: nowrap;
-          background: var(--acc);
-          color: var(--bg);
-          border-radius: 99px;
-          padding: 4px 10px;
-          font:
-            600 12px ui-monospace,
-            Menlo,
-            Consolas,
-            monospace;
+  top: 4px;
+  left: 0;
+  opacity: 0;
+  white-space: nowrap;
+  background: var(--acc);
+  color: var(--bg);
+  border-radius: 99px;
+  padding: 4px 10px;
+  font:
+    600 12px ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
 }
 
 .fly.go-r {
@@ -590,45 +590,45 @@ button:disabled {
 
 @keyframes flyR {
   from {
-            opacity: 1;
-            left: 0;
-            transform: none;
-          }
-          to {
-            opacity: 1;
-            left: 100%;
-            transform: translateX(-100%);
-          }
+    opacity: 1;
+    left: 0;
+    transform: none;
+  }
+  to {
+    opacity: 1;
+    left: 100%;
+    transform: translateX(-100%);
+  }
 }
 
 @keyframes flyL {
   from {
-            opacity: 1;
-            left: 100%;
-            transform: translateX(-100%);
-          }
-          to {
-            opacity: 1;
-            left: 0;
-            transform: none;
-          }
+    opacity: 1;
+    left: 100%;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    left: 0;
+    transform: none;
+  }
 }
 
 .feed {
   list-style: none;
-          margin: 10px 0 0;
-          padding: 0;
+  margin: 10px 0 0;
+  padding: 0;
 }
 
 .feed li {
   font:
-            14px/1.5 system-ui,
-            sans-serif;
-          padding: 7px 10px;
-          margin: 6px 0;
-          border-left: 3px solid var(--line);
-          background: var(--bg);
-          animation: fade 0.4s both;
+    14px/1.5 system-ui,
+    sans-serif;
+  padding: 7px 10px;
+  margin: 6px 0;
+  border-left: 3px solid var(--line);
+  background: var(--bg);
+  animation: fade 0.4s both;
 }
 
 .feed li.ok {
@@ -641,140 +641,140 @@ button:disabled {
 
 mark.hl {
   background: var(--acc);
-          color: var(--bg);
-          border-radius: 3px;
-          padding: 0 5px;
+  color: var(--bg);
+  border-radius: 3px;
+  padding: 0 5px;
 }
 
 .nt-table td,
-      .nt-table th {
+.nt-table th {
   font-size: 15px;
 }
 
 .nt-reveal {
   text-align: center;
-          margin-top: 14px;
+  margin-top: 14px;
 }
 
 .nt-key {
   display: inline-block;
-          font:
-            700 20px ui-monospace,
-            Menlo,
-            Consolas,
-            monospace;
-          border: 3px solid var(--acc);
-          color: var(--acc);
-          padding: 8px 18px;
-          border-radius: 6px;
-          animation: shake 0.6s both;
+  font:
+    700 20px ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+  border: 3px solid var(--acc);
+  color: var(--acc);
+  padding: 8px 18px;
+  border-radius: 6px;
+  animation: shake 0.6s both;
 }
 
 @keyframes shake {
   0%,
-          100% {
-            transform: translateX(0);
-          }
-          20% {
-            transform: translateX(-8px);
-          }
-          40% {
-            transform: translateX(8px);
-          }
-          60% {
-            transform: translateX(-5px);
-          }
-          80% {
-            transform: translateX(5px);
-          }
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(8px);
+  }
+  60% {
+    transform: translateX(-5px);
+  }
+  80% {
+    transform: translateX(5px);
+  }
 }
 
 .chips {
   display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          margin: 10px 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
 }
 
 .use h3 {
   font-size: 22px;
-          margin: 0.3em 0 0.5em;
-          font-weight: 600;
+  margin: 0.3em 0 0.5em;
+  font-weight: 600;
 }
 
 .use p {
   font-size: 17px;
-          margin: 0.6em 0;
+  margin: 0.6em 0;
 }
 
 .use-flow {
   display: flex;
-          align-items: stretch;
-          gap: 0;
-          margin: 12px 0;
+  align-items: stretch;
+  gap: 0;
+  margin: 12px 0;
 }
 
 .use-flow .node {
   flex: 1;
-          border: 1px solid var(--line);
-          border-radius: 6px;
-          background: var(--bg);
-          padding: 10px 12px;
-          font:
-            14px/1.4 system-ui,
-            sans-serif;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  padding: 10px 12px;
+  font:
+    14px/1.4 system-ui,
+    sans-serif;
 }
 
 .use-flow .node small {
   display: block;
-          font-size: 11px;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: var(--acc);
-          margin-bottom: 4px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--acc);
+  margin-bottom: 4px;
 }
 
 .use-flow .wire {
   position: relative;
-          flex: 0 0 38px;
+  flex: 0 0 38px;
 }
 
 .use-flow .wire::before {
   content: "";
-          position: absolute;
-          left: 0;
-          right: 0;
-          top: 50%;
-          border-top: 1px dashed var(--mut);
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  border-top: 1px dashed var(--mut);
 }
 
 .use-flow .wire i {
   position: absolute;
-          top: calc(50% - 4px);
-          left: 0;
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: var(--acc);
-          animation: travel 1.6s linear infinite;
+  top: calc(50% - 4px);
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--acc);
+  animation: travel 1.6s linear infinite;
 }
 
 @keyframes travel {
   from {
-            left: 0;
-          }
-          to {
-            left: calc(100% - 8px);
-          }
+    left: 0;
+  }
+  to {
+    left: calc(100% - 8px);
+  }
 }
 
 @keyframes travelV {
   from {
-            top: 0;
-          }
-          to {
-            top: calc(100% - 8px);
-          }
+    top: 0;
+  }
+  to {
+    top: calc(100% - 8px);
+  }
 }
 
 @media (max-width: 560px) {
@@ -789,16 +789,16 @@ mark.hl {
   }
   .use-flow .wire::before {
     left: 50%;
-              right: auto;
-              top: 0;
-              bottom: 0;
-              border-top: 0;
-              border-left: 1px dashed var(--mut);
+    right: auto;
+    top: 0;
+    bottom: 0;
+    border-top: 0;
+    border-left: 1px dashed var(--mut);
   }
   .use-flow .wire i {
     left: calc(50% - 4px);
-              top: 0;
-              animation-name: travelV;
+    top: 0;
+    animation-name: travelV;
   }
   .book-text {
     min-height: 340px;
@@ -807,53 +807,58 @@ mark.hl {
 
 @media (prefers-reduced-motion: reduce) {
   *,
-        *::before,
-        *::after {
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
-              animation-delay: 0s !important;
-              animation-iteration-count: 1 !important;
-              transition-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
 /* Checks widget (from lesson 8.2) */
-      .hexgrid {
+.hexgrid {
   display: grid;
-          grid-template-columns: auto repeat(8, minmax(0, 1fr));
-          gap: 4px;
-          margin: 10px 0 18px;
-          font: 13px ui-monospace, Consolas, monospace;
-          text-align: center;
+  grid-template-columns: auto repeat(8, minmax(0, 1fr));
+  gap: 4px;
+  margin: 10px 0 18px;
+  font:
+    13px ui-monospace,
+    Consolas,
+    monospace;
+  text-align: center;
 }
 
 .hexgrid .row-label {
   padding-right: 6px;
-          color: var(--mut);
-          font: 12px system-ui, sans-serif;
-          text-align: right;
-          white-space: nowrap;
+  color: var(--mut);
+  font:
+    12px system-ui,
+    sans-serif;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .hexgrid .byte {
   padding: 4px 0;
-          border: 1px solid var(--line);
-          border-radius: 3px;
-          background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--bg);
 }
 
 .hexgrid.revealed .byte.r,
-      .tag-r {
+.tag-r {
   background: color-mix(in srgb, var(--acc) 22%, var(--bg));
 }
 
 .hexgrid.revealed .byte.s,
-      .tag-s {
+.tag-s {
   background: color-mix(in srgb, #3d7a4a 24%, var(--bg));
 }
 
 .mission-steps {
   padding-left: 0;
-          list-style: none;
+  list-style: none;
 }
 
 .match-item {
@@ -862,20 +867,22 @@ mark.hl {
 
 .match-item label {
   display: block;
-          margin-bottom: 6px;
-          font-weight: 600;
+  margin-bottom: 6px;
+  font-weight: 600;
 }
 
 .match-item input,
-      .match-item select {
+.match-item select {
   width: 100%;
-          max-width: 420px;
-          padding: 10px;
-          border: 1px solid var(--line);
-          border-radius: 4px;
-          background: var(--bg);
-          color: var(--ink);
-          font: 16px system-ui, sans-serif;
+  max-width: 420px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--ink);
+  font:
+    16px system-ui,
+    sans-serif;
 }
 
 .match-item input {
@@ -883,27 +890,29 @@ mark.hl {
 }
 
 .match-item input[aria-invalid="true"],
-      .match-item select[aria-invalid="true"] {
+.match-item select[aria-invalid="true"] {
   border-color: var(--acc);
 }
 
 figure {
   margin: 1.5em 0;
-          padding: 18px;
-          border: 1px solid var(--line);
-          border-radius: 8px;
-          background: var(--soft);
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--soft);
 }
 
 figure svg {
   width: 100%;
-          max-width: 580px;
-          height: auto;
+  max-width: 580px;
+  height: auto;
 }
 
 figure svg text {
   fill: var(--ink);
-          font: 16px system-ui, sans-serif;
+  font:
+    16px system-ui,
+    sans-serif;
 }
 
 figure svg .accent {
@@ -916,33 +925,35 @@ figcaption {
 
 .equation {
   display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-          gap: 12px;
-          margin: 18px 0;
-          font: 600 clamp(18px, 4.5vw, 26px) system-ui, sans-serif;
-          text-align: center;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 18px 0;
+  font:
+    600 clamp(18px, 4.5vw, 26px) system-ui,
+    sans-serif;
+  text-align: center;
 }
 
 .equation span {
   padding: 8px 12px;
-          border: 1px solid var(--line);
-          border-radius: 6px;
-          background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
 }
 
 .ctl {
   display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-          margin: 14px 0;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0;
 }
 
 .activity-status {
   min-height: 1.6em;
-          margin: 10px 0 0;
-          color: var(--mut);
+  margin: 10px 0 0;
+  color: var(--mut);
 }
 
 .activity-status[data-result="good"] {
@@ -955,26 +966,26 @@ figcaption {
 
 button[aria-pressed="true"] {
   outline: 2px solid var(--acc);
-          outline-offset: 2px;
+  outline-offset: 2px;
 }
 
 .path-grid {
   display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 12px;
-          margin: 16px 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
 }
 
 .path-card {
   padding: 14px;
-          border: 1px solid var(--line);
-          border-radius: 6px;
-          background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
 }
 
 .path-card b {
   display: block;
-          margin-bottom: 6px;
+  margin-bottom: 6px;
 }
 
 .path-card p:last-child {
@@ -983,7 +994,7 @@ button[aria-pressed="true"] {
 
 .path-card.is-active {
   border-color: var(--acc);
-          box-shadow: inset 0 0 0 1px var(--acc);
+  box-shadow: inset 0 0 0 1px var(--acc);
 }
 
 .helper {
@@ -992,29 +1003,32 @@ button[aria-pressed="true"] {
 
 .helper summary {
   cursor: pointer;
-          color: var(--acc);
+  color: var(--acc);
 }
 
 .hexgrid {
   display: grid;
-          grid-template-columns: auto repeat(8, minmax(0, 1fr));
-          gap: 4px;
-          margin: 10px 0 18px;
-          font: 13px ui-monospace, Consolas, monospace;
-          text-align: center;
+  grid-template-columns: auto repeat(8, minmax(0, 1fr));
+  gap: 4px;
+  margin: 10px 0 18px;
+  font:
+    13px ui-monospace,
+    Consolas,
+    monospace;
+  text-align: center;
 }
 
 .tag-r,
-      .tag-s {
+.tag-s {
   padding: 0 6px;
-          border-radius: 3px;
-          font-weight: 600;
+  border-radius: 3px;
+  font-weight: 600;
 }
 
 .note {
   border-left: 3px solid var(--acc);
-          padding: 10px 16px;
-          background: var(--soft);
+  padding: 10px 16px;
+  background: var(--soft);
 }
 
 @media (max-width: 520px) {
@@ -1028,63 +1042,67 @@ button[aria-pressed="true"] {
 
 .explorer [aria-pressed="true"] {
   outline: 2px solid var(--acc);
-          outline-offset: 2px;
+  outline-offset: 2px;
 }
 
 .dash {
   display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-          gap: 10px;
-          margin: 14px 0;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
 }
 
 .stat {
   padding: 12px;
-          border: 1px solid var(--line);
-          border-radius: 6px;
-          background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
 }
 
 .stat b {
   display: block;
-          font: 600 20px system-ui, sans-serif;
+  font:
+    600 20px system-ui,
+    sans-serif;
 }
 
 .stat span {
   color: var(--mut);
-          font-size: 13px;
+  font-size: 13px;
 }
 
 .split {
   display: flex;
-          height: 22px;
-          overflow: hidden;
-          border: 1px solid var(--line);
-          border-radius: 4px;
+  height: 22px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 4px;
 }
 
 .split .sub {
   background: var(--soft);
-          padding-left: 6px;
-          font-size: 12px;
-          white-space: nowrap;
-          overflow: hidden;
+  padding-left: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .split .fee {
   background: var(--acc);
-          min-width: 2px;
+  min-width: 2px;
 }
 
 .explorer svg {
   width: 100%;
-          max-width: 580px;
-          height: auto;
+  max-width: 580px;
+  height: auto;
 }
 
 .explorer svg text {
   fill: var(--ink);
-          font: 14px system-ui, sans-serif;
+  font:
+    14px system-ui,
+    sans-serif;
 }
 
 .dag-out p {
@@ -1093,24 +1111,26 @@ button[aria-pressed="true"] {
 
 .ico {
   display: inline-flex;
-          width: 20px;
-          height: 20px;
-          margin-right: 6px;
-          vertical-align: -5px;
-          color: var(--acc);
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  vertical-align: -5px;
+  color: var(--acc);
 }
 
 .ico svg {
   width: 20px;
-          height: 20px;
+  height: 20px;
 }
 
 .goal {
   display: flex;
-          flex-wrap: wrap;
-          gap: 6px 16px;
-          margin: 10px 0;
-          font: 600 15px system-ui, sans-serif;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 10px 0;
+  font:
+    600 15px system-ui,
+    sans-serif;
 }
 
 .goal .ico {
@@ -1119,19 +1139,19 @@ button[aria-pressed="true"] {
 
 .field {
   display: flex;
-          align-items: center;
-          gap: 8px;
+  align-items: center;
+  gap: 8px;
 }
 
 .field input,
-      .field select {
+.field select {
   flex: 1;
 }
 
 .mark {
   display: inline-flex;
-          width: 22px;
-          height: 22px;
+  width: 22px;
+  height: 22px;
 }
 
 .mark.ok {
@@ -1144,19 +1164,19 @@ button[aria-pressed="true"] {
 
 .mark svg {
   width: 22px;
-          height: 22px;
+  height: 22px;
 }
 
 .hints {
   margin: 8px 0;
-          padding-left: 20px;
-          font-size: 14px;
-          color: var(--mut);
+  padding-left: 20px;
+  font-size: 14px;
+  color: var(--mut);
 }
 
 .choices {
   display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
   gap: 10px;
   margin: 12px 0;
 }
@@ -1169,7 +1189,9 @@ button[aria-pressed="true"] {
   min-height: 56px;
   padding: 12px 14px;
   text-align: left;
-  font: 15px/1.35 system-ui, sans-serif;
+  font:
+    15px/1.35 system-ui,
+    sans-serif;
   color: var(--ink);
   background: var(--bg);
   border: 1px solid var(--line);
@@ -1183,16 +1205,16 @@ button[aria-pressed="true"] {
 
 .choice[aria-pressed="true"] {
   outline: 2px solid var(--acc);
-          outline-offset: 2px;
+  outline-offset: 2px;
 }
 
 .txlist {
   display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-          gap: 12px;
-          list-style: none;
-          padding: 0;
-          margin: 14px 0;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 14px 0;
 }
 
 .txlist li {
@@ -1201,13 +1223,13 @@ button[aria-pressed="true"] {
 
 .txlist button {
   display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 4px;
-          width: 100%;
-          height: 100%;
-          padding: 12px;
-          text-align: left;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  text-align: left;
 }
 
 .txlist button b {
@@ -1216,7 +1238,7 @@ button[aria-pressed="true"] {
 
 .txlist .rate {
   color: var(--mut);
-          font-size: 13px;
+  font-size: 13px;
 }
 
 .activity-status .ico {
@@ -1225,9 +1247,9 @@ button[aria-pressed="true"] {
 
 .mission-steps {
   display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
-          gap: 8px 16px;
-          margin: 12px 0;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+  gap: 8px 16px;
+  margin: 12px 0;
 }
 
 .mission-steps .match-item {
@@ -1236,14 +1258,14 @@ button[aria-pressed="true"] {
 
 .lab .mission-steps {
   gap: 14px;
-          margin: 16px 0 8px;
+  margin: 16px 0 8px;
 }
 
 .lab .mission-steps .match-item {
   padding: 14px 16px;
-          border: 1px solid var(--line);
-          border-radius: 10px;
-          background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
 }
 
 .lab .mission-steps .match-item {
@@ -1256,8 +1278,8 @@ button[aria-pressed="true"] {
 
 .lab .field {
   flex-direction: column;
-          align-items: center;
-          gap: 6px;
+  align-items: center;
+  gap: 6px;
 }
 
 .lab .field .mark {
@@ -1265,25 +1287,25 @@ button[aria-pressed="true"] {
 }
 
 .lab .field input,
-      .lab .field select {
+.lab .field select {
   width: 100%;
-          max-width: 180px;
-          margin: 0 auto;
+  max-width: 180px;
+  margin: 0 auto;
 }
 
 .lab .ctl {
   justify-content: center;
-          margin: 18px 0 6px;
+  margin: 18px 0 6px;
 }
 
 .lab .activity-status,
-      .lab .hints {
+.lab .hints {
   text-align: center;
 }
 
 .lab .hints {
   list-style: none;
-          padding-left: 0;
+  padding-left: 0;
 }
 
 .lab .note {
@@ -1292,10 +1314,10 @@ button[aria-pressed="true"] {
 
 .mission-steps .wide {
   grid-column: 1 / -1;
-          justify-self: center;
-          width: 100%;
-          max-width: 420px;
-          text-align: center;
+  justify-self: center;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
 }
 
 .mission-steps .wide label {
@@ -1308,7 +1330,7 @@ button[aria-pressed="true"] {
 
 .mission-steps .wide .field input {
   flex: 0 0 auto;
-          width: 160px;
+  width: 160px;
 }
 
 .mission-steps label {
@@ -1317,17 +1339,17 @@ button[aria-pressed="true"] {
 
 .blockbar {
   display: flex;
-          height: 28px;
-          overflow: hidden;
-          margin: 10px 0;
-          border: 1px solid var(--line);
-          border-radius: 6px;
-          background: var(--bg);
+  height: 28px;
+  overflow: hidden;
+  margin: 10px 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
 }
 
 .blockbar span {
   background: color-mix(in srgb, var(--ink) 28%, var(--bg));
-          border-right: 2px solid var(--bg);
+  border-right: 2px solid var(--bg);
 }
 
 .blockbar span.you {
@@ -1336,23 +1358,23 @@ button[aria-pressed="true"] {
 
 .tiles {
   display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .tile {
   display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          padding: 6px 10px;
-          border: 1px solid var(--line);
-          border-radius: 999px;
-          font-size: 14px;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 14px;
 }
 
 .tile.you {
   border-color: var(--acc);
-          background: var(--soft);
+  background: var(--soft);
 }
 
 .tile.out {
@@ -1361,10 +1383,10 @@ button[aria-pressed="true"] {
 
 .result {
   margin-top: 14px;
-          padding: 12px 14px;
-          border-left: 3px solid var(--acc);
-          background: var(--bg);
-          border-radius: 6px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--acc);
+  background: var(--bg);
+  border-radius: 6px;
 }
 
 .result[data-result="good"] {
@@ -1377,19 +1399,19 @@ button[aria-pressed="true"] {
 
 .howto {
   display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
-          gap: 10px;
-          margin: 14px 0 18px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+  gap: 10px;
+  margin: 14px 0 18px;
 }
 
 .howto .step {
   display: flex;
-          flex-direction: column;
-          gap: 4px;
-          padding: 12px;
-          border: 1px solid var(--line);
-          border-radius: 8px;
-          background: var(--bg);
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
 }
 
 .howto .step b {
@@ -1398,87 +1420,86 @@ button[aria-pressed="true"] {
 
 .howto .step span {
   font-size: 14px;
-          color: var(--mut);
+  color: var(--mut);
 }
 
 .blocks {
   display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-          gap: 10px;
-          margin: 12px 0;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 12px 0;
 }
 
 .blk-card {
   display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 4px;
-          padding: 12px;
-          text-align: left;
-          border: 1px solid var(--line);
-          border-radius: 8px;
-          background: var(--bg);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
 }
 
 .blk-card.you {
   border-color: var(--acc);
-          background: var(--soft);
+  background: var(--soft);
 }
 
 .blk-card[aria-pressed="true"] {
   outline: 2px solid var(--acc);
-          outline-offset: 2px;
+  outline-offset: 2px;
 }
 
 .bids {
   display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-          gap: 12px;
-          margin: 14px 0;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 14px 0;
 }
 
 .bid {
   display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 4px;
-          padding: 14px;
-          text-align: left;
-          border: 1px dashed var(--line);
-          border-radius: 10px;
-          background: var(--bg);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px;
+  text-align: left;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  background: var(--bg);
 }
 
 .bid .stamp {
   font-weight: 700;
-          color: var(--acc);
+  color: var(--acc);
 }
 
 .bid.placed {
   border-style: solid;
-          border-color: var(--acc);
-          background: var(--soft);
+  border-color: var(--acc);
+  background: var(--soft);
 }
 
 .bid .rate {
   color: var(--mut);
-          font-size: 14px;
+  font-size: 14px;
 }
 
 .queue {
   display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          align-items: center;
-          margin: 12px 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 12px 0;
 }
 
 .bid .stamp {
   font-weight: 700;
-          color: var(--acc);
-          margin-right: 6px;
+  color: var(--acc);
+  margin-right: 6px;
 }
-
 
 /* Widget text: long URLs and code wrap inside the card instead of overflowing it. */
 .try p,
