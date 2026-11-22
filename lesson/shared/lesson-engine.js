@@ -268,6 +268,480 @@
         };
       });
     },
+    // Inspect realistic block cases and identify the one rule violation.
+    BlockInspector(el, fin, p) {
+      el.classList.add("try", "explorer");
+      let roundIndex = 0;
+      const render = () => {
+        const round = p.rounds[roundIndex];
+        el.innerHTML =
+          `<span class="label">${p.label}</span>` +
+          `<div class="case-heading"><h3>${round.title}</h3><p>${round.context}</p></div>` +
+          `<div class="case-pow">Proof of work: valid</div>` +
+          `<p class="case-source">${round.source}</p>` +
+          `<div class="block-inspector-cards" role="group" aria-label="Transactions in the candidate block">` +
+          round.txs
+            .map(
+              (tx, i) =>
+                `<button type="button" class="block-inspector-tx" data-tx="${i}"><b>${tx.id}</b><span>${tx.text}</span></button>`,
+            )
+            .join("") +
+          `</div><p class="activity-status" data-status role="status" aria-live="polite">Click the transaction line that makes this block invalid.</p>` +
+          `<div class="case-result" data-explain hidden></div><button type="button" data-next hidden>Next case</button>`;
+        el.querySelectorAll("[data-tx]").forEach((button) => {
+          button.addEventListener("click", () => {
+            if (button.disabled) return;
+            const tx = round.txs[Number(button.dataset.tx)];
+            const status = $(`[data-status]`, el);
+            if (!tx.invalid) {
+              button.dataset.result = "valid";
+              status.dataset.result = "";
+              status.textContent =
+                "This line passes the check. Inspect the other transactions.";
+              return;
+            }
+            button.dataset.result = "invalid";
+            el.querySelectorAll("[data-tx]").forEach(
+              (item) => (item.disabled = true),
+            );
+            $(`[data-explain]`, el).hidden = false;
+            $(`[data-explain]`, el).textContent = tx.why;
+            status.dataset.result = "good";
+            status.textContent = `Correct. Case found: ${roundIndex + 1} of ${p.rounds.length}.`;
+            const next = $(`[data-next]`, el);
+            next.hidden = false;
+            next.textContent =
+              roundIndex === p.rounds.length - 1
+                ? "Finish case files"
+                : "Open next case";
+            next.onclick = () => {
+              roundIndex++;
+              if (roundIndex < p.rounds.length) render();
+              else {
+                el.innerHTML = `<span class="label">${p.label}</span><p class="activity-status" data-result="good">${p.done}</p>`;
+                fin();
+              }
+            };
+          });
+        });
+      };
+      render();
+    },
+    // Add blocks to competing valid branches and watch confirmations change.
+    ReorgSimulator(el, fin, p) {
+      el.classList.add("try", "explorer");
+      let workA = p.workA,
+        workB = p.workB;
+      let blocksA = p.blocksA,
+        blocksB = p.blocksB;
+      let best = "A",
+        sawReorg = false;
+      const render = (message = "") => {
+        const maxWork = Math.max(workA, workB, 1);
+        const active = workA === workB ? best : workA > workB ? "A" : "B";
+        const confirmations = active === "A" ? 1 + (blocksA - p.blocksA) : 0;
+        const bars = (name, work, count, hasPayment) =>
+          `<div class="reorg-branch ${active === name ? "active" : ""}"><div class="reorg-branch-head"><b>Branch ${name}</b><span>${work} work units</span></div><div class="reorg-blocks">${Array.from({ length: count }, (_, i) => `<span class="reorg-block ${hasPayment && i === p.blocksA - 1 ? "payment-block" : ""}">${hasPayment && i === p.blocksA - 1 ? "Aarav payment" : "Block"}</span>`).join("")}</div><div class="reorg-meter"><span style="width:${Math.max(2, (work / maxWork) * 100)}%"></span></div></div>`;
+        el.innerHTML =
+          `<span class="label">${p.label}</span><p>${p.intro}</p>` +
+          `<div class="reorg-status"><b>Best chain: ${active}</b><span>Aarav's payment: ${confirmations} confirmation${confirmations === 1 ? "" : "s"}</span></div>` +
+          `<div class="reorg-map">${bars("A", workA, blocksA, true)}${bars("B", workB, blocksB, false)}</div>` +
+          `<div class="ctl"><button type="button" data-mine="A">Mine next block on A</button><button type="button" class="ghost" data-mine="B">Mine next block on B</button><button type="button" class="ghost" data-reset>${p.reset}</button></div>` +
+          `<p class="activity-status" data-status role="status" aria-live="polite">${message || `Branch A leads by ${workA - workB} work units. Choose where the next block is found.`}</p>`;
+        el.querySelectorAll("[data-mine]").forEach((button) =>
+          button.addEventListener("click", () => {
+            const previous = active;
+            if (button.dataset.mine === "A") {
+              workA += p.stepWork;
+              blocksA++;
+            } else {
+              workB += p.stepWork;
+              blocksB++;
+            }
+            const nextBest =
+              workA === workB ? previous : workA > workB ? "A" : "B";
+            const change = previous !== nextBest;
+            best = nextBest;
+            if (change && nextBest === "B") {
+              sawReorg = true;
+              render(
+                "Reorganization: B now has more work. Aarav's payment leaves Meera's active chain and drops from one confirmation to zero.",
+              );
+              fin();
+            } else if (change)
+              render(`Branch ${nextBest} now has more accumulated work.`);
+            else
+              render(
+                `Branch ${nextBest} remains ahead. Aarav's payment has ${nextBest === "A" ? 1 + (blocksA - p.blocksA) : 0} confirmation${nextBest === "A" && blocksA > p.blocksA ? "s" : ""}.`,
+              );
+          }),
+        );
+        $(`[data-reset]`, el).onclick = () => {
+          workA = p.workA;
+          workB = p.workB;
+          blocksA = p.blocksA;
+          blocksB = p.blocksB;
+          best = "A";
+          sawReorg = false;
+          render();
+        };
+      };
+      render();
+    },
+    // Compare solo luck with a simplified proportional pool payout over 30 days.
+    PoolIncomeSim(el, fin, p) {
+      el.classList.add("try", "explorer");
+      let runNumber = 0;
+      const run = () => {
+        runNumber++;
+        const slider = $(`[data-hash-share]`, el);
+        const shareHundredths = Number(slider.value);
+        const share = shareHundredths / 10000;
+        const percent = (shareHundredths / 100).toFixed(2);
+        const dailyMean = p.blocksPerDay * share;
+        let seed = (9137 + runNumber * 7919 + shareHundredths * 101) >>> 0;
+        const random = () => {
+          seed = (1664525 * seed + 1013904223) >>> 0;
+          return seed / 4294967296;
+        };
+        let soloTotal = 0,
+          poolTotal = 0;
+        const solo = [0],
+          pool = [0];
+        for (let day = 0; day < p.days; day++) {
+          const limit = Math.exp(-dailyMean);
+          let product = 1,
+            found = 0;
+          do {
+            found++;
+            product *= random();
+          } while (product > limit);
+          const soloBlocks = found - 1;
+          soloTotal += soloBlocks;
+          poolTotal += dailyMean;
+          solo.push(soloTotal);
+          pool.push(poolTotal);
+        }
+        const max = Math.max(1, ...solo, ...pool) * 1.12;
+        const x = (day) => 42 + (day / p.days) * 530;
+        const y = (value) => 166 - (value / max) * 130;
+        const stair = solo
+          .map((value, i) => `${i ? "L" : "M"}${x(i)} ${y(value)}`)
+          .join(" ");
+        const smooth = pool
+          .map((value, i) => `${i ? "L" : "M"}${x(i)} ${y(value)}`)
+          .join(" ");
+        $(`[data-chart]`, el).innerHTML =
+          `<svg viewBox="0 0 600 205" role="img" aria-label="Cumulative solo and pool block reward units over thirty days"><path d="M42 36V166H572" fill="none" stroke="var(--line)"/><path d="M42 101H572M42 56H572" stroke="var(--line)" stroke-dasharray="3 5"/><path d="${stair}" fill="none" stroke="#d66a3f" stroke-width="3"/><path d="${smooth}" fill="none" stroke="#43836a" stroke-width="3"/><text x="42" y="190">Day 0</text><text x="572" y="190" text-anchor="end">Day ${p.days}</text><text x="54" y="28" fill="#d66a3f">Solo</text><text x="110" y="28" fill="#43836a">Pool estimate</text></svg>`;
+        $(`[data-solo-total]`, el).textContent = soloTotal.toFixed(0);
+        $(`[data-pool-total]`, el).textContent = poolTotal.toFixed(2);
+        $(`[data-share-label]`, el).textContent =
+          `${percent}% of network hash power`;
+        $(`[data-mean]`, el).textContent =
+          `${dailyMean.toFixed(3)} block rewards per day on average`;
+        $(`[data-result]`, el).textContent =
+          `At ${percent}% hash power, the solo run found ${soloTotal} blocks. The proportional pool estimate paid ${poolTotal.toFixed(2)} block rewards over ${p.days} days.`;
+        fin();
+      };
+      el.innerHTML =
+        `<span class="label">${p.label}</span><p>${p.intro}</p>` +
+        `<label class="slider"><span>Miner's hash power: <b data-share-label></b></span><input type="range" min="1" max="100" step="1" value="${p.startShare}" data-hash-share aria-label="Hash power share in hundredths of a percent" /></label>` +
+        `<div class="dash"><div class="stat"><b data-solo-total>0</b><span>Solo blocks found</span></div><div class="stat"><b data-pool-total>0.00</b><span>Pool reward estimate</span></div><div class="stat"><b data-mean></b><span>Expected solo rate</span></div></div>` +
+        `<div class="pool-chart" data-chart></div><p class="small">The pool line is an idealized proportional payout before fees and payout thresholds. Real pool methods vary.</p>` +
+        `<div class="ctl"><button type="button" data-run>Run 30 days again</button></div><p class="activity-status" data-result role="status" aria-live="polite"></p>`;
+      $(`[data-run]`, el).onclick = run;
+      run();
+    },
+    // Practice making node decisions on blocks backed by different hash power.
+    NodeJudge(el, fin, p) {
+      el.classList.add("try", "explorer");
+      let index = 0,
+        accepted = 0,
+        rejected = 0;
+      const render = (
+        message = "Choose whether Meera's node accepts this block.",
+      ) => {
+        const block = p.rounds[index];
+        el.innerHTML =
+          `<span class="label">${p.label}</span><div class="case-heading"><h3>${block.title}</h3><p>Hash-power backing: ${block.backing}</p></div>` +
+          `<ul class="node-facts">${block.facts.map((fact) => `<li>${fact}</li>`).join("")}</ul>` +
+          `<div class="ctl"><button type="button" data-choice="accept">Accept block</button><button type="button" class="ghost" data-choice="reject">Reject block</button></div>` +
+          `<p class="activity-status" data-status role="status" aria-live="polite">${message}</p><div class="case-result" data-why hidden></div><button type="button" data-next hidden>Next block</button>`;
+        el.querySelectorAll("[data-choice]").forEach((button) =>
+          button.addEventListener("click", () => {
+            const choice = button.dataset.choice;
+            const correct = choice === (block.valid ? "accept" : "reject");
+            const status = $(`[data-status]`, el);
+            $(`[data-why]`, el).hidden = false;
+            $(`[data-why]`, el).textContent = block.why;
+            if (!correct) {
+              status.dataset.result = "bad";
+              status.textContent = `Not quite. Meera's node would ${block.valid ? "accept" : "reject"} this block.`;
+              return;
+            }
+            if (block.valid) accepted++;
+            else rejected++;
+            status.dataset.result = "good";
+            status.textContent = `Correct. Block ${index + 1} of ${p.rounds.length} checked.`;
+            el.querySelectorAll("[data-choice]").forEach(
+              (item) => (item.disabled = true),
+            );
+            const next = $(`[data-next]`, el);
+            next.hidden = false;
+            next.textContent =
+              index === p.rounds.length - 1
+                ? "Finish the review"
+                : "Next block";
+            next.onclick = () => {
+              index++;
+              if (index < p.rounds.length) render();
+              else {
+                el.innerHTML = `<span class="label">${p.label}</span><div class="dash"><div class="stat"><b>${accepted}</b><span>valid blocks accepted</span></div><div class="stat"><b>${rejected}</b><span>invalid blocks rejected</span></div></div><p class="activity-status" data-result="good">${p.done}</p>`;
+                fin();
+              }
+            };
+          }),
+        );
+      };
+      render();
+    },
+    // Let a miner test the effect of a tighter rule on two candidate blocks.
+    SoftForkLab(el, fin, p) {
+      el.classList.add("try", "explorer");
+      const inspected = new Set();
+      el.innerHTML =
+        `<span class="label">${p.label}</span><p>${p.intro}</p>` +
+        `<p class="soft-fork-note">Practice limits: the old rule allows ${p.oldLimit} units; the new rule allows ${p.newLimit}. These are made-up units for this simulation.</p>` +
+        `<div class="soft-fork-templates" role="group" aria-label="Choose a miner's candidate block">${p.candidates.map((candidate) => `<button type="button" class="soft-fork-template" data-template="${candidate.id}" aria-pressed="false"><b>${candidate.title}</b><span>${candidate.weight} units</span></button>`).join("")}</div>` +
+        `<div class="soft-fork-verdict" data-verdict hidden aria-live="polite"></div>` +
+        `<p class="activity-status" data-status role="status" aria-live="polite">Inspect both candidate templates. Then write a pool instruction that keeps the upgraded and old-rule nodes on one chain.</p>` +
+        `<div class="soft-fork-response" data-response hidden><label for="${p.key}-instruction">What limit should Meera tell miners to follow, and what would happen if they exceed it?</label><textarea id="${p.key}-instruction" data-instruction placeholder="Write the pool's block-template instruction"></textarea><button type="button" class="ghost" data-compare>Compare with one possible instruction</button><p class="soft-fork-model" data-model hidden>${p.model}</p></div>`;
+      const inspect = (candidate) => {
+        inspected.add(candidate.id);
+        el.querySelectorAll("[data-template]").forEach((button) =>
+          button.setAttribute(
+            "aria-pressed",
+            String(button.dataset.template === candidate.id),
+          ),
+        );
+        const newAccepts = candidate.weight <= p.newLimit;
+        $(`[data-verdict]`, el).hidden = false;
+        $(`[data-verdict]`, el).innerHTML =
+          `<h3>${candidate.title}: ${candidate.weight} units</h3>` +
+          `<div class="soft-fork-verdicts"><div><b>Old-rule node</b><span>${candidate.weight <= p.oldLimit ? "Accepts this block" : "Rejects this block"}</span></div><div><b>Upgraded node</b><span>${newAccepts ? "Accepts this block" : "Rejects this block"}</span></div></div>` +
+          `<p>${newAccepts ? "Both nodes accept it, so they can continue on the same chain." : "The old node accepts it, but the upgraded node rejects it. If miners extend this block, the nodes can follow different histories."}</p>`;
+        const status = $(`[data-status]`, el);
+        status.dataset.result = "good";
+        status.textContent = `${inspected.size} of ${p.candidates.length} templates inspected.`;
+        if (inspected.size === p.candidates.length)
+          $(`[data-response]`, el).hidden = false;
+      };
+      el.querySelectorAll("[data-template]").forEach((button) =>
+        button.addEventListener("click", () => {
+          inspect(
+            p.candidates.find(
+              (candidate) => candidate.id === button.dataset.template,
+            ),
+          );
+        }),
+      );
+      $(`[data-compare]`, el).onclick = () => {
+        const instruction = $(`[data-instruction]`, el);
+        const status = $(`[data-status]`, el);
+        if (inspected.size !== p.candidates.length) {
+          status.dataset.result = "bad";
+          status.textContent =
+            "Inspect both templates before writing the pool instruction.";
+          return;
+        }
+        if (!instruction.value.trim()) {
+          status.dataset.result = "bad";
+          status.textContent =
+            "Write your instruction before comparing it with the example.";
+          instruction.focus();
+          return;
+        }
+        $(`[data-model]`, el).hidden = false;
+        status.dataset.result = "good";
+        status.textContent = p.done;
+        $(`[data-compare]`, el).disabled = true;
+        fin();
+      };
+    },
+    // Let a node operator apply a hard-fork rule change to a concrete payment scenario.
+    ForkIncident(el, fin, p) {
+      el.classList.add("try", "explorer");
+      let choice = "";
+      let validated = false;
+      el.innerHTML =
+        `<span class="label">${p.label}</span><p>${p.intro}</p>` +
+        `<div class="fork-history"><div class="fork-shared"><b>Last shared block</b><span>478,558</span></div><div class="fork-paths"><div class="fork-path btc"><b>Bitcoin rules</b><span>Blocks up to 1 MB in this example</span></div><div class="fork-path bch"><b>Bitcoin Cash rules</b><span>Blocks up to 8 MB</span></div></div></div>` +
+        `<div class="fork-candidate"><div><b>New candidate block</b><span>2 MB, with other checks passing</span></div><p>This block fits the Bitcoin Cash size limit. It exceeds the Bitcoin limit.</p></div>` +
+        `<fieldset class="fork-choice"><legend>Which network should Aarav's shop accept?</legend><div class="fork-choice-options"><button type="button" data-choice="btc" aria-pressed="false"><b>Bitcoin (BTC)</b><span>Keep the Bitcoin rule set</span></button><button type="button" data-choice="bch" aria-pressed="false"><b>Bitcoin Cash (BCH)</b><span>Use the 8 MB rule set</span></button></div></fieldset>` +
+        `<div class="ctl"><button type="button" data-validate disabled>Check the candidate</button></div>` +
+        `<p class="activity-status" data-verdict role="status" aria-live="polite">Choose the network Aarav intends to accept, then check the block against that node's rules.</p>` +
+        `<div class="fork-response" data-response hidden><label for="${p.key}-notice">Write a short message to Aarav's customers. Say what this node did and why another network's node may reach a different result.</label><textarea id="${p.key}-notice" data-notice placeholder="Write the shop's update in your own words"></textarea><button type="button" class="ghost" data-compare>Compare with one possible update</button><p class="fork-model" data-model hidden></p></div>`;
+      el.querySelectorAll("[data-choice]").forEach((button) =>
+        button.addEventListener("click", () => {
+          choice = button.dataset.choice;
+          validated = false;
+          el.querySelectorAll("[data-choice]").forEach((item) =>
+            item.setAttribute("aria-pressed", String(item === button)),
+          );
+          $(`[data-validate]`, el).disabled = false;
+          $(`[data-response]`, el).hidden = true;
+          const verdict = $(`[data-verdict]`, el);
+          verdict.removeAttribute("data-result");
+          verdict.textContent =
+            choice === "btc"
+              ? "Bitcoin selected. Check whether its node accepts this larger block."
+              : "Bitcoin Cash selected. Check whether its node accepts this block under the larger limit.";
+        }),
+      );
+      $(`[data-validate]`, el).onclick = () => {
+        if (!choice) return;
+        validated = true;
+        const verdict = $(`[data-verdict]`, el);
+        verdict.dataset.result = "good";
+        verdict.textContent =
+          choice === "btc"
+            ? "Rejected by this Bitcoin node: the 2 MB block exceeds its 1 MB limit. It cannot follow a chain that builds on this block."
+            : "Accepted by this Bitcoin Cash node on the size rule: 2 MB is within its 8 MB limit. Other consensus checks still apply. A Bitcoin node rejects this block.";
+        $(`[data-response]`, el).hidden = false;
+      };
+      $(`[data-compare]`, el).onclick = () => {
+        if (!validated) return;
+        const notice = $(`[data-notice]`, el);
+        const verdict = $(`[data-verdict]`, el);
+        if (!notice.value.trim()) {
+          verdict.dataset.result = "bad";
+          verdict.textContent =
+            "Write the shop's update before comparing it with the example.";
+          notice.focus();
+          return;
+        }
+        $(`[data-model]`, el).textContent = p.model[choice];
+        $(`[data-model]`, el).hidden = false;
+        $(`[data-compare]`, el).disabled = true;
+        verdict.dataset.result = "good";
+        verdict.textContent = p.done;
+        fin();
+      };
+    },
+    // Ask learners to revise claims in their own words, without exact-match grading.
+    FixTweet(el, fin, p) {
+      el.classList.add("try", "explorer");
+      const reviewed = new Set();
+      el.innerHTML =
+        `<span class="label">${p.label}</span><p>${p.intro}</p>` +
+        p.claims
+          .map(
+            (item, i) =>
+              `<article class="tweet-fix"><blockquote>${item.claim}</blockquote><label for="${p.key}-${i}">Your correction</label><textarea id="${p.key}-${i}" data-answer="${i}" placeholder="Explain what the claim gets wrong"></textarea><button type="button" class="ghost" data-compare="${i}">Compare explanations</button><p class="tweet-example" data-example="${i}" hidden>${item.correction}</p></article>`,
+          )
+          .join("") +
+        `<p class="activity-status" data-status role="status" aria-live="polite">Write a correction for each claim, then compare.</p>`;
+      el.querySelectorAll("[data-compare]").forEach((button) =>
+        button.addEventListener("click", () => {
+          const i = button.dataset.compare;
+          const answer = $(`[data-answer="${i}"]`, el);
+          const status = $(`[data-status]`, el);
+          if (!answer.value.trim()) {
+            status.dataset.result = "bad";
+            status.textContent = "Add your own correction before comparing.";
+            answer.focus();
+            return;
+          }
+          $(`[data-example="${i}"]`, el).hidden = false;
+          button.disabled = true;
+          reviewed.add(i);
+          status.dataset.result = "good";
+          status.textContent =
+            reviewed.size === p.claims.length
+              ? p.done
+              : `${reviewed.size} of ${p.claims.length} claims revised. Continue with the others.`;
+          if (reviewed.size === p.claims.length) fin();
+        }),
+      );
+    },
+    // Explore pool shares and network-valid blocks with a toy hash score.
+    PoolShareLab(el, fin, p) {
+      el.classList.add("try", "explorer");
+      const visited = new Set();
+      el.innerHTML =
+        `<span class="label">${ico("target")}${p.label}</span><p>${p.intro}</p>` +
+        `<label class="slider"><span>Try a hash score: <b data-score></b></span><input type="range" min="1" max="100" value="${p.start}" data-hash aria-label="Toy hash score; lower is better" /></label>` +
+        `<div class="dash"><div class="stat"><b>${p.poolTarget}</b><span>Pool target</span></div><div class="stat"><b>${p.networkTarget}</b><span>Network target</span></div><div class="stat"><b data-outcome></b><span>This hash</span></div></div>` +
+        `<p class="activity-status" data-status role="status" aria-live="polite"></p>`;
+      const slider = $("[data-hash]", el);
+      const update = () => {
+        const score = Number(slider.value);
+        $("[data-score]", el).textContent = score;
+        const status = $("[data-status]", el);
+        if (score <= p.networkTarget) {
+          $("[data-outcome]", el).textContent = "Block found";
+          status.dataset.result = "good";
+          status.textContent =
+            "This hash meets the network target. It also meets the pool target; nodes must still validate the block.";
+          visited.add("network");
+        } else if (score <= p.poolTarget) {
+          $("[data-outcome]", el).textContent = "Pool share";
+          status.dataset.result = "good";
+          status.textContent =
+            "The pool records this share as evidence of contributed work, but it is not a Bitcoin block.";
+          visited.add("share");
+        } else {
+          $("[data-outcome]", el).textContent = "Try again";
+          status.dataset.result = "";
+          status.textContent =
+            "This hash misses even the pool target. Lower scores represent better hashes in this toy model.";
+          visited.add("miss");
+        }
+        if (visited.size === 3) {
+          status.textContent += " You have now seen all three outcomes.";
+          fin();
+        }
+      };
+      slider.oninput = update;
+      update();
+    },
+    // Let learners run the same candidate block through different node rules.
+    RuleForkLab(el, fin, p) {
+      el.classList.add("try", "explorer");
+      const tried = new Set();
+      el.innerHTML =
+        `<span class="label">${p.label}</span><p>${p.intro}</p>` +
+        `<div class="match-item"><label for="${p.key}-node">Node software</label><select id="${p.key}-node" data-node>` +
+        p.nodes
+          .map((node) => `<option value="${node.id}">${node.label}</option>`)
+          .join("") +
+        `</select></div><div class="match-item"><label for="${p.key}-block">Candidate block</label><select id="${p.key}-block" data-block>` +
+        p.blocks
+          .map((block) => `<option value="${block.id}">${block.label}</option>`)
+          .join("") +
+        `</select></div><button type="button" data-validate>Run this node's validation</button>` +
+        `<div class="dash"><div class="stat"><b data-verdict>Ready</b><span data-node-name>Select node software and a block</span></div></div>` +
+        `<p data-explain></p><p class="activity-status" data-status role="status" aria-live="polite">Predict the result, then run the check.</p>`;
+      const validate = () => {
+        const node = $(`[data-node]`, el).value;
+        const block = $(`[data-block]`, el).value;
+        const result = p.blocks.find((item) => item.id === block).results[node];
+        tried.add(node + ":" + block);
+        $(`[data-node-name]`, el).textContent = p.nodes.find(
+          (item) => item.id === node,
+        ).label;
+        $(`[data-verdict]`, el).textContent = result.verdict;
+        $(`[data-explain]`, el).textContent = result.explain;
+        const status = $(`[data-status]`, el);
+        status.dataset.result = "good";
+        status.textContent =
+          tried.size === p.nodes.length * p.blocks.length
+            ? p.done
+            : `Checks run: ${tried.size} of ${p.nodes.length * p.blocks.length}. Try another node and block combination.`;
+        if (tried.size === p.nodes.length * p.blocks.length) fin();
+      };
+      $(`[data-validate]`, el).addEventListener("click", validate);
+    },
     // Two sliders set the two kinds of bytes. Weight, vbytes and fee update live.
     WeightCalc(el, fin, p) {
       el.classList.add("try", "explorer");
@@ -360,11 +834,15 @@
         wrong = [];
         steps.forEach((st, i) => {
           const field = $(`#${id}-${i}`, el);
-          const ok =
-            field.value
-              .trim()
-              .toLowerCase()
-              .replace(/[\s,]+/g, "") === String(st.answer);
+          const userInput = field.value
+            .trim()
+            .toLowerCase()
+            .replace(/[\s,]+/g, "");
+          const expectedAnswer = String(st.answer)
+            .trim()
+            .toLowerCase()
+            .replace(/[\s,]+/g, "");
+          const ok = userInput === expectedAnswer;
           field.setAttribute("aria-invalid", String(!ok));
           const mark = $(`[data-mark="${i}"]`, el);
           mark.innerHTML = ico(ok ? "check" : "cross");
