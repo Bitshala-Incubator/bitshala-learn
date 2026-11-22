@@ -280,7 +280,12 @@
           `<div class="case-pow">Proof of work: valid</div>` +
           `<p class="case-source">${round.source}</p>` +
           `<div class="block-inspector-cards" role="group" aria-label="Transactions in the candidate block">` +
-          round.txs.map((tx, i) => `<button type="button" class="block-inspector-tx" data-tx="${i}"><b>${tx.id}</b><span>${tx.text}</span></button>`).join("") +
+          round.txs
+            .map(
+              (tx, i) =>
+                `<button type="button" class="block-inspector-tx" data-tx="${i}"><b>${tx.id}</b><span>${tx.text}</span></button>`,
+            )
+            .join("") +
           `</div><p class="activity-status" data-status role="status" aria-live="polite">Click the transaction line that makes this block invalid.</p>` +
           `<div class="case-result" data-explain hidden></div><button type="button" data-next hidden>Next case</button>`;
         el.querySelectorAll("[data-tx]").forEach((button) => {
@@ -291,18 +296,24 @@
             if (!tx.invalid) {
               button.dataset.result = "valid";
               status.dataset.result = "";
-              status.textContent = "This line passes the check. Inspect the other transactions.";
+              status.textContent =
+                "This line passes the check. Inspect the other transactions.";
               return;
             }
             button.dataset.result = "invalid";
-            el.querySelectorAll("[data-tx]").forEach((item) => (item.disabled = true));
+            el.querySelectorAll("[data-tx]").forEach(
+              (item) => (item.disabled = true),
+            );
             $(`[data-explain]`, el).hidden = false;
             $(`[data-explain]`, el).textContent = tx.why;
             status.dataset.result = "good";
             status.textContent = `Correct. Case found: ${roundIndex + 1} of ${p.rounds.length}.`;
             const next = $(`[data-next]`, el);
             next.hidden = false;
-            next.textContent = roundIndex === p.rounds.length - 1 ? "Finish case files" : "Open next case";
+            next.textContent =
+              roundIndex === p.rounds.length - 1
+                ? "Finish case files"
+                : "Open next case";
             next.onclick = () => {
               roundIndex++;
               if (roundIndex < p.rounds.length) render();
@@ -319,37 +330,60 @@
     // Add blocks to competing valid branches and watch confirmations change.
     ReorgSimulator(el, fin, p) {
       el.classList.add("try", "explorer");
-      let workA = p.workA, workB = p.workB;
-      let blocksA = p.blocksA, blocksB = p.blocksB;
-      let best = "A", sawReorg = false;
+      let workA = p.workA,
+        workB = p.workB;
+      let blocksA = p.blocksA,
+        blocksB = p.blocksB;
+      let best = "A",
+        sawReorg = false;
       const render = (message = "") => {
         const maxWork = Math.max(workA, workB, 1);
         const active = workA === workB ? best : workA > workB ? "A" : "B";
         const confirmations = active === "A" ? 1 + (blocksA - p.blocksA) : 0;
         const bars = (name, work, count, hasPayment) =>
-          `<div class="reorg-branch ${active === name ? "active" : ""}"><div class="reorg-branch-head"><b>Branch ${name}</b><span>${work} work units</span></div><div class="reorg-blocks">${Array.from({length: count}, (_, i) => `<span class="reorg-block ${hasPayment && i === p.blocksA - 1 ? "payment-block" : ""}">${hasPayment && i === p.blocksA - 1 ? "Aarav payment" : "Block"}</span>`).join("")}</div><div class="reorg-meter"><span style="width:${Math.max(2, work / maxWork * 100)}%"></span></div></div>`;
+          `<div class="reorg-branch ${active === name ? "active" : ""}"><div class="reorg-branch-head"><b>Branch ${name}</b><span>${work} work units</span></div><div class="reorg-blocks">${Array.from({ length: count }, (_, i) => `<span class="reorg-block ${hasPayment && i === p.blocksA - 1 ? "payment-block" : ""}">${hasPayment && i === p.blocksA - 1 ? "Aarav payment" : "Block"}</span>`).join("")}</div><div class="reorg-meter"><span style="width:${Math.max(2, (work / maxWork) * 100)}%"></span></div></div>`;
         el.innerHTML =
           `<span class="label">${p.label}</span><p>${p.intro}</p>` +
           `<div class="reorg-status"><b>Best chain: ${active}</b><span>Aarav's payment: ${confirmations} confirmation${confirmations === 1 ? "" : "s"}</span></div>` +
           `<div class="reorg-map">${bars("A", workA, blocksA, true)}${bars("B", workB, blocksB, false)}</div>` +
           `<div class="ctl"><button type="button" data-mine="A">Mine next block on A</button><button type="button" class="ghost" data-mine="B">Mine next block on B</button><button type="button" class="ghost" data-reset>${p.reset}</button></div>` +
           `<p class="activity-status" data-status role="status" aria-live="polite">${message || `Branch A leads by ${workA - workB} work units. Choose where the next block is found.`}</p>`;
-        el.querySelectorAll("[data-mine]").forEach((button) => button.addEventListener("click", () => {
-          const previous = active;
-          if (button.dataset.mine === "A") { workA += p.stepWork; blocksA++; }
-          else { workB += p.stepWork; blocksB++; }
-          const nextBest = workA === workB ? previous : workA > workB ? "A" : "B";
-          const change = previous !== nextBest;
-          best = nextBest;
-          if (change && nextBest === "B") {
-            sawReorg = true;
-            render("Reorganization: B now has more work. Aarav's payment leaves Meera's active chain and drops from one confirmation to zero.");
-            fin();
-          } else if (change) render(`Branch ${nextBest} now has more accumulated work.`);
-          else render(`Branch ${nextBest} remains ahead. Aarav's payment has ${nextBest === "A" ? 1 + (blocksA - p.blocksA) : 0} confirmation${nextBest === "A" && blocksA > p.blocksA ? "s" : ""}.`);
-        }));
+        el.querySelectorAll("[data-mine]").forEach((button) =>
+          button.addEventListener("click", () => {
+            const previous = active;
+            if (button.dataset.mine === "A") {
+              workA += p.stepWork;
+              blocksA++;
+            } else {
+              workB += p.stepWork;
+              blocksB++;
+            }
+            const nextBest =
+              workA === workB ? previous : workA > workB ? "A" : "B";
+            const change = previous !== nextBest;
+            best = nextBest;
+            if (change && nextBest === "B") {
+              sawReorg = true;
+              render(
+                "Reorganization: B now has more work. Aarav's payment leaves Meera's active chain and drops from one confirmation to zero.",
+              );
+              fin();
+            } else if (change)
+              render(`Branch ${nextBest} now has more accumulated work.`);
+            else
+              render(
+                `Branch ${nextBest} remains ahead. Aarav's payment has ${nextBest === "A" ? 1 + (blocksA - p.blocksA) : 0} confirmation${nextBest === "A" && blocksA > p.blocksA ? "s" : ""}.`,
+              );
+          }),
+        );
         $(`[data-reset]`, el).onclick = () => {
-          workA = p.workA; workB = p.workB; blocksA = p.blocksA; blocksB = p.blocksB; best = "A"; sawReorg = false; render();
+          workA = p.workA;
+          workB = p.workB;
+          blocksA = p.blocksA;
+          blocksB = p.blocksB;
+          best = "A";
+          sawReorg = false;
+          render();
         };
       };
       render();
@@ -366,30 +400,47 @@
         const percent = (shareHundredths / 100).toFixed(2);
         const dailyMean = p.blocksPerDay * share;
         let seed = (9137 + runNumber * 7919 + shareHundredths * 101) >>> 0;
-        const random = () => { seed = (1664525 * seed + 1013904223) >>> 0; return seed / 4294967296; };
-        let soloTotal = 0, poolTotal = 0;
-        const solo = [0], pool = [0];
+        const random = () => {
+          seed = (1664525 * seed + 1013904223) >>> 0;
+          return seed / 4294967296;
+        };
+        let soloTotal = 0,
+          poolTotal = 0;
+        const solo = [0],
+          pool = [0];
         for (let day = 0; day < p.days; day++) {
           const limit = Math.exp(-dailyMean);
-          let product = 1, found = 0;
-          do { found++; product *= random(); } while (product > limit);
+          let product = 1,
+            found = 0;
+          do {
+            found++;
+            product *= random();
+          } while (product > limit);
           const soloBlocks = found - 1;
           soloTotal += soloBlocks;
           poolTotal += dailyMean;
-          solo.push(soloTotal); pool.push(poolTotal);
+          solo.push(soloTotal);
+          pool.push(poolTotal);
         }
         const max = Math.max(1, ...solo, ...pool) * 1.12;
-        const x = (day) => 42 + day / p.days * 530;
-        const y = (value) => 166 - value / max * 130;
-        const stair = solo.map((value, i) => `${i ? "L" : "M"}${x(i)} ${y(value)}`).join(" ");
-        const smooth = pool.map((value, i) => `${i ? "L" : "M"}${x(i)} ${y(value)}`).join(" ");
+        const x = (day) => 42 + (day / p.days) * 530;
+        const y = (value) => 166 - (value / max) * 130;
+        const stair = solo
+          .map((value, i) => `${i ? "L" : "M"}${x(i)} ${y(value)}`)
+          .join(" ");
+        const smooth = pool
+          .map((value, i) => `${i ? "L" : "M"}${x(i)} ${y(value)}`)
+          .join(" ");
         $(`[data-chart]`, el).innerHTML =
           `<svg viewBox="0 0 600 205" role="img" aria-label="Cumulative solo and pool block reward units over thirty days"><path d="M42 36V166H572" fill="none" stroke="var(--line)"/><path d="M42 101H572M42 56H572" stroke="var(--line)" stroke-dasharray="3 5"/><path d="${stair}" fill="none" stroke="#d66a3f" stroke-width="3"/><path d="${smooth}" fill="none" stroke="#43836a" stroke-width="3"/><text x="42" y="190">Day 0</text><text x="572" y="190" text-anchor="end">Day ${p.days}</text><text x="54" y="28" fill="#d66a3f">Solo</text><text x="110" y="28" fill="#43836a">Pool estimate</text></svg>`;
         $(`[data-solo-total]`, el).textContent = soloTotal.toFixed(0);
         $(`[data-pool-total]`, el).textContent = poolTotal.toFixed(2);
-        $(`[data-share-label]`, el).textContent = `${percent}% of network hash power`;
-        $(`[data-mean]`, el).textContent = `${dailyMean.toFixed(3)} block rewards per day on average`;
-        $(`[data-result]`, el).textContent = `At ${percent}% hash power, the solo run found ${soloTotal} blocks. The proportional pool estimate paid ${poolTotal.toFixed(2)} block rewards over ${p.days} days.`;
+        $(`[data-share-label]`, el).textContent =
+          `${percent}% of network hash power`;
+        $(`[data-mean]`, el).textContent =
+          `${dailyMean.toFixed(3)} block rewards per day on average`;
+        $(`[data-result]`, el).textContent =
+          `At ${percent}% hash power, the solo run found ${soloTotal} blocks. The proportional pool estimate paid ${poolTotal.toFixed(2)} block rewards over ${p.days} days.`;
         fin();
       };
       el.innerHTML =
@@ -404,41 +455,53 @@
     // Practice making node decisions on blocks backed by different hash power.
     NodeJudge(el, fin, p) {
       el.classList.add("try", "explorer");
-      let index = 0, accepted = 0, rejected = 0;
-      const render = (message = "Choose whether Meera's node accepts this block.") => {
+      let index = 0,
+        accepted = 0,
+        rejected = 0;
+      const render = (
+        message = "Choose whether Meera's node accepts this block.",
+      ) => {
         const block = p.rounds[index];
         el.innerHTML =
           `<span class="label">${p.label}</span><div class="case-heading"><h3>${block.title}</h3><p>Hash-power backing: ${block.backing}</p></div>` +
           `<ul class="node-facts">${block.facts.map((fact) => `<li>${fact}</li>`).join("")}</ul>` +
           `<div class="ctl"><button type="button" data-choice="accept">Accept block</button><button type="button" class="ghost" data-choice="reject">Reject block</button></div>` +
           `<p class="activity-status" data-status role="status" aria-live="polite">${message}</p><div class="case-result" data-why hidden></div><button type="button" data-next hidden>Next block</button>`;
-        el.querySelectorAll("[data-choice]").forEach((button) => button.addEventListener("click", () => {
-          const choice = button.dataset.choice;
-          const correct = choice === (block.valid ? "accept" : "reject");
-          const status = $(`[data-status]`, el);
-          $(`[data-why]`, el).hidden = false;
-          $(`[data-why]`, el).textContent = block.why;
-          if (!correct) {
-            status.dataset.result = "bad";
-            status.textContent = `Not quite. Meera's node would ${block.valid ? "accept" : "reject"} this block.`;
-            return;
-          }
-          if (block.valid) accepted++; else rejected++;
-          status.dataset.result = "good";
-          status.textContent = `Correct. Block ${index + 1} of ${p.rounds.length} checked.`;
-          el.querySelectorAll("[data-choice]").forEach((item) => (item.disabled = true));
-          const next = $(`[data-next]`, el);
-          next.hidden = false;
-          next.textContent = index === p.rounds.length - 1 ? "Finish the review" : "Next block";
-          next.onclick = () => {
-            index++;
-            if (index < p.rounds.length) render();
-            else {
-              el.innerHTML = `<span class="label">${p.label}</span><div class="dash"><div class="stat"><b>${accepted}</b><span>valid blocks accepted</span></div><div class="stat"><b>${rejected}</b><span>invalid blocks rejected</span></div></div><p class="activity-status" data-result="good">${p.done}</p>`;
-              fin();
+        el.querySelectorAll("[data-choice]").forEach((button) =>
+          button.addEventListener("click", () => {
+            const choice = button.dataset.choice;
+            const correct = choice === (block.valid ? "accept" : "reject");
+            const status = $(`[data-status]`, el);
+            $(`[data-why]`, el).hidden = false;
+            $(`[data-why]`, el).textContent = block.why;
+            if (!correct) {
+              status.dataset.result = "bad";
+              status.textContent = `Not quite. Meera's node would ${block.valid ? "accept" : "reject"} this block.`;
+              return;
             }
-          };
-        }));
+            if (block.valid) accepted++;
+            else rejected++;
+            status.dataset.result = "good";
+            status.textContent = `Correct. Block ${index + 1} of ${p.rounds.length} checked.`;
+            el.querySelectorAll("[data-choice]").forEach(
+              (item) => (item.disabled = true),
+            );
+            const next = $(`[data-next]`, el);
+            next.hidden = false;
+            next.textContent =
+              index === p.rounds.length - 1
+                ? "Finish the review"
+                : "Next block";
+            next.onclick = () => {
+              index++;
+              if (index < p.rounds.length) render();
+              else {
+                el.innerHTML = `<span class="label">${p.label}</span><div class="dash"><div class="stat"><b>${accepted}</b><span>valid blocks accepted</span></div><div class="stat"><b>${rejected}</b><span>invalid blocks rejected</span></div></div><p class="activity-status" data-result="good">${p.done}</p>`;
+                fin();
+              }
+            };
+          }),
+        );
       };
       render();
     },
@@ -455,7 +518,12 @@
         `<div class="soft-fork-response" data-response hidden><label for="${p.key}-instruction">What limit should Meera tell miners to follow, and what would happen if they exceed it?</label><textarea id="${p.key}-instruction" data-instruction placeholder="Write the pool's block-template instruction"></textarea><button type="button" class="ghost" data-compare>Compare with one possible instruction</button><p class="soft-fork-model" data-model hidden>${p.model}</p></div>`;
       const inspect = (candidate) => {
         inspected.add(candidate.id);
-        el.querySelectorAll("[data-template]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.template === candidate.id)));
+        el.querySelectorAll("[data-template]").forEach((button) =>
+          button.setAttribute(
+            "aria-pressed",
+            String(button.dataset.template === candidate.id),
+          ),
+        );
         const newAccepts = candidate.weight <= p.newLimit;
         $(`[data-verdict]`, el).hidden = false;
         $(`[data-verdict]`, el).innerHTML =
@@ -465,22 +533,31 @@
         const status = $(`[data-status]`, el);
         status.dataset.result = "good";
         status.textContent = `${inspected.size} of ${p.candidates.length} templates inspected.`;
-        if (inspected.size === p.candidates.length) $(`[data-response]`, el).hidden = false;
+        if (inspected.size === p.candidates.length)
+          $(`[data-response]`, el).hidden = false;
       };
-      el.querySelectorAll("[data-template]").forEach((button) => button.addEventListener("click", () => {
-        inspect(p.candidates.find((candidate) => candidate.id === button.dataset.template));
-      }));
+      el.querySelectorAll("[data-template]").forEach((button) =>
+        button.addEventListener("click", () => {
+          inspect(
+            p.candidates.find(
+              (candidate) => candidate.id === button.dataset.template,
+            ),
+          );
+        }),
+      );
       $(`[data-compare]`, el).onclick = () => {
         const instruction = $(`[data-instruction]`, el);
         const status = $(`[data-status]`, el);
         if (inspected.size !== p.candidates.length) {
           status.dataset.result = "bad";
-          status.textContent = "Inspect both templates before writing the pool instruction.";
+          status.textContent =
+            "Inspect both templates before writing the pool instruction.";
           return;
         }
         if (!instruction.value.trim()) {
           status.dataset.result = "bad";
-          status.textContent = "Write your instruction before comparing it with the example.";
+          status.textContent =
+            "Write your instruction before comparing it with the example.";
           instruction.focus();
           return;
         }
@@ -504,26 +581,32 @@
         `<div class="ctl"><button type="button" data-validate disabled>Check the candidate</button></div>` +
         `<p class="activity-status" data-verdict role="status" aria-live="polite">Choose the network Aarav intends to accept, then check the block against that node's rules.</p>` +
         `<div class="fork-response" data-response hidden><label for="${p.key}-notice">Write a short message to Aarav's customers. Say what this node did and why another network's node may reach a different result.</label><textarea id="${p.key}-notice" data-notice placeholder="Write the shop's update in your own words"></textarea><button type="button" class="ghost" data-compare>Compare with one possible update</button><p class="fork-model" data-model hidden></p></div>`;
-      el.querySelectorAll("[data-choice]").forEach((button) => button.addEventListener("click", () => {
-        choice = button.dataset.choice;
-        validated = false;
-        el.querySelectorAll("[data-choice]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
-        $(`[data-validate]`, el).disabled = false;
-        $(`[data-response]`, el).hidden = true;
-        const verdict = $(`[data-verdict]`, el);
-        verdict.removeAttribute("data-result");
-        verdict.textContent = choice === "btc"
-          ? "Bitcoin selected. Check whether its node accepts this larger block."
-          : "Bitcoin Cash selected. Check whether its node accepts this block under the larger limit.";
-      }));
+      el.querySelectorAll("[data-choice]").forEach((button) =>
+        button.addEventListener("click", () => {
+          choice = button.dataset.choice;
+          validated = false;
+          el.querySelectorAll("[data-choice]").forEach((item) =>
+            item.setAttribute("aria-pressed", String(item === button)),
+          );
+          $(`[data-validate]`, el).disabled = false;
+          $(`[data-response]`, el).hidden = true;
+          const verdict = $(`[data-verdict]`, el);
+          verdict.removeAttribute("data-result");
+          verdict.textContent =
+            choice === "btc"
+              ? "Bitcoin selected. Check whether its node accepts this larger block."
+              : "Bitcoin Cash selected. Check whether its node accepts this block under the larger limit.";
+        }),
+      );
       $(`[data-validate]`, el).onclick = () => {
         if (!choice) return;
         validated = true;
         const verdict = $(`[data-verdict]`, el);
         verdict.dataset.result = "good";
-        verdict.textContent = choice === "btc"
-          ? "Rejected by this Bitcoin node: the 2 MB block exceeds its 1 MB limit. It cannot follow a chain that builds on this block."
-          : "Accepted by this Bitcoin Cash node on the size rule: 2 MB is within its 8 MB limit. Other consensus checks still apply. A Bitcoin node rejects this block.";
+        verdict.textContent =
+          choice === "btc"
+            ? "Rejected by this Bitcoin node: the 2 MB block exceeds its 1 MB limit. It cannot follow a chain that builds on this block."
+            : "Accepted by this Bitcoin Cash node on the size rule: 2 MB is within its 8 MB limit. Other consensus checks still apply. A Bitcoin node rejects this block.";
         $(`[data-response]`, el).hidden = false;
       };
       $(`[data-compare]`, el).onclick = () => {
@@ -532,7 +615,8 @@
         const verdict = $(`[data-verdict]`, el);
         if (!notice.value.trim()) {
           verdict.dataset.result = "bad";
-          verdict.textContent = "Write the shop's update before comparing it with the example.";
+          verdict.textContent =
+            "Write the shop's update before comparing it with the example.";
           notice.focus();
           return;
         }
@@ -550,25 +634,35 @@
       const reviewed = new Set();
       el.innerHTML =
         `<span class="label">${p.label}</span><p>${p.intro}</p>` +
-        p.claims.map((item, i) => `<article class="tweet-fix"><blockquote>${item.claim}</blockquote><label for="${p.key}-${i}">Your correction</label><textarea id="${p.key}-${i}" data-answer="${i}" placeholder="Explain what the claim gets wrong"></textarea><button type="button" class="ghost" data-compare="${i}">Compare explanations</button><p class="tweet-example" data-example="${i}" hidden>${item.correction}</p></article>`).join("") +
+        p.claims
+          .map(
+            (item, i) =>
+              `<article class="tweet-fix"><blockquote>${item.claim}</blockquote><label for="${p.key}-${i}">Your correction</label><textarea id="${p.key}-${i}" data-answer="${i}" placeholder="Explain what the claim gets wrong"></textarea><button type="button" class="ghost" data-compare="${i}">Compare explanations</button><p class="tweet-example" data-example="${i}" hidden>${item.correction}</p></article>`,
+          )
+          .join("") +
         `<p class="activity-status" data-status role="status" aria-live="polite">Write a correction for each claim, then compare.</p>`;
-      el.querySelectorAll("[data-compare]").forEach((button) => button.addEventListener("click", () => {
-        const i = button.dataset.compare;
-        const answer = $(`[data-answer="${i}"]`, el);
-        const status = $(`[data-status]`, el);
-        if (!answer.value.trim()) {
-          status.dataset.result = "bad";
-          status.textContent = "Add your own correction before comparing.";
-          answer.focus();
-          return;
-        }
-        $(`[data-example="${i}"]`, el).hidden = false;
-        button.disabled = true;
-        reviewed.add(i);
-        status.dataset.result = "good";
-        status.textContent = reviewed.size === p.claims.length ? p.done : `${reviewed.size} of ${p.claims.length} claims revised. Continue with the others.`;
-        if (reviewed.size === p.claims.length) fin();
-      }));
+      el.querySelectorAll("[data-compare]").forEach((button) =>
+        button.addEventListener("click", () => {
+          const i = button.dataset.compare;
+          const answer = $(`[data-answer="${i}"]`, el);
+          const status = $(`[data-status]`, el);
+          if (!answer.value.trim()) {
+            status.dataset.result = "bad";
+            status.textContent = "Add your own correction before comparing.";
+            answer.focus();
+            return;
+          }
+          $(`[data-example="${i}"]`, el).hidden = false;
+          button.disabled = true;
+          reviewed.add(i);
+          status.dataset.result = "good";
+          status.textContent =
+            reviewed.size === p.claims.length
+              ? p.done
+              : `${reviewed.size} of ${p.claims.length} claims revised. Continue with the others.`;
+          if (reviewed.size === p.claims.length) fin();
+        }),
+      );
     },
     // Explore pool shares and network-valid blocks with a toy hash score.
     PoolShareLab(el, fin, p) {
@@ -587,17 +681,20 @@
         if (score <= p.networkTarget) {
           $("[data-outcome]", el).textContent = "Block found";
           status.dataset.result = "good";
-          status.textContent = "This hash meets the network target. It also meets the pool target; nodes must still validate the block.";
+          status.textContent =
+            "This hash meets the network target. It also meets the pool target; nodes must still validate the block.";
           visited.add("network");
         } else if (score <= p.poolTarget) {
           $("[data-outcome]", el).textContent = "Pool share";
           status.dataset.result = "good";
-          status.textContent = "The pool records this share as evidence of contributed work, but it is not a Bitcoin block.";
+          status.textContent =
+            "The pool records this share as evidence of contributed work, but it is not a Bitcoin block.";
           visited.add("share");
         } else {
           $("[data-outcome]", el).textContent = "Try again";
           status.dataset.result = "";
-          status.textContent = "This hash misses even the pool target. Lower scores represent better hashes in this toy model.";
+          status.textContent =
+            "This hash misses even the pool target. Lower scores represent better hashes in this toy model.";
           visited.add("miss");
         }
         if (visited.size === 3) {
@@ -615,9 +712,13 @@
       el.innerHTML =
         `<span class="label">${p.label}</span><p>${p.intro}</p>` +
         `<div class="match-item"><label for="${p.key}-node">Node software</label><select id="${p.key}-node" data-node>` +
-        p.nodes.map((node) => `<option value="${node.id}">${node.label}</option>`).join("") +
+        p.nodes
+          .map((node) => `<option value="${node.id}">${node.label}</option>`)
+          .join("") +
         `</select></div><div class="match-item"><label for="${p.key}-block">Candidate block</label><select id="${p.key}-block" data-block>` +
-        p.blocks.map((block) => `<option value="${block.id}">${block.label}</option>`).join("") +
+        p.blocks
+          .map((block) => `<option value="${block.id}">${block.label}</option>`)
+          .join("") +
         `</select></div><button type="button" data-validate>Run this node's validation</button>` +
         `<div class="dash"><div class="stat"><b data-verdict>Ready</b><span data-node-name>Select node software and a block</span></div></div>` +
         `<p data-explain></p><p class="activity-status" data-status role="status" aria-live="polite">Predict the result, then run the check.</p>`;
@@ -626,14 +727,17 @@
         const block = $(`[data-block]`, el).value;
         const result = p.blocks.find((item) => item.id === block).results[node];
         tried.add(node + ":" + block);
-        $(`[data-node-name]`, el).textContent = p.nodes.find((item) => item.id === node).label;
+        $(`[data-node-name]`, el).textContent = p.nodes.find(
+          (item) => item.id === node,
+        ).label;
         $(`[data-verdict]`, el).textContent = result.verdict;
         $(`[data-explain]`, el).textContent = result.explain;
         const status = $(`[data-status]`, el);
         status.dataset.result = "good";
-        status.textContent = tried.size === p.nodes.length * p.blocks.length
-          ? p.done
-          : `Checks run: ${tried.size} of ${p.nodes.length * p.blocks.length}. Try another node and block combination.`;
+        status.textContent =
+          tried.size === p.nodes.length * p.blocks.length
+            ? p.done
+            : `Checks run: ${tried.size} of ${p.nodes.length * p.blocks.length}. Try another node and block combination.`;
         if (tried.size === p.nodes.length * p.blocks.length) fin();
       };
       $(`[data-validate]`, el).addEventListener("click", validate);
@@ -730,15 +834,14 @@
         wrong = [];
         steps.forEach((st, i) => {
           const field = $(`#${id}-${i}`, el);
-          const userInput =
-            field.value
-              .trim()
-              .toLowerCase()
-              .replace(/[\s,]+/g, "");
+          const userInput = field.value
+            .trim()
+            .toLowerCase()
+            .replace(/[\s,]+/g, "");
           const expectedAnswer = String(st.answer)
-              .trim()
-              .toLowerCase()
-              .replace(/[\s,]+/g, "");
+            .trim()
+            .toLowerCase()
+            .replace(/[\s,]+/g, "");
           const ok = userInput === expectedAnswer;
           field.setAttribute("aria-invalid", String(!ok));
           const mark = $(`[data-mark="${i}"]`, el);

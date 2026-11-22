@@ -39,5 +39,5 @@ window.LESSON_ASSETS = {
     <g fill="#463b34" stroke="none" font-size="12" text-anchor="middle"><text x="122" y="94">Payment A · 80 sat/vB</text><text x="122" y="132">Payment B · 42 sat/vB</text><text x="122" y="170">Payment C · 18 sat/vB</text><text x="122" y="208">Payment D · 5 sat/vB</text></g><path d="M218 89h44m-44 38h44m-44 38h44" stroke="#e87549" stroke-width="2.5"/>
     <path d="M274 60h303q11 0 11 11v136q0 11-11 11H274z" fill="#fffaf1" stroke="#66574b" stroke-width="1.5"/><text x="430" y="52" text-anchor="middle" fill="#50443d" stroke="none" font-size="12" font-weight="700">Candidate block</text>
     <rect x="295" y="74" width="260" height="30" rx="7" fill="#91c5ad"/><rect x="295" y="112" width="260" height="30" rx="7" fill="#a9c8ad"/><rect x="295" y="150" width="260" height="30" rx="7" fill="#f3cb75"/><g fill="#263a35" stroke="none" font-size="12"><text x="425" y="94" text-anchor="middle">A · strong fee rate</text><text x="425" y="132" text-anchor="middle">B · next best</text><text x="425" y="170" text-anchor="middle">C · if there is room</text></g>
-  </svg>`
+  </svg>`,
 };

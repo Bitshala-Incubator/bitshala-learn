@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <title>Consensus — Bitshala Learn 12.2</title>
     <link rel="stylesheet" href="../../../styles/global.css" />
     <link rel="stylesheet" href="../../../styles/lesson.css" />
@@ -10,472 +13,475 @@
     <link rel="stylesheet" href="./consensus.css" />
   </head>
   <body>
-    <nav><span>Bitshala Learn: Lesson 12.2</span><span id="prog">Ready</span><div id="bar"></div></nav>
+    <nav>
+      <span>Bitshala Learn: Lesson 12.2</span><span id="prog">Ready</span>
+      <div id="bar"></div>
+    </nav>
     <div class="wrap">
       <header id="head"></header>
       <div id="warn"></div>
       <main id="lesson"></main>
     </div>
     <script type="application/json" id="lesson-data">
-
-{
-  "id": "12.2",
-  "title": "Consensus",
-  "subtitle": "Aarav's payment meets a fork. Follow it through validation, chain selection, pools, and rule changes.",
-  "phase": "Bitcoin Foundations",
-  "module": "Module 12",
-  "minutes": 60,
-  "level": "Beginner",
-  "next": {
-    "id": "13.1",
-    "title": "Wallet and Key Security",
-    "teaser": "Next, Aarav and Meera turn to the keys behind his bitcoin: how wallets help manage them, how backups support recovery, and which habits help protect access."
-  },
-  "sections": [
-    {
-      "id": "opening",
-      "label": "The incident",
-      "title": "Aarav has one confirmation",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Aarav runs a small shop. A customer pays him 0.002 BTC, and one block confirms the payment. He is ready to hand over the order when Meera, who helps him run a Bitcoin node, asks him to wait. A second branch has appeared, and the block containing his payment may not stay in the chain his node follows."
-        },
-        {
-          "type": "text",
-          "md": "Together, they check the block, watch the chain change, ask who built it, and decide what their own node should accept. Each part of the lesson follows the same payment."
-        }
-      ]
-    },
-    {
-      "id": "validation",
-      "label": "Part 1: Block validation",
-      "title": "A valid hash cannot rescue a bad block",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "A block reaches Meera's node with proof of work below the network target. That is only the first check. Her node also checks the block structure, every transaction, the coinbase amount, and the transaction commitment. A miner proposes a block; each full node decides whether it follows that node's consensus rules."
-        },
-        {
-          "type": "text",
-          "md": "A real warning came in August 2010. Block 74,638 had valid proof of work, but an integer overflow let one transaction create about 184 billion BTC. Fixed nodes rejected that block and returned to the chain before it. The original [2010 incident thread](https://bitcointalk.org/index.php?topic=823.0) records the warning and the patch."
-        },
-        {
-          "type": "figure",
-          "asset": "validationCheckpoint",
-          "caption": "The block passes the proof-of-work check, then reaches transaction and coinbase checks. One failed rule stops it."
-        },
-        {
-          "type": "widget",
-          "id": "ex-consensus-validation",
-          "name": "BlockInspector",
-          "props": {
-            "key": "ex-consensus-validation",
-            "label": "Case file: Find the invalid transaction",
-            "intro": "Each case has valid proof of work. Open the transaction cards and find the line Meera's node must reject.",
-            "done": "You found the bad transaction in every case. Proof of work never cancels a consensus-rule failure.",
-            "rounds": [
-              {
-                "title": "Block 74,638, August 2010",
-                "context": "Historical case. An integer overflow made the output total appear small enough.",
-                "pow": true,
-                "source": "The outputs created about 184 billion BTC.",
-                "txs": [
-                  {
-                    "id": "A",
-                    "text": "Payment: 0.50 BTC to a wallet"
-                  },
-                  {
-                    "id": "B",
-                    "text": "Payment: 1.20 BTC to a shop"
-                  },
-                  {
-                    "id": "C",
-                    "text": "Output total: about 184 billion BTC from an integer overflow",
-                    "invalid": true,
-                    "why": "The transaction's output total exceeded the money limit. The old overflow bug hid the excess; fixed nodes rejected the block."
-                  },
-                  {
-                    "id": "D",
-                    "text": "Payment: 0.08 BTC with a valid signature"
-                  },
-                  {
-                    "id": "E",
-                    "text": "Payment: 2.00 BTC to a saved address"
-                  },
-                  {
-                    "id": "F",
-                    "text": "Miner claim is within the allowed subsidy"
-                  }
-                ]
-              },
-              {
-                "title": "Aarav's payment block",
-                "context": "A second case. Every line looks ordinary until you compare the inputs.",
-                "pow": true,
-                "source": "Two payments try to spend the same output.",
-                "txs": [
-                  {
-                    "id": "A",
-                    "text": "Spends output 9f2a:0 to pay the supplier"
-                  },
-                  {
-                    "id": "B",
-                    "text": "Spends output 22b1:1 to pay the courier"
-                  },
-                  {
-                    "id": "C",
-                    "text": "Spends output 9f2a:0 again to pay the shop",
-                    "invalid": true,
-                    "why": "The same output is spent twice. A valid block cannot contain both spends."
-                  },
-                  {
-                    "id": "D",
-                    "text": "Spends output a104:2 with a valid signature"
-                  },
-                  {
-                    "id": "E",
-                    "text": "Spends output b809:0 with a valid signature"
-                  },
-                  {
-                    "id": "F",
-                    "text": "Coinbase claim matches subsidy plus fees"
-                  }
-                ]
-              },
-              {
-                "title": "A miner's payout",
-                "context": "A third case. Check the amount the miner tries to claim.",
-                "pow": true,
-                "source": "The coinbase is larger than the subsidy and fees allow.",
-                "txs": [
-                  {
-                    "id": "A",
-                    "text": "Payment spends an existing output correctly"
-                  },
-                  {
-                    "id": "B",
-                    "text": "Payment signature passes the script check"
-                  },
-                  {
-                    "id": "C",
-                    "text": "Transaction outputs do not exceed their inputs"
-                  },
-                  {
-                    "id": "D",
-                    "text": "Merkle root matches the block transactions"
-                  },
-                  {
-                    "id": "E",
-                    "text": "Coinbase claims 3.20 BTC; subsidy plus fees allow 3.145 BTC",
-                    "invalid": true,
-                    "why": "The coinbase claims more than the subsidy and transaction fees permit. Nodes reject the block."
-                  },
-                  {
-                    "id": "F",
-                    "text": "Header hash is below the target"
-                  }
-                ]
-              }
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "id": "chain-selection",
-      "label": "Part 2: Chain selection",
-      "title": "Aarav's confirmation can disappear",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Meera's node sees two valid branches. One branch has more blocks, but that does not decide the winner. Nodes prefer the valid chain with the most accumulated proof of work. A shorter branch can have more work if its blocks were harder to mine."
-        },
-        {
-          "type": "text",
-          "md": "When the other branch overtakes the one containing Aarav's payment, Meera's node reorganizes to it. His payment goes from one confirmation back to zero and waits to be included again. Confirmations increase confidence; they are not a promise of absolute finality. Bitcoin Core tracks accumulated chain work when selecting a candidate chain in its [validation code](https://github.com/bitcoin/bitcoin/blob/master/src/validation.cpp)."
-        },
-        {
-          "type": "figure",
-          "asset": "confirmationScale",
-          "caption": "Four lighter blocks can carry less accumulated work than two harder blocks. Aarav's payment is on the branch that loses."
-        },
-        {
-          "type": "widget",
-          "id": "ex-consensus-reorg",
-          "name": "ReorgSimulator",
-          "props": {
-            "key": "ex-consensus-reorg",
-            "label": "Follow Aarav's payment through a reorganization",
-            "intro": "Branch A currently has more work and contains Aarav's payment. Add blocks to either branch and watch the best chain and confirmation count change.",
-            "workA": 12,
-            "workB": 10,
-            "stepWork": 3,
-            "blocksA": 3,
-            "blocksB": 2,
-            "done": "The branch with more accumulated work won. Aarav's confirmation disappeared during the reorganization.",
-            "reset": "Reset the fork"
-          }
-        }
-      ]
-    },
-    {
-      "id": "pools",
-      "label": "Part 3: Mining pools",
-      "title": "Who built the block that replaced it?",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Aarav asks who found the block on the winning branch. Meera explains mining pools. A pool coordinator sends candidate work to miners and tracks their shares. A share meets the pool's easier target and records contributed hash power; a block must meet the network target and pass node validation."
-        },
-        {
-          "type": "text",
-          "md": "Pools make payouts more regular for a small miner, but payment methods vary. The comparison below uses a simplified proportional pool payout, before fees and payout thresholds. It is not a promise of real earnings."
-        },
-        {
-          "type": "figure",
-          "asset": "poolThreshold",
-          "caption": "A share can meet the pool target without meeting Bitcoin's network target. The network target is harder to reach."
-        },
-        {
-          "type": "widget",
-          "id": "ex-consensus-pools",
-          "name": "PoolIncomeSim",
-          "props": {
-            "key": "ex-consensus-pools",
-            "label": "A month of mining: alone or in a pool",
-            "intro": "Compare a solo miner with a pool payout over 30 days. Change the miner's share of network hash power, then run the month.",
-            "days": 30,
-            "blocksPerDay": 144,
-            "startShare": 1,
-            "done": "Compare the jagged solo result with the steadier proportional pool estimate. The averages can match while timing and payout variance differ."
-          }
-        }
-      ]
-    },
-    {
-      "id": "rules",
-      "label": "Part 4: Consensus rules",
-      "title": "Your node, your rules",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "The pool operator emails Aarav: \"We have 60% of the hash power. Accept our new rule.\" Meera says hash power cannot make an invalid block valid. Her node independently checks each candidate block against the rules she chose to run."
-        },
-        {
-          "type": "text",
-          "md": "Miners produce blocks and can influence which valid branch gains work. Full nodes reject blocks that violate their consensus rules, even when a great deal of hash power supports them. Try running the checks yourself."
-        },
-        {
-          "type": "figure",
-          "asset": "nodeCourt",
-          "caption": "The same block reaches five nodes. Each checks its own rules; a miner's hash power is not a validity check."
-        },
-        {
-          "type": "widget",
-          "id": "ex-consensus-rules",
-          "name": "NodeJudge",
-          "props": {
-            "key": "ex-consensus-rules",
-            "label": "Be Meera's node",
-            "intro": "Six blocks arrive. Accept blocks that follow the rules and reject the ones that do not. Hash-power backing is shown, but it never changes the validity check.",
-            "done": "You checked all six blocks. Hash power helps choose among valid chains; it is not an input to block validity.",
-            "rounds": [
-              {
-                "title": "A normal payment block",
-                "backing": "12% of network hash power",
-                "facts": [
-                  "Proof of work meets the target",
-                  "All signatures and spends are valid",
-                  "Coinbase claim is within the limit"
-                ],
-                "valid": true,
-                "why": "All listed consensus checks pass."
-              },
-              {
-                "title": "The 90% block with an overclaim",
-                "backing": "90% of network hash power",
-                "facts": [
-                  "Proof of work meets the target",
-                  "Coinbase claims more than subsidy plus fees",
-                  "All other transactions are valid"
-                ],
-                "valid": false,
-                "why": "Reject it. The coinbase exceeds the allowed amount. Hash-power backing does not fix that."
-              },
-              {
-                "title": "A block with a double spend",
-                "backing": "35% of network hash power",
-                "facts": [
-                  "Proof of work meets the target",
-                  "Two transactions spend the same output",
-                  "Coinbase claim is within the limit"
-                ],
-                "valid": false,
-                "why": "Reject it. An output cannot be spent twice in the same valid history."
-              },
-              {
-                "title": "A header above the target",
-                "backing": "95% of network hash power",
-                "facts": [
-                  "The header hash is above the target",
-                  "Transactions and coinbase look valid",
-                  "Most miners support this branch"
-                ],
-                "valid": false,
-                "why": "Reject it. The proof of work does not meet the target, regardless of how much hash power miners claim to support it."
-              },
-              {
-                "title": "A broken transaction commitment",
-                "backing": "51% of network hash power",
-                "facts": [
-                  "Proof of work meets the target",
-                  "The block's Merkle root does not match its transactions",
-                  "Signatures are valid"
-                ],
-                "valid": false,
-                "why": "Reject it. The header commitment must match the transactions in the block."
-              },
-              {
-                "title": "A fully checked block",
-                "backing": "8% of network hash power",
-                "facts": [
-                  "Proof of work meets the target",
-                  "Transactions and scripts pass",
-                  "Coinbase and Merkle root are valid"
-                ],
-                "valid": true,
-                "why": "Accept it as valid. The node can then compare its chain work with other valid branches."
-              }
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "id": "soft-fork",
-      "label": "Part 5: Soft forks",
-      "title": "A tighter rule can fit inside the old rules",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Meera shows Aarav a nested rule map. A soft fork tightens the set of valid blocks. A block that follows the new rule also follows the old rules. An old node may still accept a block that violates the new restriction, because that node does not enforce the added rule."
-        },
-        {
-          "type": "text",
-          "md": "SegWit was deployed as a soft fork. It activated on Bitcoin in August 2017 at block 481,824; [BIP 141](https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki) describes the consensus change. Meera is helping a local pool update its block templates to respect a tighter rule. Test two candidate blocks and write the pool's instruction."
-        },
-        {
-          "type": "figure",
-          "asset": "softForkMap",
-          "caption": "The inner area follows both rule sets. The surrounding ring is valid under old rules only. Outside the old rules, both reject."
-        },
-        {
-          "type": "widget",
-          "id": "ex-consensus-softfork",
-          "name": "SoftForkLab",
-          "props": {
-            "key": "ex-consensus-softfork",
-            "label": "Meera updates the pool's block template",
-            "intro": "The pool is choosing what to mine under a tighter rule. Inspect each candidate against both node versions, then write a clear instruction to keep them on one chain.",
-            "oldLimit": 4,
-            "newLimit": 3.8,
-            "done": "The pool instruction keeps templates within the tighter limit. Those blocks remain valid to old nodes too; an old-valid block outside the new limit can be rejected by upgraded nodes.",
-            "model": "Keep every block at or below 3.8 units. That satisfies the tighter rule and the old rule, so both node versions accept it. A 3.9-unit block is valid only under the old rule; upgraded nodes reject it, which can split the histories if miners build on it.",
-            "candidates": [
-              {
-                "id": "shared",
-                "title": "Template A",
-                "weight": 3.6
-              },
-              {
-                "id": "old-only",
-                "title": "Template B",
-                "weight": 3.9
-              }
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "id": "hard-fork",
-      "label": "Part 6: Hard forks",
-      "title": "Choosing software chooses rules",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "A hard fork changes the rules so a block accepted by upgraded nodes can be rejected by old nodes. In March 2013, block 225,430 triggered an accidental compatibility split between Bitcoin versions 0.7 and 0.8. The [incident report](https://bitcoin.org/en/alert/2013-03-11-chain-fork) explains how participants returned to one compatible chain."
-        },
-        {
-          "type": "text",
-          "md": "In August 2017, Bitcoin and Bitcoin Cash shared history through block 478,558, then followed different rules. SegWit activated later that month on Bitcoin at block 481,824. A hard fork does not force a permanent split if everyone coordinates on one rule set. Aarav now decides which software his shop's node runs. That choice is one way he opts into the rules he wants it to enforce."
-        },
-        {
-          "type": "figure",
-          "asset": "forkTimeline",
-          "caption": "The 2013 compatibility incident and the 2017 Bitcoin Cash split show two different paths to competing histories."
-        },
-        {
-          "type": "widget",
-          "id": "ex-consensus-hardfork",
-          "name": "ForkIncident",
-          "props": {
-            "key": "ex-consensus-hardfork",
-            "label": "Fork incident: choose a network and inform customers",
-            "intro": "You are Meera, helping Aarav configure the shop node. Bitcoin and Bitcoin Cash shared block 478,558. In this simplified case, a 2 MB block follows the Bitcoin Cash size limit but exceeds Bitcoin's 1 MB limit. Assume all other checks pass.",
-            "done": "Your update names the network, explains the node's rule check, and reminds customers that nodes following different rules can see separate histories.",
-            "model": {
-              "btc": "Our shop accepts Bitcoin. Its node rejected this 2 MB block because it exceeds the Bitcoin size limit. Bitcoin Cash nodes follow a different rule set and may build a separate history. Please check that your payment is on the network our shop accepts.",
-              "bch": "Our shop accepts Bitcoin Cash. Its node accepted this 2 MB block on the size rule, after the other checks passed. Bitcoin nodes reject it under their rule set and may build a separate history. Please check that your payment is on the network our shop accepts."
-            }
-          }
-        }
-      ]
-    },
-    {
-      "id": "wrap",
-      "label": "The decision",
-      "title": "Correct the claims before Aarav ships",
-      "blocks": [
-        {
-          "type": "text",
-          "md": "Aarav's payment is back in the chain his node follows. He has seen why one confirmation can change, why a miner cannot force an invalid block through, and why software versions matter when rules change."
-        },
-        {
-          "type": "widget",
-          "id": "ex-consensus-tweet",
-          "name": "FixTweet",
-          "props": {
-            "key": "ex-consensus-tweet",
-            "label": "Aarav's group chat has three claims to fix",
-            "intro": "Write a short correction for each claim in your own words. Then compare it with one possible explanation.",
-            "done": "Aarav can now explain the difference between accumulated work, node-enforced rules, and fork compatibility.",
-            "claims": [
-              {
-                "claim": "\"The longest chain always wins.\"",
-                "correction": "Nodes prefer the valid chain with the most accumulated proof of work. It often has more blocks, but block count alone is not the rule."
-              },
-              {
-                "claim": "\"Miners vote on which blocks are valid.\"",
-                "correction": "Miners propose blocks and add proof of work. Each full node independently accepts only blocks that follow its consensus rules."
-              },
-              {
-                "claim": "\"Old nodes enforce a soft fork's new rules.\"",
-                "correction": "Old nodes do not enforce the added restriction. They can still follow blocks that satisfy the new, tighter rules because those blocks also fit the old rules."
-              }
-            ]
-          }
-        },
-        {
-          "type": "next",
+      {
+        "id": "12.2",
+        "title": "Consensus",
+        "subtitle": "Aarav's payment meets a fork. Follow it through validation, chain selection, pools, and rule changes.",
+        "phase": "Bitcoin Foundations",
+        "module": "Module 12",
+        "minutes": 60,
+        "level": "Beginner",
+        "next": {
           "id": "13.1",
-          "title": "Next module"
-        }
-      ]
-    }
-  ]
-}</script>
+          "title": "Wallet and Key Security",
+          "teaser": "Next, Aarav and Meera turn to the keys behind his bitcoin: how wallets help manage them, how backups support recovery, and which habits help protect access."
+        },
+        "sections": [
+          {
+            "id": "opening",
+            "label": "The incident",
+            "title": "Aarav has one confirmation",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav runs a small shop. A customer pays him 0.002 BTC, and one block confirms the payment. He is ready to hand over the order when Meera, who helps him run a Bitcoin node, asks him to wait. A second branch has appeared, and the block containing his payment may not stay in the chain his node follows."
+              },
+              {
+                "type": "text",
+                "md": "Together, they check the block, watch the chain change, ask who built it, and decide what their own node should accept. Each part of the lesson follows the same payment."
+              }
+            ]
+          },
+          {
+            "id": "validation",
+            "label": "Part 1: Block validation",
+            "title": "A valid hash cannot rescue a bad block",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "A block reaches Meera's node with proof of work below the network target. That is only the first check. Her node also checks the block structure, every transaction, the coinbase amount, and the transaction commitment. A miner proposes a block; each full node decides whether it follows that node's consensus rules."
+              },
+              {
+                "type": "text",
+                "md": "A real warning came in August 2010. Block 74,638 had valid proof of work, but an integer overflow let one transaction create about 184 billion BTC. Fixed nodes rejected that block and returned to the chain before it. The original [2010 incident thread](https://bitcointalk.org/index.php?topic=823.0) records the warning and the patch."
+              },
+              {
+                "type": "figure",
+                "asset": "validationCheckpoint",
+                "caption": "The block passes the proof-of-work check, then reaches transaction and coinbase checks. One failed rule stops it."
+              },
+              {
+                "type": "widget",
+                "id": "ex-consensus-validation",
+                "name": "BlockInspector",
+                "props": {
+                  "key": "ex-consensus-validation",
+                  "label": "Case file: Find the invalid transaction",
+                  "intro": "Each case has valid proof of work. Open the transaction cards and find the line Meera's node must reject.",
+                  "done": "You found the bad transaction in every case. Proof of work never cancels a consensus-rule failure.",
+                  "rounds": [
+                    {
+                      "title": "Block 74,638, August 2010",
+                      "context": "Historical case. An integer overflow made the output total appear small enough.",
+                      "pow": true,
+                      "source": "The outputs created about 184 billion BTC.",
+                      "txs": [
+                        {
+                          "id": "A",
+                          "text": "Payment: 0.50 BTC to a wallet"
+                        },
+                        {
+                          "id": "B",
+                          "text": "Payment: 1.20 BTC to a shop"
+                        },
+                        {
+                          "id": "C",
+                          "text": "Output total: about 184 billion BTC from an integer overflow",
+                          "invalid": true,
+                          "why": "The transaction's output total exceeded the money limit. The old overflow bug hid the excess; fixed nodes rejected the block."
+                        },
+                        {
+                          "id": "D",
+                          "text": "Payment: 0.08 BTC with a valid signature"
+                        },
+                        {
+                          "id": "E",
+                          "text": "Payment: 2.00 BTC to a saved address"
+                        },
+                        {
+                          "id": "F",
+                          "text": "Miner claim is within the allowed subsidy"
+                        }
+                      ]
+                    },
+                    {
+                      "title": "Aarav's payment block",
+                      "context": "A second case. Every line looks ordinary until you compare the inputs.",
+                      "pow": true,
+                      "source": "Two payments try to spend the same output.",
+                      "txs": [
+                        {
+                          "id": "A",
+                          "text": "Spends output 9f2a:0 to pay the supplier"
+                        },
+                        {
+                          "id": "B",
+                          "text": "Spends output 22b1:1 to pay the courier"
+                        },
+                        {
+                          "id": "C",
+                          "text": "Spends output 9f2a:0 again to pay the shop",
+                          "invalid": true,
+                          "why": "The same output is spent twice. A valid block cannot contain both spends."
+                        },
+                        {
+                          "id": "D",
+                          "text": "Spends output a104:2 with a valid signature"
+                        },
+                        {
+                          "id": "E",
+                          "text": "Spends output b809:0 with a valid signature"
+                        },
+                        {
+                          "id": "F",
+                          "text": "Coinbase claim matches subsidy plus fees"
+                        }
+                      ]
+                    },
+                    {
+                      "title": "A miner's payout",
+                      "context": "A third case. Check the amount the miner tries to claim.",
+                      "pow": true,
+                      "source": "The coinbase is larger than the subsidy and fees allow.",
+                      "txs": [
+                        {
+                          "id": "A",
+                          "text": "Payment spends an existing output correctly"
+                        },
+                        {
+                          "id": "B",
+                          "text": "Payment signature passes the script check"
+                        },
+                        {
+                          "id": "C",
+                          "text": "Transaction outputs do not exceed their inputs"
+                        },
+                        {
+                          "id": "D",
+                          "text": "Merkle root matches the block transactions"
+                        },
+                        {
+                          "id": "E",
+                          "text": "Coinbase claims 3.20 BTC; subsidy plus fees allow 3.145 BTC",
+                          "invalid": true,
+                          "why": "The coinbase claims more than the subsidy and transaction fees permit. Nodes reject the block."
+                        },
+                        {
+                          "id": "F",
+                          "text": "Header hash is below the target"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "chain-selection",
+            "label": "Part 2: Chain selection",
+            "title": "Aarav's confirmation can disappear",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Meera's node sees two valid branches. One branch has more blocks, but that does not decide the winner. Nodes prefer the valid chain with the most accumulated proof of work. A shorter branch can have more work if its blocks were harder to mine."
+              },
+              {
+                "type": "text",
+                "md": "When the other branch overtakes the one containing Aarav's payment, Meera's node reorganizes to it. His payment goes from one confirmation back to zero and waits to be included again. Confirmations increase confidence; they are not a promise of absolute finality. Bitcoin Core tracks accumulated chain work when selecting a candidate chain in its [validation code](https://github.com/bitcoin/bitcoin/blob/master/src/validation.cpp)."
+              },
+              {
+                "type": "figure",
+                "asset": "confirmationScale",
+                "caption": "Four lighter blocks can carry less accumulated work than two harder blocks. Aarav's payment is on the branch that loses."
+              },
+              {
+                "type": "widget",
+                "id": "ex-consensus-reorg",
+                "name": "ReorgSimulator",
+                "props": {
+                  "key": "ex-consensus-reorg",
+                  "label": "Follow Aarav's payment through a reorganization",
+                  "intro": "Branch A currently has more work and contains Aarav's payment. Add blocks to either branch and watch the best chain and confirmation count change.",
+                  "workA": 12,
+                  "workB": 10,
+                  "stepWork": 3,
+                  "blocksA": 3,
+                  "blocksB": 2,
+                  "done": "The branch with more accumulated work won. Aarav's confirmation disappeared during the reorganization.",
+                  "reset": "Reset the fork"
+                }
+              }
+            ]
+          },
+          {
+            "id": "pools",
+            "label": "Part 3: Mining pools",
+            "title": "Who built the block that replaced it?",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav asks who found the block on the winning branch. Meera explains mining pools. A pool coordinator sends candidate work to miners and tracks their shares. A share meets the pool's easier target and records contributed hash power; a block must meet the network target and pass node validation."
+              },
+              {
+                "type": "text",
+                "md": "Pools make payouts more regular for a small miner, but payment methods vary. The comparison below uses a simplified proportional pool payout, before fees and payout thresholds. It is not a promise of real earnings."
+              },
+              {
+                "type": "figure",
+                "asset": "poolThreshold",
+                "caption": "A share can meet the pool target without meeting Bitcoin's network target. The network target is harder to reach."
+              },
+              {
+                "type": "widget",
+                "id": "ex-consensus-pools",
+                "name": "PoolIncomeSim",
+                "props": {
+                  "key": "ex-consensus-pools",
+                  "label": "A month of mining: alone or in a pool",
+                  "intro": "Compare a solo miner with a pool payout over 30 days. Change the miner's share of network hash power, then run the month.",
+                  "days": 30,
+                  "blocksPerDay": 144,
+                  "startShare": 1,
+                  "done": "Compare the jagged solo result with the steadier proportional pool estimate. The averages can match while timing and payout variance differ."
+                }
+              }
+            ]
+          },
+          {
+            "id": "rules",
+            "label": "Part 4: Consensus rules",
+            "title": "Your node, your rules",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "The pool operator emails Aarav: \"We have 60% of the hash power. Accept our new rule.\" Meera says hash power cannot make an invalid block valid. Her node independently checks each candidate block against the rules she chose to run."
+              },
+              {
+                "type": "text",
+                "md": "Miners produce blocks and can influence which valid branch gains work. Full nodes reject blocks that violate their consensus rules, even when a great deal of hash power supports them. Try running the checks yourself."
+              },
+              {
+                "type": "figure",
+                "asset": "nodeCourt",
+                "caption": "The same block reaches five nodes. Each checks its own rules; a miner's hash power is not a validity check."
+              },
+              {
+                "type": "widget",
+                "id": "ex-consensus-rules",
+                "name": "NodeJudge",
+                "props": {
+                  "key": "ex-consensus-rules",
+                  "label": "Be Meera's node",
+                  "intro": "Six blocks arrive. Accept blocks that follow the rules and reject the ones that do not. Hash-power backing is shown, but it never changes the validity check.",
+                  "done": "You checked all six blocks. Hash power helps choose among valid chains; it is not an input to block validity.",
+                  "rounds": [
+                    {
+                      "title": "A normal payment block",
+                      "backing": "12% of network hash power",
+                      "facts": [
+                        "Proof of work meets the target",
+                        "All signatures and spends are valid",
+                        "Coinbase claim is within the limit"
+                      ],
+                      "valid": true,
+                      "why": "All listed consensus checks pass."
+                    },
+                    {
+                      "title": "The 90% block with an overclaim",
+                      "backing": "90% of network hash power",
+                      "facts": [
+                        "Proof of work meets the target",
+                        "Coinbase claims more than subsidy plus fees",
+                        "All other transactions are valid"
+                      ],
+                      "valid": false,
+                      "why": "Reject it. The coinbase exceeds the allowed amount. Hash-power backing does not fix that."
+                    },
+                    {
+                      "title": "A block with a double spend",
+                      "backing": "35% of network hash power",
+                      "facts": [
+                        "Proof of work meets the target",
+                        "Two transactions spend the same output",
+                        "Coinbase claim is within the limit"
+                      ],
+                      "valid": false,
+                      "why": "Reject it. An output cannot be spent twice in the same valid history."
+                    },
+                    {
+                      "title": "A header above the target",
+                      "backing": "95% of network hash power",
+                      "facts": [
+                        "The header hash is above the target",
+                        "Transactions and coinbase look valid",
+                        "Most miners support this branch"
+                      ],
+                      "valid": false,
+                      "why": "Reject it. The proof of work does not meet the target, regardless of how much hash power miners claim to support it."
+                    },
+                    {
+                      "title": "A broken transaction commitment",
+                      "backing": "51% of network hash power",
+                      "facts": [
+                        "Proof of work meets the target",
+                        "The block's Merkle root does not match its transactions",
+                        "Signatures are valid"
+                      ],
+                      "valid": false,
+                      "why": "Reject it. The header commitment must match the transactions in the block."
+                    },
+                    {
+                      "title": "A fully checked block",
+                      "backing": "8% of network hash power",
+                      "facts": [
+                        "Proof of work meets the target",
+                        "Transactions and scripts pass",
+                        "Coinbase and Merkle root are valid"
+                      ],
+                      "valid": true,
+                      "why": "Accept it as valid. The node can then compare its chain work with other valid branches."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "soft-fork",
+            "label": "Part 5: Soft forks",
+            "title": "A tighter rule can fit inside the old rules",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Meera shows Aarav a nested rule map. A soft fork tightens the set of valid blocks. A block that follows the new rule also follows the old rules. An old node may still accept a block that violates the new restriction, because that node does not enforce the added rule."
+              },
+              {
+                "type": "text",
+                "md": "SegWit was deployed as a soft fork. It activated on Bitcoin in August 2017 at block 481,824; [BIP 141](https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki) describes the consensus change. Meera is helping a local pool update its block templates to respect a tighter rule. Test two candidate blocks and write the pool's instruction."
+              },
+              {
+                "type": "figure",
+                "asset": "softForkMap",
+                "caption": "The inner area follows both rule sets. The surrounding ring is valid under old rules only. Outside the old rules, both reject."
+              },
+              {
+                "type": "widget",
+                "id": "ex-consensus-softfork",
+                "name": "SoftForkLab",
+                "props": {
+                  "key": "ex-consensus-softfork",
+                  "label": "Meera updates the pool's block template",
+                  "intro": "The pool is choosing what to mine under a tighter rule. Inspect each candidate against both node versions, then write a clear instruction to keep them on one chain.",
+                  "oldLimit": 4,
+                  "newLimit": 3.8,
+                  "done": "The pool instruction keeps templates within the tighter limit. Those blocks remain valid to old nodes too; an old-valid block outside the new limit can be rejected by upgraded nodes.",
+                  "model": "Keep every block at or below 3.8 units. That satisfies the tighter rule and the old rule, so both node versions accept it. A 3.9-unit block is valid only under the old rule; upgraded nodes reject it, which can split the histories if miners build on it.",
+                  "candidates": [
+                    {
+                      "id": "shared",
+                      "title": "Template A",
+                      "weight": 3.6
+                    },
+                    {
+                      "id": "old-only",
+                      "title": "Template B",
+                      "weight": 3.9
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "hard-fork",
+            "label": "Part 6: Hard forks",
+            "title": "Choosing software chooses rules",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "A hard fork changes the rules so a block accepted by upgraded nodes can be rejected by old nodes. In March 2013, block 225,430 triggered an accidental compatibility split between Bitcoin versions 0.7 and 0.8. The [incident report](https://bitcoin.org/en/alert/2013-03-11-chain-fork) explains how participants returned to one compatible chain."
+              },
+              {
+                "type": "text",
+                "md": "In August 2017, Bitcoin and Bitcoin Cash shared history through block 478,558, then followed different rules. SegWit activated later that month on Bitcoin at block 481,824. A hard fork does not force a permanent split if everyone coordinates on one rule set. Aarav now decides which software his shop's node runs. That choice is one way he opts into the rules he wants it to enforce."
+              },
+              {
+                "type": "figure",
+                "asset": "forkTimeline",
+                "caption": "The 2013 compatibility incident and the 2017 Bitcoin Cash split show two different paths to competing histories."
+              },
+              {
+                "type": "widget",
+                "id": "ex-consensus-hardfork",
+                "name": "ForkIncident",
+                "props": {
+                  "key": "ex-consensus-hardfork",
+                  "label": "Fork incident: choose a network and inform customers",
+                  "intro": "You are Meera, helping Aarav configure the shop node. Bitcoin and Bitcoin Cash shared block 478,558. In this simplified case, a 2 MB block follows the Bitcoin Cash size limit but exceeds Bitcoin's 1 MB limit. Assume all other checks pass.",
+                  "done": "Your update names the network, explains the node's rule check, and reminds customers that nodes following different rules can see separate histories.",
+                  "model": {
+                    "btc": "Our shop accepts Bitcoin. Its node rejected this 2 MB block because it exceeds the Bitcoin size limit. Bitcoin Cash nodes follow a different rule set and may build a separate history. Please check that your payment is on the network our shop accepts.",
+                    "bch": "Our shop accepts Bitcoin Cash. Its node accepted this 2 MB block on the size rule, after the other checks passed. Bitcoin nodes reject it under their rule set and may build a separate history. Please check that your payment is on the network our shop accepts."
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "wrap",
+            "label": "The decision",
+            "title": "Correct the claims before Aarav ships",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav's payment is back in the chain his node follows. He has seen why one confirmation can change, why a miner cannot force an invalid block through, and why software versions matter when rules change."
+              },
+              {
+                "type": "widget",
+                "id": "ex-consensus-tweet",
+                "name": "FixTweet",
+                "props": {
+                  "key": "ex-consensus-tweet",
+                  "label": "Aarav's group chat has three claims to fix",
+                  "intro": "Write a short correction for each claim in your own words. Then compare it with one possible explanation.",
+                  "done": "Aarav can now explain the difference between accumulated work, node-enforced rules, and fork compatibility.",
+                  "claims": [
+                    {
+                      "claim": "\"The longest chain always wins.\"",
+                      "correction": "Nodes prefer the valid chain with the most accumulated proof of work. It often has more blocks, but block count alone is not the rule."
+                    },
+                    {
+                      "claim": "\"Miners vote on which blocks are valid.\"",
+                      "correction": "Miners propose blocks and add proof of work. Each full node independently accepts only blocks that follow its consensus rules."
+                    },
+                    {
+                      "claim": "\"Old nodes enforce a soft fork's new rules.\"",
+                      "correction": "Old nodes do not enforce the added restriction. They can still follow blocks that satisfy the new, tighter rules because those blocks also fit the old rules."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "next",
+                "id": "13.1",
+                "title": "Next module"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
     <script src="./figures.js" defer></script>
     <script src="../../shared/lesson-engine.js" defer></script>
     <script type="module" src="../../navigation.js"></script>

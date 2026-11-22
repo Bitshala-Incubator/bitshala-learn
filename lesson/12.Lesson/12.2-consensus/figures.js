@@ -1,6 +1,7 @@
 ﻿/* Case-study illustrations for Aarav's payment and the rules around it. */
 const figureStyle = `<style>.case-svg text{font:13px system-ui,sans-serif;fill:#3c332d}.case-svg .small{font-size:11px}.case-svg .green{fill:#347b59}.case-svg .red{fill:#b23d35}.case-svg .orange{fill:#c85b31}.case-svg .label{font-size:13px;font-weight:650;letter-spacing:0;text-transform:none}</style>`;
-const person = (x, y, name, shirt, skin) => `<g stroke="#3b332d" stroke-width="1.5" stroke-linejoin="round"><circle cx="${x}" cy="${y}" r="12" fill="${skin}"/><path d="M${x-18} ${y+34}v-10q0-12 18-12t18 12v10z" fill="${shirt}"/><path d="M${x-5} ${y}h.1m10 0h.1" stroke-width="2.5"/><path d="M${x-4} ${y+6}q4 3 8 0" fill="none"/></g><text x="${x}" y="${y+49}" text-anchor="middle" class="small">${name}</text>`;
+const person = (x, y, name, shirt, skin) =>
+  `<g stroke="#3b332d" stroke-width="1.5" stroke-linejoin="round"><circle cx="${x}" cy="${y}" r="12" fill="${skin}"/><path d="M${x - 18} ${y + 34}v-10q0-12 18-12t18 12v10z" fill="${shirt}"/><path d="M${x - 5} ${y}h.1m10 0h.1" stroke-width="2.5"/><path d="M${x - 4} ${y + 6}q4 3 8 0" fill="none"/></g><text x="${x}" y="${y + 49}" text-anchor="middle" class="small">${name}</text>`;
 
 window.LESSON_ASSETS = {
   validationCheckpoint: `<svg class="case-svg" viewBox="0 0 640 270" role="img" aria-label="Block 74638 passes proof of work but fails a transaction value check at Meera's checkpoint">
@@ -95,8 +96,5 @@ window.LESSON_ASSETS = {
     ${person(670, 383, "Aarav", "#e87549", "#d9966d")}${person(670, 509, "Meera", "#538b8c", "#a96f54")}
     <text x="670" y="449" text-anchor="middle" class="small">Bitcoin node</text><text x="670" y="575" text-anchor="middle" class="small">Bitcoin Cash node</text>
     <rect x="118" y="578" width="484" height="42" rx="9" fill="#fffaf1" stroke="#74695e" stroke-width="1.3"/><text x="360" y="604" text-anchor="middle" class="detail">Meera: same candidate, different rules, different verdict.</text>
-  </svg>`
+  </svg>`,
 };
-
-
-

@@ -2,85 +2,333 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <title>Mining — Bitshala Learn 12.1</title>
     <link rel="stylesheet" href="../../../styles/global.css" />
     <link rel="stylesheet" href="../../../styles/lesson.css" />
     <link rel="stylesheet" href="../../../styles/widgets.css" />
   </head>
   <body>
-    <nav><span>Bitshala Learn · Lesson 12.1</span><span id="prog">Ready</span><div id="bar"></div></nav>
+    <nav>
+      <span>Bitshala Learn · Lesson 12.1</span><span id="prog">Ready</span>
+      <div id="bar"></div>
+    </nav>
     <div class="wrap">
       <header id="head"></header>
       <div id="warn"></div>
       <main id="lesson"></main>
     </div>
     <script type="application/json" id="lesson-data">
-{
-  "id": "12.1",
-  "title": "Mining",
-  "subtitle": "Build a block, test a proof of work, and see how miners earn rewards",
-  "phase": "Bitcoin Foundations",
-  "module": "Module 12",
-  "minutes": 60,
-  "level": "Beginner",
-  "next": {"id":"12.2", "title":"Consensus", "teaser":"See how full nodes check blocks, compare competing chains, and coordinate rule changes."},
-  "sections": [
-    {
-      "id": "intro", "label": "The challenge", "title": "Who secures Bitcoin?",
-      "blocks": [
-        {"type":"text", "md":"Aarav leans over Meera's desk as a new Bitcoin block appears on her monitor. \"Who decided that block was allowed?\" he asks. Meera turns the screen toward him: \"No one person did. Miners proposed blocks, and thousands of independent nodes checked them.\"\n\nBitcoin has no central operator. Its network aims for one new block about every 10 minutes. Miners compete to find proof of work; every full node checks the result and rejects blocks that break Bitcoin's rules."},
-        {"type":"text", "md":"Meera gives Aarav a challenge: build a candidate block, try nonce values, respond when more miners join, and pick transactions for limited block space. Along the way, he'll see how miners earn the subsidy and fees, and why the rest of the network still checks their work."}
-      ]
-    },
-    {
-      "id": "part1", "label": "Part 1 · The puzzle", "title": "What miners solve",
-      "blocks": [
-        {"type":"text", "md":"\"First, what goes in the block?\" Aarav asks. Meera points to a queue of pending transactions. He gathers valid ones into a **candidate block**, then changes a field in its header called the **nonce** and hashes that header. A hash is valid when its numeric value is below the network's target. Leading zeros are a handy picture of a low hash, but the target is the actual rule.\n\nEach attempt is quick; finding a qualifying hash is unpredictable. The network averages roughly one block every 10 minutes, though any single block can arrive sooner or later."},
-        {"type":"text", "md":"Aarav taps the keyboard again and again. Meera explains that real miners use specialized machines called ASICs to calculate hashes at high speed. Bitcoin adjusts its target every 2,016 blocks, aiming to keep the long-run average near 10 minutes. More hash power makes blocks arrive faster until the next adjustment; less hash power makes them arrive slower."},
-        {"type":"figure", "asset":"proofOfWork", "caption":"Aarav keeps changing the nonce until his machine finds a hash below the target."},
-        {"type":"widget", "id":"ex-nonce-scenario", "name":"PathToggle", "props":{"key":"ex-nonce-scenario","label":"Exercise 1 · Help Aarav test his block","icon":"target","intro":"Aarav's mining console flashes a new hash. Meera asks him to check it before he announces the block.","question":"What makes this proof of work valid?","paths":{"password":{"button":"It matches a secret password","feedback":"Bitcoin has no secret mining password. The proof is public and any node can check it."},"nonce":{"button":"The header hash is below the network target","feedback":"Exactly. The nonce is one value Aarav can change, but the rule checks whether the resulting hash is below the target.","correct":true,"reveal":"<p><strong>Meera's hint:</strong> Leading zeros help us picture a low hash. The consensus rule compares the hash with a numeric target, so the number of zeros is only a visual shortcut.</p>"},"permission":{"button":"A central authority approves it","feedback":"Bitcoin is permissionless. Nodes check the proof against the same published rules."}}}},
-        {"type":"widget", "id":"ex-difficulty-scenario", "name":"PathToggle", "props":{"key":"ex-difficulty-scenario","label":"Exercise 2 · Aarav sees new miners arrive","icon":"clock","intro":"Aarav checks the network and notices many new mining machines have joined. The difficulty has not adjusted yet.","question":"What is likely to happen to block timing before the next adjustment?","paths":{"faster":{"button":"Blocks are found faster on average","feedback":"Correct. More hash power means more attempts per second, so blocks tend to arrive faster until the target adjusts.","correct":true,"reveal":"<p>Meera reminds Aarav: after 2,016 blocks, nodes calculate a new target based on how long the period took, within protocol limits.</p>"},"slower":{"button":"Blocks are found slower on average","feedback":"More attempts per second generally makes blocks arrive sooner, not later."},"unchanged":{"button":"The block interval stays exactly the same","feedback":"Block times vary. The target is adjusted periodically; it does not enforce an exact interval for every block."}}}},
-        {"type":"widget", "id":"ex-fee-scenario", "name":"PathToggle", "props":{"key":"ex-fee-scenario","label":"Exercise 3 · Meera's block-space challenge","icon":"layers","intro":"Meera shows Aarav three waiting payments. His candidate block has room for only one. Each sender offers a different fee.","question":"What should Aarav compare first when choosing for revenue?","paths":{"oldest":{"button":"How long each payment has waited","feedback":"Waiting time alone does not tell Aarav how much fee a transaction pays."},"feerate":{"button":"Fee rate, measured in sats per virtual byte","feedback":"Yes. Fee rate compares fee income with the block space a transaction uses. Actual selection can also consider dependencies and policy.","correct":true,"reveal":"<p>Meera explains that users who want quicker confirmation may offer a higher fee rate when space is scarce. Miners choose transactions; full nodes still validate the block.</p>"},"random":{"button":"Pick one at random to be fair","feedback":"A miner may consider many things, but fee rate is a strong incentive when seeking revenue."}}}}
-      ]
-    },
-    {
-      "id": "part2", "label": "Part 2 · Block timing", "title": "Keeping the average near 10 minutes",
-      "blocks": [
-        {"type":"text", "md":"Aarav's new machines find blocks quickly, but Meera tells him not to expect every block to arrive exactly 10 minutes apart. Bitcoin aims for a 10-minute average. Every 2,016 blocks, nodes calculate a new target from the time taken by the previous period, within protocol limits. If blocks arrived too quickly, the next target makes mining harder; if they arrived too slowly, it makes mining easier.\n\nThe adjustment is a feedback loop, not a clock. It helps bring the average back toward the target as hash power changes."},
-        {"type":"figure", "asset":"difficultyAdjustment", "caption":"Every 2,016 blocks, Bitcoin recalculates the target using the time taken by the previous period."}
-      ]
-    },
-    {
-      "id": "part3", "label": "Part 3 · Mining rewards", "title": "How miners earn",
-      "blocks": [
-        {"type":"text", "md":"At last, Aarav finds a hash below the target. \"What does the winning miner get?\" he asks. Meera draws two parts on the whiteboard: a **block subsidy** and the **transaction fees** included in that block. Since the 2024 halving, the subsidy is 3.125 BTC per block; it halves every 210,000 blocks, not on a fixed calendar schedule. Fees vary with demand.\n\nThe miner claims the allowed amount in the block's first transaction, called the **coinbase transaction**. Meera points out that every full node checks the claim against Bitcoin's rules."},
-        {"type":"figure", "asset":"rewardSplit", "caption":"A block's miner revenue combines a rule-limited subsidy and the fees from its included transactions."},
-        {"type":"widget", "id":"ex-when-fees-matter", "name":"PathToggle", "props":{"key":"ex-when-fees-matter","label":"Exercise 4 · Meera looks ahead","icon":"coin","intro":"Meera asks Aarav to imagine a future block where the subsidy has become much smaller.","question":"Which revenue source will make up a larger share for miners?","paths":{"costs":{"button":"Transaction fees, because the subsidy contributes less","feedback":"Right. If the subsidy falls, fees make up a larger share of miner revenue. Future security also depends on miner incentives and costs.","correct":true,"reveal":"<p>Aarav notes that subsidy declines by block height while fee income changes with demand. Neither he nor Meera can know exactly what future fees or mining costs will be.</p>"},"stops":{"button":"Mining becomes less profitable if fee income cannot cover costs","feedback":"That could happen for some miners. The network itself does not automatically shut down."},"nodes":{"button":"Nodes stop validating blocks","feedback":"Nodes continue enforcing the rules independently. A smaller subsidy alone does not turn off validation."}}}},
-        {"type":"widget", "id":"ex-fee-rate", "name":"TargetRate", "props":{"key":"ex-fee-rate","label":"Exercise 5 · Help Aarav get into the next block","intro":"Now Aarav is sending a payment. Meera's wallet estimates that the next block may include transactions around 12 sat/vB. Set his fee rate near that level without wildly overpaying.","clearing":12,"vsize":225,"start":5,"done":"Aarav found the estimate. Fee forecasts are uncertain, and miners may choose a different cutoff."}},
-        {"type":"text", "md":"Meera reminds Aarav that a higher fee rate can improve a payment's chance of confirmation when block space is scarce. The needed rate changes with demand, and paying a high rate does not guarantee inclusion in a particular block."}
-      ]
-    },
-    {
-      "id": "part4", "label": "Part 4 · Transaction construction", "title": "Fees and block space",
-      "blocks": [
-        {"type":"text", "md":"Aarav sees two payments competing for space. One pays a larger total fee, but it is also a much bigger transaction. Meera shows him how to compare **fee rate** instead. For a simple transaction, the fee is the total input value minus the total output value: `fee = inputs − outputs`. If 100,000 sats come in and 98,000 go out, the fee is 2,000 sats.\n\nReal transactions can have several inputs and outputs, including change back to the sender. Miners compare fee rates, usually measured in sats per virtual byte (sat/vB), because block space is limited."},
-        {"type":"figure", "asset":"feeMarket", "caption":"A simplified view of a miner selecting transactions by fee rate while staying within the block's weight limit."},
-        {"type":"widget", "id":"ex-fee-rate-comparison", "name":"PathToggle", "props":{"key":"ex-fee-rate-comparison","label":"Exercise 6 · Aarav picks between two payments","icon":"target","intro":"Meera gives Aarav two candidate payments for the last space in his block: A is 100 vB with a 10,000 sat fee; B is 200 vB with a 15,000 sat fee.","question":"Which payment earns more per unit of block space?","paths":{"total":{"button":"B, because its total fee is higher","feedback":"B pays more total sats, but it also uses twice the space."},"rate":{"button":"A: 100 sat/vB, compared with B at 75 sat/vB","feedback":"Correct: A offers 100 sat/vB and B offers 75 sat/vB. A gives more fee per unit of block space, though actual block assembly can involve package selection and other constraints.","correct":true,"reveal":"<p>Bitcoin limits blocks by weight, up to 4,000,000 weight units, not a simple 4 MB byte-size cap. Fee rate helps miners compare use of that limited capacity.</p>"},"equal":{"button":"They are equal","feedback":"Their fee rates differ: A offers 100 sat/vB and B offers 75 sat/vB."}}}},
-        {"type":"widget", "id":"ex-build-fee", "name":"FeeBuilder", "props":{"key":"ex-build-fee","label":"Exercise 7 · Make Aarav's payment balance","intro":"Aarav has 100,000 sats in inputs. Help him set the payment and change outputs so that exactly 2,000 sats remain as the fee.","inputs":100000,"target":2000,"outputs":[{"label":"Payment to Meera","icon":"coin","start":45000},{"label":"Change back to Aarav","icon":"coin","start":53000}],"done":"Aarav's transaction balances: inputs equal outputs plus the 2,000 sat fee."}},
-        {"type":"text", "md":"Aarav can now explain the whole process back to Meera: miners search for a header hash below the target; difficulty adjusts as hash power changes; miners may earn a subsidy and fees; and fee rates help them compare transactions for limited block space.\n\nMeera adds one final detail: users choose their fees, but confirmation time is not guaranteed. Nodes, rather than miners, enforce Bitcoin's consensus rules."}
-      ]
-    },
-    {
-      "id": "wrap", "label": "Why this matters", "title": "Mining powers Bitcoin",
-      "blocks": [
-        {"type":"text", "md":"On the way out, Aarav asks if proof of work makes attacks impossible. Meera says no: it makes block production costly and helps the network choose among competing blocks, but security still depends on hash power, incentives, and people's ability to verify the rules.\n\nMining is permissionless, though it can concentrate around large operators or pools. Full nodes remain essential because they independently validate blocks and transactions. Aarav leaves with a clearer picture: miners propose; the network checks."},
-        {"type":"reflect", "prompt":"Aarav asks: suppose hash calculations became nearly free and instant. How might that change the cost of attempting to reorganize recent blocks? What other checks would still matter?", "placeholder":"Your thoughts..."},
-        {"type":"next", "id":"12.2", "title":"Next lesson: Consensus"}
-      ]
-    }
-  ]
-}
+      {
+        "id": "12.1",
+        "title": "Mining",
+        "subtitle": "Build a block, test a proof of work, and see how miners earn rewards",
+        "phase": "Bitcoin Foundations",
+        "module": "Module 12",
+        "minutes": 60,
+        "level": "Beginner",
+        "next": {
+          "id": "12.2",
+          "title": "Consensus",
+          "teaser": "See how full nodes check blocks, compare competing chains, and coordinate rule changes."
+        },
+        "sections": [
+          {
+            "id": "intro",
+            "label": "The challenge",
+            "title": "Who secures Bitcoin?",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav leans over Meera's desk as a new Bitcoin block appears on her monitor. \"Who decided that block was allowed?\" he asks. Meera turns the screen toward him: \"No one person did. Miners proposed blocks, and thousands of independent nodes checked them.\"\n\nBitcoin has no central operator. Its network aims for one new block about every 10 minutes. Miners compete to find proof of work; every full node checks the result and rejects blocks that break Bitcoin's rules."
+              },
+              {
+                "type": "text",
+                "md": "Meera gives Aarav a challenge: build a candidate block, try nonce values, respond when more miners join, and pick transactions for limited block space. Along the way, he'll see how miners earn the subsidy and fees, and why the rest of the network still checks their work."
+              }
+            ]
+          },
+          {
+            "id": "part1",
+            "label": "Part 1 · The puzzle",
+            "title": "What miners solve",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "\"First, what goes in the block?\" Aarav asks. Meera points to a queue of pending transactions. He gathers valid ones into a **candidate block**, then changes a field in its header called the **nonce** and hashes that header. A hash is valid when its numeric value is below the network's target. Leading zeros are a handy picture of a low hash, but the target is the actual rule.\n\nEach attempt is quick; finding a qualifying hash is unpredictable. The network averages roughly one block every 10 minutes, though any single block can arrive sooner or later."
+              },
+              {
+                "type": "text",
+                "md": "Aarav taps the keyboard again and again. Meera explains that real miners use specialized machines called ASICs to calculate hashes at high speed. Bitcoin adjusts its target every 2,016 blocks, aiming to keep the long-run average near 10 minutes. More hash power makes blocks arrive faster until the next adjustment; less hash power makes them arrive slower."
+              },
+              {
+                "type": "figure",
+                "asset": "proofOfWork",
+                "caption": "Aarav keeps changing the nonce until his machine finds a hash below the target."
+              },
+              {
+                "type": "widget",
+                "id": "ex-nonce-scenario",
+                "name": "PathToggle",
+                "props": {
+                  "key": "ex-nonce-scenario",
+                  "label": "Exercise 1 · Help Aarav test his block",
+                  "icon": "target",
+                  "intro": "Aarav's mining console flashes a new hash. Meera asks him to check it before he announces the block.",
+                  "question": "What makes this proof of work valid?",
+                  "paths": {
+                    "password": {
+                      "button": "It matches a secret password",
+                      "feedback": "Bitcoin has no secret mining password. The proof is public and any node can check it."
+                    },
+                    "nonce": {
+                      "button": "The header hash is below the network target",
+                      "feedback": "Exactly. The nonce is one value Aarav can change, but the rule checks whether the resulting hash is below the target.",
+                      "correct": true,
+                      "reveal": "<p><strong>Meera's hint:</strong> Leading zeros help us picture a low hash. The consensus rule compares the hash with a numeric target, so the number of zeros is only a visual shortcut.</p>"
+                    },
+                    "permission": {
+                      "button": "A central authority approves it",
+                      "feedback": "Bitcoin is permissionless. Nodes check the proof against the same published rules."
+                    }
+                  }
+                }
+              },
+              {
+                "type": "widget",
+                "id": "ex-difficulty-scenario",
+                "name": "PathToggle",
+                "props": {
+                  "key": "ex-difficulty-scenario",
+                  "label": "Exercise 2 · Aarav sees new miners arrive",
+                  "icon": "clock",
+                  "intro": "Aarav checks the network and notices many new mining machines have joined. The difficulty has not adjusted yet.",
+                  "question": "What is likely to happen to block timing before the next adjustment?",
+                  "paths": {
+                    "faster": {
+                      "button": "Blocks are found faster on average",
+                      "feedback": "Correct. More hash power means more attempts per second, so blocks tend to arrive faster until the target adjusts.",
+                      "correct": true,
+                      "reveal": "<p>Meera reminds Aarav: after 2,016 blocks, nodes calculate a new target based on how long the period took, within protocol limits.</p>"
+                    },
+                    "slower": {
+                      "button": "Blocks are found slower on average",
+                      "feedback": "More attempts per second generally makes blocks arrive sooner, not later."
+                    },
+                    "unchanged": {
+                      "button": "The block interval stays exactly the same",
+                      "feedback": "Block times vary. The target is adjusted periodically; it does not enforce an exact interval for every block."
+                    }
+                  }
+                }
+              },
+              {
+                "type": "widget",
+                "id": "ex-fee-scenario",
+                "name": "PathToggle",
+                "props": {
+                  "key": "ex-fee-scenario",
+                  "label": "Exercise 3 · Meera's block-space challenge",
+                  "icon": "layers",
+                  "intro": "Meera shows Aarav three waiting payments. His candidate block has room for only one. Each sender offers a different fee.",
+                  "question": "What should Aarav compare first when choosing for revenue?",
+                  "paths": {
+                    "oldest": {
+                      "button": "How long each payment has waited",
+                      "feedback": "Waiting time alone does not tell Aarav how much fee a transaction pays."
+                    },
+                    "feerate": {
+                      "button": "Fee rate, measured in sats per virtual byte",
+                      "feedback": "Yes. Fee rate compares fee income with the block space a transaction uses. Actual selection can also consider dependencies and policy.",
+                      "correct": true,
+                      "reveal": "<p>Meera explains that users who want quicker confirmation may offer a higher fee rate when space is scarce. Miners choose transactions; full nodes still validate the block.</p>"
+                    },
+                    "random": {
+                      "button": "Pick one at random to be fair",
+                      "feedback": "A miner may consider many things, but fee rate is a strong incentive when seeking revenue."
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "part2",
+            "label": "Part 2 · Block timing",
+            "title": "Keeping the average near 10 minutes",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav's new machines find blocks quickly, but Meera tells him not to expect every block to arrive exactly 10 minutes apart. Bitcoin aims for a 10-minute average. Every 2,016 blocks, nodes calculate a new target from the time taken by the previous period, within protocol limits. If blocks arrived too quickly, the next target makes mining harder; if they arrived too slowly, it makes mining easier.\n\nThe adjustment is a feedback loop, not a clock. It helps bring the average back toward the target as hash power changes."
+              },
+              {
+                "type": "figure",
+                "asset": "difficultyAdjustment",
+                "caption": "Every 2,016 blocks, Bitcoin recalculates the target using the time taken by the previous period."
+              }
+            ]
+          },
+          {
+            "id": "part3",
+            "label": "Part 3 · Mining rewards",
+            "title": "How miners earn",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "At last, Aarav finds a hash below the target. \"What does the winning miner get?\" he asks. Meera draws two parts on the whiteboard: a **block subsidy** and the **transaction fees** included in that block. Since the 2024 halving, the subsidy is 3.125 BTC per block; it halves every 210,000 blocks, not on a fixed calendar schedule. Fees vary with demand.\n\nThe miner claims the allowed amount in the block's first transaction, called the **coinbase transaction**. Meera points out that every full node checks the claim against Bitcoin's rules."
+              },
+              {
+                "type": "figure",
+                "asset": "rewardSplit",
+                "caption": "A block's miner revenue combines a rule-limited subsidy and the fees from its included transactions."
+              },
+              {
+                "type": "widget",
+                "id": "ex-when-fees-matter",
+                "name": "PathToggle",
+                "props": {
+                  "key": "ex-when-fees-matter",
+                  "label": "Exercise 4 · Meera looks ahead",
+                  "icon": "coin",
+                  "intro": "Meera asks Aarav to imagine a future block where the subsidy has become much smaller.",
+                  "question": "Which revenue source will make up a larger share for miners?",
+                  "paths": {
+                    "costs": {
+                      "button": "Transaction fees, because the subsidy contributes less",
+                      "feedback": "Right. If the subsidy falls, fees make up a larger share of miner revenue. Future security also depends on miner incentives and costs.",
+                      "correct": true,
+                      "reveal": "<p>Aarav notes that subsidy declines by block height while fee income changes with demand. Neither he nor Meera can know exactly what future fees or mining costs will be.</p>"
+                    },
+                    "stops": {
+                      "button": "Mining becomes less profitable if fee income cannot cover costs",
+                      "feedback": "That could happen for some miners. The network itself does not automatically shut down."
+                    },
+                    "nodes": {
+                      "button": "Nodes stop validating blocks",
+                      "feedback": "Nodes continue enforcing the rules independently. A smaller subsidy alone does not turn off validation."
+                    }
+                  }
+                }
+              },
+              {
+                "type": "widget",
+                "id": "ex-fee-rate",
+                "name": "TargetRate",
+                "props": {
+                  "key": "ex-fee-rate",
+                  "label": "Exercise 5 · Help Aarav get into the next block",
+                  "intro": "Now Aarav is sending a payment. Meera's wallet estimates that the next block may include transactions around 12 sat/vB. Set his fee rate near that level without wildly overpaying.",
+                  "clearing": 12,
+                  "vsize": 225,
+                  "start": 5,
+                  "done": "Aarav found the estimate. Fee forecasts are uncertain, and miners may choose a different cutoff."
+                }
+              },
+              {
+                "type": "text",
+                "md": "Meera reminds Aarav that a higher fee rate can improve a payment's chance of confirmation when block space is scarce. The needed rate changes with demand, and paying a high rate does not guarantee inclusion in a particular block."
+              }
+            ]
+          },
+          {
+            "id": "part4",
+            "label": "Part 4 · Transaction construction",
+            "title": "Fees and block space",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav sees two payments competing for space. One pays a larger total fee, but it is also a much bigger transaction. Meera shows him how to compare **fee rate** instead. For a simple transaction, the fee is the total input value minus the total output value: `fee = inputs − outputs`. If 100,000 sats come in and 98,000 go out, the fee is 2,000 sats.\n\nReal transactions can have several inputs and outputs, including change back to the sender. Miners compare fee rates, usually measured in sats per virtual byte (sat/vB), because block space is limited."
+              },
+              {
+                "type": "figure",
+                "asset": "feeMarket",
+                "caption": "A simplified view of a miner selecting transactions by fee rate while staying within the block's weight limit."
+              },
+              {
+                "type": "widget",
+                "id": "ex-fee-rate-comparison",
+                "name": "PathToggle",
+                "props": {
+                  "key": "ex-fee-rate-comparison",
+                  "label": "Exercise 6 · Aarav picks between two payments",
+                  "icon": "target",
+                  "intro": "Meera gives Aarav two candidate payments for the last space in his block: A is 100 vB with a 10,000 sat fee; B is 200 vB with a 15,000 sat fee.",
+                  "question": "Which payment earns more per unit of block space?",
+                  "paths": {
+                    "total": {
+                      "button": "B, because its total fee is higher",
+                      "feedback": "B pays more total sats, but it also uses twice the space."
+                    },
+                    "rate": {
+                      "button": "A: 100 sat/vB, compared with B at 75 sat/vB",
+                      "feedback": "Correct: A offers 100 sat/vB and B offers 75 sat/vB. A gives more fee per unit of block space, though actual block assembly can involve package selection and other constraints.",
+                      "correct": true,
+                      "reveal": "<p>Bitcoin limits blocks by weight, up to 4,000,000 weight units, not a simple 4 MB byte-size cap. Fee rate helps miners compare use of that limited capacity.</p>"
+                    },
+                    "equal": {
+                      "button": "They are equal",
+                      "feedback": "Their fee rates differ: A offers 100 sat/vB and B offers 75 sat/vB."
+                    }
+                  }
+                }
+              },
+              {
+                "type": "widget",
+                "id": "ex-build-fee",
+                "name": "FeeBuilder",
+                "props": {
+                  "key": "ex-build-fee",
+                  "label": "Exercise 7 · Make Aarav's payment balance",
+                  "intro": "Aarav has 100,000 sats in inputs. Help him set the payment and change outputs so that exactly 2,000 sats remain as the fee.",
+                  "inputs": 100000,
+                  "target": 2000,
+                  "outputs": [
+                    {
+                      "label": "Payment to Meera",
+                      "icon": "coin",
+                      "start": 45000
+                    },
+                    {
+                      "label": "Change back to Aarav",
+                      "icon": "coin",
+                      "start": 53000
+                    }
+                  ],
+                  "done": "Aarav's transaction balances: inputs equal outputs plus the 2,000 sat fee."
+                }
+              },
+              {
+                "type": "text",
+                "md": "Aarav can now explain the whole process back to Meera: miners search for a header hash below the target; difficulty adjusts as hash power changes; miners may earn a subsidy and fees; and fee rates help them compare transactions for limited block space.\n\nMeera adds one final detail: users choose their fees, but confirmation time is not guaranteed. Nodes, rather than miners, enforce Bitcoin's consensus rules."
+              }
+            ]
+          },
+          {
+            "id": "wrap",
+            "label": "Why this matters",
+            "title": "Mining powers Bitcoin",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "On the way out, Aarav asks if proof of work makes attacks impossible. Meera says no: it makes block production costly and helps the network choose among competing blocks, but security still depends on hash power, incentives, and people's ability to verify the rules.\n\nMining is permissionless, though it can concentrate around large operators or pools. Full nodes remain essential because they independently validate blocks and transactions. Aarav leaves with a clearer picture: miners propose; the network checks."
+              },
+              {
+                "type": "reflect",
+                "prompt": "Aarav asks: suppose hash calculations became nearly free and instant. How might that change the cost of attempting to reorganize recent blocks? What other checks would still matter?",
+                "placeholder": "Your thoughts..."
+              },
+              {
+                "type": "next",
+                "id": "12.2",
+                "title": "Next lesson: Consensus"
+              }
+            ]
+          }
+        ]
+      }
     </script>
     <script src="./figures.js" defer></script>
     <script src="../../shared/lesson-engine.js" defer></script>
