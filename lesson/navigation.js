@@ -109,6 +109,16 @@ const lessons = [
     title: "Blockchain Structure",
     path: "lesson/11.Lesson/11.2-blockchain-structure/index.html",
   },
+  {
+    id: "12.1",
+    title: "Mining",
+    path: "lesson/12.Lesson/12.1-mining/index.html",
+  },
+  {
+    id: "12.2",
+    title: "Consensus",
+    path: "lesson/12.Lesson/12.2-consensus/index.html",
+  },
 ];
 
 const lessonData = JSON.parse(
