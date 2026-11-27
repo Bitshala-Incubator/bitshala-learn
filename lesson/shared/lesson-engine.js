@@ -1879,19 +1879,40 @@
 
     ScamChat(el, fin, p) {
       el.classList.add("try", "explorer");
-      let step = 0, slips = 0;
+      let step = 0,
+        slips = 0;
       const render = () => {
         const scene = p.steps[step];
         el.innerHTML = `<span class="label">${p.label}</span><p>${p.intro}</p><p class="scam-meter" role="status">Risky choices: ${slips} of ${p.steps.length}</p><article class="scam-message"><strong>${scene.sender}</strong><p>${scene.message}</p><div class="scam-options" role="group" aria-label="Choose Aarav's reply">${scene.options.map((option, index) => `<button type="button" class="ghost" data-option="${index}">${option.text}</button>`).join("")}</div><p data-feedback class="scam-feedback" hidden></p></article><button type="button" data-next hidden>${step === p.steps.length - 1 ? "End the chat safely" : "Continue the chat"}</button>`;
-        const status = $(".scam-meter", el), feedback = $(`[data-feedback]`, el);
-        el.querySelectorAll("[data-option]").forEach(button => button.onclick = () => {
-          const option = scene.options[Number(button.dataset.option)];
-          if (!option.safe) { slips++; status.textContent = `Risky choices: ${slips} of ${p.steps.length}`; }
-          feedback.hidden = false; feedback.textContent = option.result;
-          el.querySelectorAll("[data-option]").forEach(item => item.disabled = true);
-          const next = $("[data-next]", el); next.hidden = false;
-          next.onclick = () => { if (step < p.steps.length - 1) { step++; render(); } else { const result = slips ? p.slipDone : p.done; el.innerHTML = `<span class="label">${p.label}</span><p class="activity-status" data-result="good">${result}</p>`; fin(); } };
-        });
+        const status = $(".scam-meter", el),
+          feedback = $(`[data-feedback]`, el);
+        el.querySelectorAll("[data-option]").forEach(
+          (button) =>
+            (button.onclick = () => {
+              const option = scene.options[Number(button.dataset.option)];
+              if (!option.safe) {
+                slips++;
+                status.textContent = `Risky choices: ${slips} of ${p.steps.length}`;
+              }
+              feedback.hidden = false;
+              feedback.textContent = option.result;
+              el.querySelectorAll("[data-option]").forEach(
+                (item) => (item.disabled = true),
+              );
+              const next = $("[data-next]", el);
+              next.hidden = false;
+              next.onclick = () => {
+                if (step < p.steps.length - 1) {
+                  step++;
+                  render();
+                } else {
+                  const result = slips ? p.slipDone : p.done;
+                  el.innerHTML = `<span class="label">${p.label}</span><p class="activity-status" data-result="good">${result}</p>`;
+                  fin();
+                }
+              };
+            }),
+        );
       };
       render();
     },
@@ -1899,30 +1920,74 @@
     BackupGrid(el, fin, p) {
       el.classList.add("try", "explorer", "backup-grid-widget");
       const legend = { helps: "Helps", depends: "Depends", gap: "Gap" };
-      el.innerHTML = `<span class="label">${p.label}</span><p>${p.intro}</p><div class="backup-scroll"><table class="backup-matrix"><thead><tr><th scope="col">Backup approach</th>${p.disasters.map(d => `<th scope="col">${d}</th>`).join("")}</tr></thead><tbody>${p.types.map((type, row) => `<tr><th scope="row">${type}</th>${p.results[row].map((result, col) => `<td><button type="button" data-result="${row}-${col}" class="backup-result ${result.state}" aria-label="${type}: ${p.disasters[col]}: ${legend[result.state]}">${legend[result.state]}</button></td>`).join("")}</tr>`).join("")}</tbody></table></div><p class="backup-note" data-note aria-live="polite">Select cells to inspect the trade-offs, then choose what Aarav should do about the note.</p><section class="backup-decision"><h3>${p.decision.prompt}</h3><div class="backup-decision-options">${p.decision.options.map((option, index) => `<button type="button" class="ghost" data-decision="${index}">${option.text}</button>`).join("")}</div></section><p class="activity-status" data-status role="status">These are teaching scenarios. Actual protection depends on the wallet, backup format, storage, and who can access it.</p>`;
+      el.innerHTML = `<span class="label">${p.label}</span><p>${p.intro}</p><div class="backup-scroll"><table class="backup-matrix"><thead><tr><th scope="col">Backup approach</th>${p.disasters.map((d) => `<th scope="col">${d}</th>`).join("")}</tr></thead><tbody>${p.types.map((type, row) => `<tr><th scope="row">${type}</th>${p.results[row].map((result, col) => `<td><button type="button" data-result="${row}-${col}" class="backup-result ${result.state}" aria-label="${type}: ${p.disasters[col]}: ${legend[result.state]}">${legend[result.state]}</button></td>`).join("")}</tr>`).join("")}</tbody></table></div><p class="backup-note" data-note aria-live="polite">Select cells to inspect the trade-offs, then choose what Aarav should do about the note.</p><section class="backup-decision"><h3>${p.decision.prompt}</h3><div class="backup-decision-options">${p.decision.options.map((option, index) => `<button type="button" class="ghost" data-decision="${index}">${option.text}</button>`).join("")}</div></section><p class="activity-status" data-status role="status">These are teaching scenarios. Actual protection depends on the wallet, backup format, storage, and who can access it.</p>`;
       const note = $("[data-note]", el);
-      el.querySelectorAll("[data-result]").forEach(button => button.onclick = () => { const [r,c] = button.dataset.result.split("-").map(Number); note.textContent = p.results[r][c].note; });
-      el.querySelectorAll("[data-decision]").forEach(button => button.onclick = () => {
-        const option = p.decision.options[Number(button.dataset.decision)], status = $("[data-status]", el);
-        if (!option.correct) { status.dataset.result = "bad"; status.textContent = option.feedback; return; }
-        button.classList.add("decision-selected");
-        el.querySelectorAll("[data-decision]").forEach(choice => choice.disabled = true);
-        status.dataset.result = "good"; status.textContent = option.feedback || p.done; fin();
-      });
+      el.querySelectorAll("[data-result]").forEach(
+        (button) =>
+          (button.onclick = () => {
+            const [r, c] = button.dataset.result.split("-").map(Number);
+            note.textContent = p.results[r][c].note;
+          }),
+      );
+      el.querySelectorAll("[data-decision]").forEach(
+        (button) =>
+          (button.onclick = () => {
+            const option = p.decision.options[Number(button.dataset.decision)],
+              status = $("[data-status]", el);
+            if (!option.correct) {
+              status.dataset.result = "bad";
+              status.textContent = option.feedback;
+              return;
+            }
+            button.classList.add("decision-selected");
+            el.querySelectorAll("[data-decision]").forEach(
+              (choice) => (choice.disabled = true),
+            );
+            status.dataset.result = "good";
+            status.textContent = option.feedback || p.done;
+            fin();
+          }),
+      );
     },
 
     RestoreLab(el, fin, p) {
       el.classList.add("try", "explorer");
       el.innerHTML = `<span class="label">${p.label}</span><p>${p.intro}</p><section class="restore-terminal"><div><strong>Backup</strong><span>Fictional recovery backup: loaded</span></div><div><strong>Passphrase</strong><span>Hidden for safety</span></div><div><strong>Wallet result</strong><span data-wallet-result>Not restored yet</span></div><p data-restore-status aria-live="polite">Choose a recovery note. No recovery words are shown or requested.</p><div class="restore-actions">${p.options.map((option, index) => `<button type="button" class="ghost" data-try="${option.id}">${option.label}</button>`).join("")}</div><button type="button" data-reset hidden>Try another recovery note</button></section>`;
-      const result = $("[data-wallet-result]", el), status = $("[data-restore-status]", el), reset = $("[data-reset]", el);
-      el.querySelectorAll("[data-try]").forEach(button => button.onclick = () => {
-        const option = p.options.find(item => item.id === button.dataset.try);
-        el.querySelectorAll("[data-try]").forEach(option => option.disabled = true);
-        if (!option.correct) { result.textContent = option.result; status.dataset.result = "bad"; status.textContent = option.feedback; }
-        else { result.textContent = option.result; status.dataset.result = "good"; status.textContent = option.feedback; fin(); }
-        reset.hidden = false;
-      });
-      reset.onclick = () => { result.textContent = "Not restored yet"; status.removeAttribute("data-result"); status.textContent = "Choose a recovery note. No recovery words are shown or requested."; el.querySelectorAll("[data-try]").forEach(option => option.disabled = false); reset.hidden = true; };
+      const result = $("[data-wallet-result]", el),
+        status = $("[data-restore-status]", el),
+        reset = $("[data-reset]", el);
+      el.querySelectorAll("[data-try]").forEach(
+        (button) =>
+          (button.onclick = () => {
+            const option = p.options.find(
+              (item) => item.id === button.dataset.try,
+            );
+            el.querySelectorAll("[data-try]").forEach(
+              (option) => (option.disabled = true),
+            );
+            if (!option.correct) {
+              result.textContent = option.result;
+              status.dataset.result = "bad";
+              status.textContent = option.feedback;
+            } else {
+              result.textContent = option.result;
+              status.dataset.result = "good";
+              status.textContent = option.feedback;
+              fin();
+            }
+            reset.hidden = false;
+          }),
+      );
+      reset.onclick = () => {
+        result.textContent = "Not restored yet";
+        status.removeAttribute("data-result");
+        status.textContent =
+          "Choose a recovery note. No recovery words are shown or requested.";
+        el.querySelectorAll("[data-try]").forEach(
+          (option) => (option.disabled = false),
+        );
+        reset.hidden = true;
+      };
     },
 
     DecisionTrail(el, fin, p) {
@@ -1930,16 +1995,42 @@
       let index = 0;
       const render = () => {
         const item = p.steps[index];
-        el.innerHTML = `<span class="label">${p.label}</span><p>${p.intro}</p><p class="triage-count">Decision ${index + 1} of ${p.steps.length}</p><article class="triage-item"><h3>${item.title}</h3><p>${item.prompt}</p><div class="triage-options">${item.options.map(o => `<button type="button" class="ghost" data-choice="${o.id}">${o.text}</button>`).join("")}</div><p data-explain class="triage-explanation" hidden></p></article><p class="activity-status" data-status role="status">Choose the next action.</p><button type="button" data-next hidden>Next decision</button>`;
-        el.querySelectorAll("[data-choice]").forEach(button => button.onclick = () => {
-          const choice = item.options.find(o => o.id === button.dataset.choice), status = $("[data-status]", el);
-          if (!choice.correct) { status.dataset.result = "bad"; status.textContent = choice.feedback; return; }
-          el.querySelectorAll("[data-choice]").forEach(b => b.disabled = true);
-          $("[data-explain]", el).hidden = false; $("[data-explain]", el).textContent = choice.feedback;
-          status.dataset.result = "good"; status.textContent = item.successText || "That choice fits this situation.";
-          const next = $("[data-next]", el); next.textContent = index === p.steps.length - 1 ? "Finish the response" : "Next decision"; next.hidden = false;
-          next.onclick = () => { if (++index < p.steps.length) render(); else { el.innerHTML = `<span class="label">${p.label}</span><p class="activity-status" data-result="good">${p.done}</p>`; fin(); } };
-        });
+        el.innerHTML = `<span class="label">${p.label}</span><p>${p.intro}</p><p class="triage-count">Decision ${index + 1} of ${p.steps.length}</p><article class="triage-item"><h3>${item.title}</h3><p>${item.prompt}</p><div class="triage-options">${item.options.map((o) => `<button type="button" class="ghost" data-choice="${o.id}">${o.text}</button>`).join("")}</div><p data-explain class="triage-explanation" hidden></p></article><p class="activity-status" data-status role="status">Choose the next action.</p><button type="button" data-next hidden>Next decision</button>`;
+        el.querySelectorAll("[data-choice]").forEach(
+          (button) =>
+            (button.onclick = () => {
+              const choice = item.options.find(
+                  (o) => o.id === button.dataset.choice,
+                ),
+                status = $("[data-status]", el);
+              if (!choice.correct) {
+                status.dataset.result = "bad";
+                status.textContent = choice.feedback;
+                return;
+              }
+              el.querySelectorAll("[data-choice]").forEach(
+                (b) => (b.disabled = true),
+              );
+              $("[data-explain]", el).hidden = false;
+              $("[data-explain]", el).textContent = choice.feedback;
+              status.dataset.result = "good";
+              status.textContent =
+                item.successText || "That choice fits this situation.";
+              const next = $("[data-next]", el);
+              next.textContent =
+                index === p.steps.length - 1
+                  ? "Finish the response"
+                  : "Next decision";
+              next.hidden = false;
+              next.onclick = () => {
+                if (++index < p.steps.length) render();
+                else {
+                  el.innerHTML = `<span class="label">${p.label}</span><p class="activity-status" data-result="good">${p.done}</p>`;
+                  fin();
+                }
+              };
+            }),
+        );
       };
       render();
     },
@@ -1948,8 +2039,41 @@
       el.classList.add("try", "explorer");
       const visited = new Set();
       el.innerHTML = `<span class="label">${p.label}</span><p>${p.intro}</p><div class="payment-stations" role="group" aria-label="Payment preparation stations">${p.stations.map((station, index) => `<button type="button" class="payment-station" data-station="${index}"><strong>${index + 1}. ${station.title}</strong><span>${station.summary}</span></button>`).join("")}</div><p class="activity-status" data-status role="status">Tap each station to follow Aarav's payment.</p><div class="payment-check" data-check hidden><p>Which station is the independent point where Aarav checks the recipient?</p><div class="payment-check-options">${p.stations.map((station, index) => `<button type="button" class="ghost" data-check-choice="${index}">${index + 1}. ${station.title}</button>`).join("")}</div></div><p data-explanation hidden></p>`;
-      el.querySelectorAll("[data-station]").forEach(button => button.onclick = () => { const i = Number(button.dataset.station); visited.add(i); button.classList.add("selected"); const status = $("[data-status]", el); status.textContent = `${p.stations[i].detail} (${visited.size} of ${p.stations.length} stations inspected.)`; if (visited.size === p.stations.length) $("[data-check]", el).hidden = false; });
-      el.querySelectorAll("[data-check-choice]").forEach(button => button.onclick = () => { const status = $("[data-status]", el), explanation = $("[data-explanation]", el); explanation.hidden = false; if (Number(button.dataset.checkChoice) !== p.checkAt) { status.dataset.result = "bad"; status.textContent = p.wrongStations[Number(button.dataset.checkChoice)]; explanation.textContent = p.wrong; return; } button.classList.add("decision-selected"); el.querySelectorAll("[data-check-choice]").forEach(choice => choice.disabled = true); status.dataset.result = "good"; status.textContent = p.done; explanation.textContent = p.right; fin(); });
+      el.querySelectorAll("[data-station]").forEach(
+        (button) =>
+          (button.onclick = () => {
+            const i = Number(button.dataset.station);
+            visited.add(i);
+            button.classList.add("selected");
+            const status = $("[data-status]", el);
+            status.textContent = `${p.stations[i].detail} (${visited.size} of ${p.stations.length} stations inspected.)`;
+            if (visited.size === p.stations.length)
+              $("[data-check]", el).hidden = false;
+          }),
+      );
+      el.querySelectorAll("[data-check-choice]").forEach(
+        (button) =>
+          (button.onclick = () => {
+            const status = $("[data-status]", el),
+              explanation = $("[data-explanation]", el);
+            explanation.hidden = false;
+            if (Number(button.dataset.checkChoice) !== p.checkAt) {
+              status.dataset.result = "bad";
+              status.textContent =
+                p.wrongStations[Number(button.dataset.checkChoice)];
+              explanation.textContent = p.wrong;
+              return;
+            }
+            button.classList.add("decision-selected");
+            el.querySelectorAll("[data-check-choice]").forEach(
+              (choice) => (choice.disabled = true),
+            );
+            status.dataset.result = "good";
+            status.textContent = p.done;
+            explanation.textContent = p.right;
+            fin();
+          }),
+      );
     },
 
     // Rehearse recovery choices without collecting real wallet secrets.
@@ -1958,24 +2082,28 @@
       let index = 0;
       const render = () => {
         const scenario = p.scenarios[index];
-        el.innerHTML =
-          `<span class="label">${p.label}</span><div class="recovery-scenario"><p class="recovery-count">Incident ${index + 1} of ${p.scenarios.length}</p><h3>${scenario.title}</h3><p>${scenario.story}</p><label for="${p.key}-${index}">${scenario.prompt}</label><textarea id="${p.key}-${index}" data-plan placeholder="Write a recovery plan in your own words"></textarea><button type="button" class="ghost" data-review>Compare with a safe plan</button><div class="recovery-model" data-model hidden>${scenario.model}</div></div><p class="activity-status" data-status role="status" aria-live="polite">Do not enter real recovery words or private keys here.</p><button type="button" data-next hidden>${index === p.scenarios.length - 1 ? "Finish the drill" : "Next incident"}</button>`;
+        el.innerHTML = `<span class="label">${p.label}</span><div class="recovery-scenario"><p class="recovery-count">Incident ${index + 1} of ${p.scenarios.length}</p><h3>${scenario.title}</h3><p>${scenario.story}</p><label for="${p.key}-${index}">${scenario.prompt}</label><textarea id="${p.key}-${index}" data-plan placeholder="Write a recovery plan in your own words"></textarea><button type="button" class="ghost" data-review>Compare with a safe plan</button><div class="recovery-model" data-model hidden>${scenario.model}</div></div><p class="activity-status" data-status role="status" aria-live="polite">Do not enter real recovery words or private keys here.</p><button type="button" data-next hidden>${index === p.scenarios.length - 1 ? "Finish the drill" : "Next incident"}</button>`;
         $(`[data-review]`, el).onclick = () => {
           const plan = $(`[data-plan]`, el);
           const status = $(`[data-status]`, el);
           if (!plan.value.trim()) {
             status.dataset.result = "bad";
-            status.textContent = "Write your plan before reviewing the example. Never type a real recovery phrase here.";
+            status.textContent =
+              "Write your plan before reviewing the example. Never type a real recovery phrase here.";
             plan.focus();
             return;
           }
           $(`[data-model]`, el).hidden = false;
           $(`[data-review]`, el).disabled = true;
-          if (p.enableRubric && typeof window.enhanceRecoveryDrill === "function") {
+          if (
+            p.enableRubric &&
+            typeof window.enhanceRecoveryDrill === "function"
+          ) {
             window.enhanceRecoveryDrill(el, scenario, plan.value);
           }
           status.dataset.result = "good";
-          status.textContent = "Compare your plan with the example, then continue.";
+          status.textContent =
+            "Compare your plan with the example, then continue.";
           const next = $(`[data-next]`, el);
           next.hidden = false;
           next.onclick = () => {
@@ -1997,31 +2125,34 @@
       let index = 0;
       const render = () => {
         const item = p.items[index];
-        el.innerHTML =
-          `<span class="label">${p.label}</span><p class="triage-count">Shop counter item ${index + 1} of ${p.items.length}</p><article class="triage-item"><h3>${item.title}</h3><p>${item.prompt}</p><div class="triage-options" role="group" aria-label="Choose how to handle this information"><button type="button" class="ghost" data-answer="share">Share</button><button type="button" class="ghost" data-answer="careful">Share carefully</button><button type="button" class="ghost" data-answer="never">Never share</button></div><p class="triage-explanation" data-explanation hidden></p></article><p class="activity-status" data-status role="status" aria-live="polite">Think about whether this information can authorize spending or reveal Aarav's activity.</p><button type="button" data-next hidden>${index === p.items.length - 1 ? "Finish the review" : "Next item"}</button>`;
+        el.innerHTML = `<span class="label">${p.label}</span><p class="triage-count">Shop counter item ${index + 1} of ${p.items.length}</p><article class="triage-item"><h3>${item.title}</h3><p>${item.prompt}</p><div class="triage-options" role="group" aria-label="Choose how to handle this information"><button type="button" class="ghost" data-answer="share">Share</button><button type="button" class="ghost" data-answer="careful">Share carefully</button><button type="button" class="ghost" data-answer="never">Never share</button></div><p class="triage-explanation" data-explanation hidden></p></article><p class="activity-status" data-status role="status" aria-live="polite">Think about whether this information can authorize spending or reveal Aarav's activity.</p><button type="button" data-next hidden>${index === p.items.length - 1 ? "Finish the review" : "Next item"}</button>`;
         const status = $(`[data-status]`, el);
-        el.querySelectorAll("[data-answer]").forEach((button) => button.addEventListener("click", () => {
-          if (button.dataset.answer !== item.answer) {
-            status.dataset.result = "bad";
-            status.textContent = item.hint;
-            return;
-          }
-          el.querySelectorAll("[data-answer]").forEach((option) => (option.disabled = true));
-          button.classList.add("decision-selected");
-          $(`[data-explanation]`, el).textContent = item.explanation;
-          $(`[data-explanation]`, el).hidden = false;
-          status.dataset.result = "good";
-          status.textContent = `That is the right handling for ${item.title.toLowerCase()}.`;
-          $(`[data-next]`, el).hidden = false;
-          $(`[data-next]`, el).onclick = () => {
-            index++;
-            if (index < p.items.length) render();
-            else {
-              el.innerHTML = `<span class="label">${p.label}</span><p class="activity-status" data-result="good">${p.done}</p>`;
-              fin();
+        el.querySelectorAll("[data-answer]").forEach((button) =>
+          button.addEventListener("click", () => {
+            if (button.dataset.answer !== item.answer) {
+              status.dataset.result = "bad";
+              status.textContent = item.hint;
+              return;
             }
-          };
-        }));
+            el.querySelectorAll("[data-answer]").forEach(
+              (option) => (option.disabled = true),
+            );
+            button.classList.add("decision-selected");
+            $(`[data-explanation]`, el).textContent = item.explanation;
+            $(`[data-explanation]`, el).hidden = false;
+            status.dataset.result = "good";
+            status.textContent = `That is the right handling for ${item.title.toLowerCase()}.`;
+            $(`[data-next]`, el).hidden = false;
+            $(`[data-next]`, el).onclick = () => {
+              index++;
+              if (index < p.items.length) render();
+              else {
+                el.innerHTML = `<span class="label">${p.label}</span><p class="activity-status" data-result="good">${p.done}</p>`;
+                fin();
+              }
+            };
+          }),
+        );
       };
       render();
     },
@@ -2034,23 +2165,45 @@
       const render = () => {
         const line = p.lines[index];
         el.innerHTML = `<span class="label">${p.label}</span><p>${p.intro}</p><p class="security-card-warning">This card may contain procedures, never a seed phrase, private key, PIN, passphrase, or exact backup location.</p><p class="triage-count">Card line ${index + 1} of ${p.lines.length}</p><article class="triage-item"><h3>${line.label}</h3><div class="triage-options">${line.options.map((o, i) => `<button type="button" class="ghost" data-pick="${i}">${o.text}</button>`).join("")}</div><p data-explain class="triage-explanation" hidden></p></article><p class="activity-status" data-status role="status">Choose the procedure Meera can safely follow.</p><button type="button" data-next hidden>${index === p.lines.length - 1 ? "Build the Security Card" : "Next card line"}</button><article class="security-card-preview" data-preview hidden><h3>Aarav and Meera's Friday Security Card</h3><p>Shop continuity plan</p><dl data-card-content></dl></article>`;
-        el.querySelectorAll("[data-pick]").forEach(button => button.onclick = () => {
-          const option = line.options[Number(button.dataset.pick)], status = $("[data-status]", el);
-          if (!option.safe) { status.dataset.result = "bad"; status.textContent = option.feedback; return; }
-          chosen[index] = { label: line.label, text: option.text };
-          button.classList.add("decision-selected");
-          el.querySelectorAll("[data-pick]").forEach(b => b.disabled = true);
-          $("[data-explain]", el).hidden = false; $("[data-explain]", el).textContent = option.feedback;
-          status.dataset.result = "good"; status.textContent = "Safe procedure selected.";
-          const next = $("[data-next]", el); next.hidden = false;
-          next.onclick = () => {
-            if (++index < p.lines.length) { render(); return; }
-            el.innerHTML = `<span class="label">${p.label}</span><article class="security-card-preview"><h3>Aarav and Meera's Friday Security Card</h3><p>Shop continuity plan</p><dl data-card-content></dl></article><p class="activity-status" data-result="good">${p.done}</p>`;
-            const list = $("[data-card-content]", el);
-            chosen.forEach(entry => { const dt=document.createElement("dt"), dd=document.createElement("dd"); dt.textContent=entry.label; dd.textContent=entry.text; list.append(dt,dd); });
-            fin();
-          };
-        });
+        el.querySelectorAll("[data-pick]").forEach(
+          (button) =>
+            (button.onclick = () => {
+              const option = line.options[Number(button.dataset.pick)],
+                status = $("[data-status]", el);
+              if (!option.safe) {
+                status.dataset.result = "bad";
+                status.textContent = option.feedback;
+                return;
+              }
+              chosen[index] = { label: line.label, text: option.text };
+              button.classList.add("decision-selected");
+              el.querySelectorAll("[data-pick]").forEach(
+                (b) => (b.disabled = true),
+              );
+              $("[data-explain]", el).hidden = false;
+              $("[data-explain]", el).textContent = option.feedback;
+              status.dataset.result = "good";
+              status.textContent = "Safe procedure selected.";
+              const next = $("[data-next]", el);
+              next.hidden = false;
+              next.onclick = () => {
+                if (++index < p.lines.length) {
+                  render();
+                  return;
+                }
+                el.innerHTML = `<span class="label">${p.label}</span><article class="security-card-preview"><h3>Aarav and Meera's Friday Security Card</h3><p>Shop continuity plan</p><dl data-card-content></dl></article><p class="activity-status" data-result="good">${p.done}</p>`;
+                const list = $("[data-card-content]", el);
+                chosen.forEach((entry) => {
+                  const dt = document.createElement("dt"),
+                    dd = document.createElement("dd");
+                  dt.textContent = entry.label;
+                  dd.textContent = entry.text;
+                  list.append(dt, dd);
+                });
+                fin();
+              };
+            }),
+        );
       };
       render();
     },
@@ -2063,13 +2216,14 @@
         const status = $(`[data-status]`, el);
         el.insertAdjacentHTML(
           "beforeend",
-          `<div class="signer-followup"><label for="${p.key}-review">What did the hardware signer protect, and what still had to be checked by Aarav?</label><textarea id="${p.key}-review" data-review placeholder="Explain what the signer can and cannot verify"></textarea><button type="button" class="ghost" data-compare>Compare with one explanation</button><p class="signer-model" data-model hidden>${p.model}</p></div>`
+          `<div class="signer-followup"><label for="${p.key}-review">What did the hardware signer protect, and what still had to be checked by Aarav?</label><textarea id="${p.key}-review" data-review placeholder="Explain what the signer can and cannot verify"></textarea><button type="button" class="ghost" data-compare>Compare with one explanation</button><p class="signer-model" data-model hidden>${p.model}</p></div>`,
         );
         $(`[data-compare]`, el).onclick = () => {
           const review = $(`[data-review]`, el);
           if (!review.value.trim()) {
             status.dataset.result = "bad";
-            status.textContent = "Write your explanation before comparing it with the example.";
+            status.textContent =
+              "Write your explanation before comparing it with the example.";
             review.focus();
             return;
           }
@@ -2084,15 +2238,34 @@
         const scenario = p.rounds[round];
         const changed = (field) => {
           if (field === "Fee") {
-            const limit = Number((scenario.invoiceFee.match(/[\d,]+/) || ["0"])[0].replaceAll(",", ""));
-            const fee = Number((scenario.deviceFee.match(/[\d,]+/) || ["0"])[0].replaceAll(",", ""));
+            const limit = Number(
+              (scenario.invoiceFee.match(/[\d,]+/) || ["0"])[0].replaceAll(
+                ",",
+                "",
+              ),
+            );
+            const fee = Number(
+              (scenario.deviceFee.match(/[\d,]+/) || ["0"])[0].replaceAll(
+                ",",
+                "",
+              ),
+            );
             return fee > limit;
           }
-          const expected = { Recipient: scenario.invoiceAddress, Amount: `${scenario.invoiceAmount} BTC`, Change: scenario.invoiceChange }[field];
-          const actual = { Recipient: scenario.deviceAddress, Amount: `${scenario.deviceAmount} BTC`, Change: scenario.deviceChange }[field];
+          const expected = {
+            Recipient: scenario.invoiceAddress,
+            Amount: `${scenario.invoiceAmount} BTC`,
+            Change: scenario.invoiceChange,
+          }[field];
+          const actual = {
+            Recipient: scenario.deviceAddress,
+            Amount: `${scenario.deviceAmount} BTC`,
+            Change: scenario.deviceChange,
+          }[field];
           return actual !== expected;
         };
-        const deviceValue = (field, value) => `<span class="sign-value" data-field="${field}">${value}</span>`;
+        const deviceValue = (field, value) =>
+          `<span class="sign-value" data-field="${field}">${value}</span>`;
         el.innerHTML =
           `<span class="label">${p.label}</span><p>${p.intro}</p><p class="signing-round">Payment review ${round + 1} of ${p.rounds.length}: ${scenario.title}</p>` +
           `<div class="sign-review-grid"><section><h3>Trusted invoice and plan</h3><dl><dt>Wallet input</dt><dd>${scenario.inputAmount}</dd><dt>Recipient</dt><dd>${scenario.invoiceAddress}</dd><dt>Amount</dt><dd>${scenario.invoiceAmount} BTC</dd><dt>Fee limit</dt><dd>${scenario.invoiceFee}</dd><dt>Expected change</dt><dd>${scenario.invoiceChange}</dd></dl></section><section><h3>Computer screen</h3><dl><dt>Recipient</dt><dd>${scenario.desktopAddress}</dd><dt>Amount</dt><dd>${scenario.desktopAmount} BTC</dd><dt>Fee</dt><dd>${scenario.desktopFee}</dd><dt>Change</dt><dd>${scenario.desktopChange}</dd></dl></section><section class="device-screen"><h3>Hardware signer display</h3><dl><dt>Recipient</dt><dd>${deviceValue("Recipient", scenario.deviceAddress)}</dd><dt>Amount</dt><dd>${deviceValue("Amount", `${scenario.deviceAmount} BTC`)}</dd><dt>Fee</dt><dd>${deviceValue("Fee", scenario.deviceFee)}</dd><dt>Change</dt><dd>${deviceValue("Change", scenario.deviceChange)}</dd></dl></section></div>` +
@@ -2100,14 +2273,17 @@
           `<p class="activity-status" data-status role="status" aria-live="polite">Compare the trusted invoice with the details on the hardware signer.</p><button type="button" data-next hidden>${round === p.rounds.length - 1 ? "Explain the signer" : "Review the next payment"}</button>`;
         const status = $(`[data-status]`, el);
         const revealDifferences = () => {
-          el.querySelectorAll(".device-screen [data-field]").forEach((value) => {
-            if (changed(value.dataset.field)) value.classList.add("mismatch");
-          });
+          el.querySelectorAll(".device-screen [data-field]").forEach(
+            (value) => {
+              if (changed(value.dataset.field)) value.classList.add("mismatch");
+            },
+          );
         };
         const resolve = (action) => {
           if (action !== scenario.correctAction) {
             status.dataset.result = "bad";
-            status.textContent = "That choice does not fit the details shown. Recheck the trusted plan, computer, and signer before trying again.";
+            status.textContent =
+              "That choice does not fit the details shown. Recheck the trusted plan, computer, and signer before trying again.";
             return;
           }
           // Show the mismatching fields only after the learner has made the right decision.
@@ -2116,7 +2292,9 @@
           status.dataset.result = "good";
           status.textContent = scenario.explanation;
           $(`[data-action="${action}"]`, el).classList.add("decision-selected");
-          el.querySelectorAll("[data-action]").forEach((button) => (button.disabled = true));
+          el.querySelectorAll("[data-action]").forEach(
+            (button) => (button.disabled = true),
+          );
           const next = $(`[data-next]`, el);
           next.hidden = false;
           next.onclick = () => {
@@ -2125,7 +2303,11 @@
             else renderFollowup();
           };
         };
-        el.querySelectorAll("[data-action]").forEach((button) => button.addEventListener("click", () => resolve(button.dataset.action)));
+        el.querySelectorAll("[data-action]").forEach((button) =>
+          button.addEventListener("click", () =>
+            resolve(button.dataset.action),
+          ),
+        );
       };
       renderRound();
     },

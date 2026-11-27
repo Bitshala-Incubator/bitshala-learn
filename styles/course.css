@@ -53,7 +53,9 @@ nav {
   width: min(100%, 420px);
   margin: 18px 0 24px auto;
   color: var(--mut);
-  font: 600 13px/1.4 system-ui, sans-serif;
+  font:
+    600 13px/1.4 system-ui,
+    sans-serif;
 }
 .course-search input {
   width: 100%;
@@ -68,7 +70,6 @@ nav {
     sans-serif;
 }
 .course-search input:focus-visible,
-
 .start-lesson:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--acc) 65%, transparent);
   outline-offset: 2px;

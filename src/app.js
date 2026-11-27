@@ -42,7 +42,7 @@ for (const [moduleNumber, moduleLessons] of groups) {
   name.className = "module-name";
   name.textContent = `Module ${moduleNumber} · ${modules[moduleNumber] || "Bitcoin"}`;
   const count = document.createElement("span");
- 
+
   summary.append(name, count);
   group.append(summary);
 
