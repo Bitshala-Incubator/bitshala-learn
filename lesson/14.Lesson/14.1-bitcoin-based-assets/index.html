@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Bitcoin-Based Assets — Bitshala Learn 14.1</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+    <link rel="stylesheet" href="../../../styles/widgets.css" />
+    <link rel="stylesheet" href="./assets.css" />
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn: Lesson 14.1</span><span id="prog">Ready</span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "14.1",
+        "title": "Bitcoin-Based Assets",
+        "subtitle": "See what Bitcoin confirms, what an asset client validates, and how RGB and Taproot Assets use those roles.",
+        "phase": "Bitcoin Applications",
+        "module": "Module 14",
+        "minutes": 30,
+        "level": "Beginner",
+        "next": {
+          "id": "14.2",
+          "title": "Lightning Network",
+          "teaser": "Follow a payment across channels, conditional HTLCs, and a route to its recipient."
+        },
+        "sections": [
+          {
+            "id": "opening",
+            "label": "A different kind of asset",
+            "title": "Bitcoin can anchor data without validating every asset rule",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Meera wants to test a fictional set of digital shop vouchers. She can record the vouchers in an asset protocol that uses Bitcoin transactions, but the vouchers are not bitcoins and Bitcoin's consensus rules do not define their terms. The protocol, the issuer's promises, the wallet software, and the Bitcoin transaction each have different jobs."
+              },
+              {
+                "type": "aside",
+                "md": "This lesson is a conceptual introduction, not instructions for issuing or storing real assets. RGB and Taproot Assets use different formats and proof systems; their data is not interchangeable."
+              }
+            ]
+          },
+          {
+            "id": "client-validation",
+            "label": "1 · Client-side validation",
+            "title": "The recipient checks the asset proof",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "In client-side validation, the sender gives the recipient the asset data and the history needed to check a transfer. The recipient's compatible client validates that proof against the asset protocol's rules. Bitcoin still orders and validates Bitcoin transactions; a transaction can commit to asset data, but Bitcoin nodes do not inspect the full asset proof or decide whether an asset issuer kept a promise."
+              },
+              {
+                "type": "figure",
+                "asset": "validationFlow",
+                "caption": "The recipient validates the asset data and history. Bitcoin's public ledger validates the Bitcoin transaction and anchors a commitment to the transfer."
+              },
+              {
+                "type": "text",
+                "md": "This division can keep detailed asset data off the public chain and reduce how much data every Bitcoin node must process. It also puts work on each recipient: obtain the right proof data, check its history with the correct software, and keep the data needed to validate or pass the asset on. A confirmed Bitcoin transaction alone is not proof that the voucher or other asset is valid."
+              },
+              {
+                "type": "reflect",
+                "prompt": "Explain the basic idea in your own words. What does the recipient's client validate, and what does Bitcoin validate?",
+                "placeholder": "Explain the two validation jobs. Do not enter any private wallet data.",
+                "model": "The recipient's compatible client checks the asset transfer data and history against the asset protocol's rules. Bitcoin nodes validate Bitcoin transactions and consensus rules; they can confirm a transaction that anchors a commitment, but they do not validate the full asset proof or the issuer's promises."
+              }
+            ]
+          },
+          {
+            "id": "rgb",
+            "label": "2 · RGB",
+            "title": "RGB keeps contract state with the participants",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "RGB is a family of Bitcoin-based contract and asset protocols built around client-side validation. In a simplified transfer, the sender passes the recipient an RGB consignment: data that lets the recipient validate the contract state and the history leading to the new allocation. The relevant state data is exchanged between participants instead of publishing the complete asset history to every Bitcoin node."
+              },
+              {
+                "type": "text",
+                "md": "RGB uses single-use seals linked to Bitcoin transaction outputs. Spending the output closes the previous seal, while a commitment in a Bitcoin transaction anchors the next state. The Bitcoin transaction helps order the transition and prevent conflicting use of the same seal; the recipient still needs and checks the RGB data. [RGB's client-side validation guide](https://docs.rgb.info/distributed-computing-concepts/client-side-validation) and [commitment guide](https://docs.rgb.info/commitment-layer/commitment-schemes) describe these roles."
+              },
+              {
+                "type": "aside",
+                "md": "For Meera's voucher, the Bitcoin transaction can anchor the transfer, while the recipient's RGB client checks the voucher's protocol history. Seeing the transaction in a block does not replace that client-side check."
+              }
+            ]
+          },
+          {
+            "id": "taproot-assets",
+            "label": "3 · Taproot Assets",
+            "title": "Taproot outputs anchor asset state and proofs",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Taproot Assets is a separate protocol that uses Taproot commitments in Bitcoin transactions. Its witness data carries asset transfer information to the recipient off-chain. The recipient checks the proof lineage back to the asset's genesis and checks the referenced Bitcoin outputs against the blockchain. A Bitcoin node validates the transaction and Taproot rules; it does not apply Taproot Assets' full asset logic."
+              },
+              {
+                "type": "text",
+                "md": "The official Taproot Assets materials describe issuing and transferring assets with Bitcoin UTXOs as anchors and keeping witness data off-chain. The protocol can support multiple asset records in one Bitcoin UTXO, while clients exchange the data needed to validate transfers. [The Taproot Assets project overview](https://github.com/lightninglabs/taproot-assets/blob/main/README.md) explains the transfer flow; [the protocol guide](https://docs.lightning.engineering/the-lightning-network/taproot-assets/taproot-assets-protocol) describes Taproot commitments and asset proofs."
+              },
+              {
+                "type": "aside",
+                "md": "An asset proof is protocol-specific. A Taproot Assets proof does not become an RGB proof just because both protocols use Bitcoin transactions. Use compatible software and keep the proof data needed by that wallet."
+              }
+            ]
+          },
+          {
+            "id": "micro-exercise",
+            "label": "Micro-exercise · match the roles",
+            "title": "Which concept does each description fit?",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Match each short description to its basic role. These are simplified descriptions; actual wallet workflows and proof formats depend on the protocol and software."
+              },
+              {
+                "type": "widget",
+                "id": "ex-141-asset-match",
+                "name": "DecisionTrail",
+                "props": {
+                  "key": "ex-141-asset-match",
+                  "label": "Client-side validation, RGB, and Taproot Assets",
+                  "intro": "Choose the best match for each description.",
+                  "done": "You matched the validation model and the two distinct asset protocols.",
+                  "steps": [
+                    {
+                      "title": "The validation model",
+                      "prompt": "The recipient checks transferred asset data and its history; Bitcoin anchors a commitment and validates its own transaction rules. What is this?",
+                      "options": [
+                        {
+                          "id": "client-validation",
+                          "text": "Client-side validation",
+                          "correct": true,
+                          "feedback": "Correct. The recipient validates the asset proof; Bitcoin validates the Bitcoin transaction and provides an anchor."
+                        },
+                        {
+                          "id": "rgb",
+                          "text": "RGB specifically",
+                          "correct": false,
+                          "feedback": "RGB uses client-side validation, but this description names the broader model used by more than one design."
+                        },
+                        {
+                          "id": "taproot-assets",
+                          "text": "Taproot Assets specifically",
+                          "correct": false,
+                          "feedback": "Taproot Assets is one protocol that uses Bitcoin commitments and client-validated asset proof data."
+                        }
+                      ]
+                    },
+                    {
+                      "title": "Single-use seals and consignments",
+                      "prompt": "Which protocol uses this combination in its Bitcoin-based client-side validation design?",
+                      "options": [
+                        {
+                          "id": "client-validation",
+                          "text": "Client-side validation as a general idea",
+                          "correct": false,
+                          "feedback": "That describes the broader model. The question asks for the specific protocol associated with these terms."
+                        },
+                        {
+                          "id": "rgb",
+                          "text": "RGB",
+                          "correct": true,
+                          "feedback": "Correct. RGB recipients validate protocol data such as consignments, with single-use seals anchored to Bitcoin transaction outputs."
+                        },
+                        {
+                          "id": "taproot-assets",
+                          "text": "Taproot Assets",
+                          "correct": false,
+                          "feedback": "Taproot Assets has its own asset proof and witness format; it is not the RGB protocol."
+                        }
+                      ]
+                    },
+                    {
+                      "title": "Taproot commitments and asset proofs",
+                      "prompt": "Which protocol anchors asset state in Taproot outputs and passes witness data to the recipient?",
+                      "options": [
+                        {
+                          "id": "client-validation",
+                          "text": "Client-side validation as a general idea",
+                          "correct": false,
+                          "feedback": "Client-side validation is a model, not the name of this specific protocol."
+                        },
+                        {
+                          "id": "rgb",
+                          "text": "RGB",
+                          "correct": false,
+                          "feedback": "RGB uses its own commitment and proof system. The description here is for a different protocol."
+                        },
+                        {
+                          "id": "taproot-assets",
+                          "text": "Taproot Assets",
+                          "correct": true,
+                          "feedback": "Correct. Taproot Assets uses Taproot commitments and protocol-specific asset proof data."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              { "type": "next", "title": "Next: Lightning Network" }
+            ]
+          }
+        ]
+      }
+    </script>
+    <script src="./figures.js" defer></script>
+    <script src="../../shared/lesson-engine.js" defer></script>
+    <script type="module" src="../../navigation.js"></script>
+  </body>
+</html>

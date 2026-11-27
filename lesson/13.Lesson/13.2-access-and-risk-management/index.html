@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Access and Risk Management — Bitshala Learn 13.2</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+    <link rel="stylesheet" href="../../../styles/widgets.css" />
+    <link rel="stylesheet" href="./access-risk.css" />
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn: Lesson 13.2</span><span id="prog">Ready</span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "13.2",
+        "title": "Access and Risk Management",
+        "subtitle": "Help Aarav and Meera share wallet control safely as their shop grows.",
+        "phase": "Bitcoin Foundations",
+        "module": "Module 13",
+        "minutes": 45,
+        "level": "Beginner",
+        "next": {
+          "id": "14.1",
+          "title": "Bitcoin-Based Assets",
+          "teaser": "See what Bitcoin confirms, what an asset client validates, and how RGB and Taproot Assets use those roles."
+        },
+        "sections": [
+          {
+            "id": "opening",
+            "label": "The shop is growing",
+            "title": "More protection needs a clearer plan",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "In Lesson 13.1, Aarav and Meera made a Security Card for receiving, signing, and recovering payments. Now the shop is holding more working funds, and Aarav wants a plan that does not depend on one device, one person, or one storage place."
+              },
+              {
+                "type": "text",
+                "md": "They will consider four connected questions: how many keys should authorize a spend, what each person is allowed to do, how to protect devices and records in the physical shop, and which risks need attention first. A useful plan makes responsibilities clear and gives the shop a way to practise recovery before an emergency."
+              },
+              {
+                "type": "aside",
+                "md": "This lesson uses fictional wallet details only. Never enter real recovery words, private keys, PINs, or passphrases into a lesson or online form."
+              }
+            ]
+          },
+          {
+            "id": "multisig",
+            "label": "1 · Multisig",
+            "title": "Share signing authority across independent keys",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "A multisignature wallet sets a rule for how many keys must approve a spend. In a 2-of-3 wallet, the wallet has three signer keys and any two can authorize a transaction. One key by itself cannot spend. If a signer key is lost, the other two may still be enough to move funds, but the shop must act before it loses another key."
+              },
+              {
+                "type": "figure",
+                "asset": "threshold",
+                "caption": "A 2-of-3 policy means any two of the three keys can authorize a spend. The illustration shows a threshold, not three copies of one key."
+              },
+              {
+                "type": "text",
+                "md": "A threshold is a real authority boundary: if Meera holds one of the three keys, she can sign, and any other authorized signer can complete the 2-of-3 threshold with her. A written job policy cannot change what the wallet script permits. Choose the threshold and signers so every permitted pair is acceptable to the business."
+              },
+              {
+                "type": "text",
+                "md": "Keep signers independent across people, devices, and places so one stolen device or one local disaster is less likely to expose or destroy enough keys. Multisig also adds coordination and recovery work. Record the wallet policy, signer membership, script and derivation setup, and a protected copy of the wallet descriptor or equivalent recovery information. That configuration is not a spending key, but it can reveal wallet activity, so restrict access to it."
+              },
+              {
+                "type": "text",
+                "md": "During setup, compare the threshold and all cosigner information on the intended devices, then verify receiving addresses and change behavior. Practise restoring the wallet and completing a small test transaction before relying on the setup. [BIP 129 describes a standardized multisig setup and verification workflow](https://github.com/bitcoin/bips/blob/master/bip-0129.mediawiki); [BIP 48 documents a common derivation hierarchy for multisig wallets](https://github.com/bitcoin/bips/blob/master/bip-0048.mediawiki). Wallet support varies, so follow the documentation for the exact wallet and signer combination."
+              },
+              {
+                "type": "widget",
+                "id": "ex-132-multisig-review",
+                "name": "DecisionTrail",
+                "props": {
+                  "key": "ex-132-multisig-review",
+                  "label": "Review the proposed multisig setup",
+                  "intro": "Aarav and Meera are checking a draft 2-of-3 arrangement before the shop moves any funds.",
+                  "done": "The shop has checked the threshold, signer independence, and recovery information before relying on the wallet.",
+                  "steps": [
+                    {
+                      "title": "What does 2-of-3 allow?",
+                      "prompt": "Which statement correctly describes the wallet rule?",
+                      "options": [
+                        {
+                          "id": "two",
+                          "text": "Any two of the three keys can authorize a spend.",
+                          "correct": true,
+                          "feedback": "Correct. The threshold is two signatures from the three configured keys."
+                        },
+                        {
+                          "id": "all",
+                          "text": "All three keys must sign every spend.",
+                          "correct": false,
+                          "feedback": "That describes a 3-of-3 rule. A 2-of-3 rule needs any two."
+                        },
+                        {
+                          "id": "one",
+                          "text": "Any one signer may spend; the other keys are backups.",
+                          "correct": false,
+                          "feedback": "A single key cannot meet a 2-of-3 threshold."
+                        }
+                      ]
+                    },
+                    {
+                      "title": "Who should hold the keys?",
+                      "prompt": "Which layout best reduces a single point of failure?",
+                      "options": [
+                        {
+                          "id": "separate",
+                          "text": "Three separately controlled signers, kept in distinct places, with no person holding two keys.",
+                          "correct": true,
+                          "feedback": "Separate people, devices, and locations reduce the chance one event exposes or disables the threshold."
+                        },
+                        {
+                          "id": "together",
+                          "text": "Put two signer devices in the shop safe so any employee can find them quickly.",
+                          "correct": false,
+                          "feedback": "A person who reaches that safe could obtain the spending threshold, and one local incident could affect both keys."
+                        },
+                        {
+                          "id": "sameperson",
+                          "text": "Give Aarav two keys and ask him to use only one at a time.",
+                          "correct": false,
+                          "feedback": "The script still permits Aarav to meet the threshold alone; the promise does not change wallet authorization."
+                        }
+                      ]
+                    },
+                    {
+                      "title": "What should they verify before funding it?",
+                      "prompt": "Which check helps catch a setup error or substituted wallet policy?",
+                      "options": [
+                        {
+                          "id": "verify",
+                          "text": "Compare the threshold and cosigners on the signers, verify receive and change addresses, and practise recovery.",
+                          "correct": true,
+                          "feedback": "Good. The shop checks both the policy and the wallet behavior before depending on it."
+                        },
+                        {
+                          "id": "label",
+                          "text": "Trust the wallet name on the computer and skip checking the signer displays.",
+                          "correct": false,
+                          "feedback": "A familiar name does not prove the configured keys or addresses are correct."
+                        },
+                        {
+                          "id": "seed",
+                          "text": "Email every recovery phrase to the shop so the signers can be restored together.",
+                          "correct": false,
+                          "feedback": "Recovery phrases are private signing secrets. Do not put them in email or combine them in one place."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "access-management",
+            "label": "2 · Access management",
+            "title": "Give each person only the access their work needs",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Access management is the shop's people-and-process plan: who may receive payments, prepare a draft, approve a spend, change wallet settings, or restore a wallet. Least privilege means granting only the access needed for a task. Separation of duties assigns sensitive steps to different people, while unique credentials make actions attributable. Review and remove access when a role changes or someone leaves. [NIST defines least privilege as limiting access to what assigned work requires](https://csrc.nist.gov/glossary/term/least_privilege)."
+              },
+              {
+                "type": "table",
+                "headers": ["Role", "May do", "Should not receive by default"],
+                "rows": [
+                  [
+                    "Shop operator (Meera)",
+                    "Receive payments, reconcile the ledger, and prepare an unsigned payment request.",
+                    "Aarav's recovery phrase or an unapproved signing key."
+                  ],
+                  [
+                    "Authorized signer",
+                    "Inspect a payment on their own signer and add their signature when the policy and invoice match.",
+                    "Another person's PIN, seed phrase, or signer."
+                  ],
+                  [
+                    "Bookkeeping service",
+                    "See only the records needed for bookkeeping, through an approved method.",
+                    "Signing keys; an xpub unless the privacy trade-off is understood and accepted."
+                  ],
+                  [
+                    "Wallet administrator",
+                    "Coordinate documented setup changes with the required independent review.",
+                    "Sole authority to change the signer policy or destination records without review."
+                  ]
+                ]
+              },
+              {
+                "type": "aside",
+                "md": "A multisig threshold and an access policy solve different problems. The threshold defines which key combinations can spend. The access policy defines which people may use systems, records, and procedures. Keep each signer key under its own holder's control."
+              },
+              {
+                "type": "widget",
+                "id": "ex-132-access-plan",
+                "name": "DecisionTrail",
+                "props": {
+                  "key": "ex-132-access-plan",
+                  "label": "Design the shop's access plan",
+                  "intro": "Choose permissions for the people who handle a normal supplier payment.",
+                  "done": "The shop can separate receiving and preparation from signing, and it has a process to review access changes.",
+                  "steps": [
+                    {
+                      "title": "Meera needs to record a customer payment",
+                      "prompt": "What access is sufficient?",
+                      "options": [
+                        {
+                          "id": "receive",
+                          "text": "Let her use the shop's receiving and bookkeeping process without giving her recovery secrets.",
+                          "correct": true,
+                          "feedback": "Receiving and recording a payment do not require spending authority."
+                        },
+                        {
+                          "id": "allkeys",
+                          "text": "Give her every signer phrase so she can solve any problem herself.",
+                          "correct": false,
+                          "feedback": "That grants far more access than the task needs and weakens the threshold."
+                        },
+                        {
+                          "id": "sharedlogin",
+                          "text": "Use one shared wallet login for all staff so no one is left out.",
+                          "correct": false,
+                          "feedback": "Shared credentials obscure who acted and make it hard to remove one person's access."
+                        }
+                      ]
+                    },
+                    {
+                      "title": "A signer leaves the business",
+                      "prompt": "What should the shop do?",
+                      "options": [
+                        {
+                          "id": "review",
+                          "text": "Revoke their system access, assess whether their signer key is exposed, and follow the wallet's documented signer-replacement process.",
+                          "correct": true,
+                          "feedback": "Remove unneeded access promptly and handle a key change through a verified wallet procedure."
+                        },
+                        {
+                          "id": "wait",
+                          "text": "Keep their access active until the next annual review.",
+                          "correct": false,
+                          "feedback": "Access should be reviewed when roles change and removed when it is no longer needed."
+                        },
+                        {
+                          "id": "password",
+                          "text": "Change the shop's shared password but leave the signer key in circulation.",
+                          "correct": false,
+                          "feedback": "A shared password change does not revoke a separate signing key or device."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "physical-security",
+            "label": "3 · Physical security",
+            "title": "Protect devices, people, and recovery records where they live",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "A wallet's physical security includes who can enter the shop, reach a signer, observe its screen, or access recovery records. The note under the shared keyboard in Lesson 13.1 was a warning: a private backup can be copied even when no device is stolen. Keep signer keys apart from one another and from any unlocking information; limit access to storage areas, keep a simple custody and inspection process, and account for fire, water, theft, and routine visitors."
+              },
+              {
+                "type": "text",
+                "md": "Use controls that fit the shop: lock storage, keep sensitive work out of public view, escort visitors in restricted areas, and check who can access each location. A tamper seal or camera may help reveal an incident, but neither proves a device or backup is safe. Avoid recording exact backup locations on a document that is itself easy to find. [NIST's Cybersecurity Framework calls for physical access controls proportionate to risk](https://csrc.nist.gov/Projects/Cybersecurity-Framework/Filters)."
+              },
+              {
+                "type": "widget",
+                "id": "ex-132-physical-review",
+                "name": "DecisionTrail",
+                "props": {
+                  "key": "ex-132-physical-review",
+                  "label": "Inspect the physical setup",
+                  "intro": "Aarav and Meera are checking the room and storage before the shop relies on its multisig wallet.",
+                  "done": "The shop has reduced shared-location risks and has a repeatable way to check physical access.",
+                  "steps": [
+                    {
+                      "title": "Two signer devices are kept in the same drawer",
+                      "prompt": "What is the better control?",
+                      "options": [
+                        {
+                          "id": "separate",
+                          "text": "Move them into independently controlled storage locations and document who may access each one.",
+                          "correct": true,
+                          "feedback": "Distinct locations reduce a shared theft, fire, or access event affecting both keys."
+                        },
+                        {
+                          "id": "label",
+                          "text": "Label the drawer with both signers' names so staff can find it quickly.",
+                          "correct": false,
+                          "feedback": "The label advertises where multiple keys are stored without reducing the shared-location risk."
+                        },
+                        {
+                          "id": "seal",
+                          "text": "Add a tamper seal but keep both devices together and skip inspections.",
+                          "correct": false,
+                          "feedback": "A seal may show some interference; it does not separate the keys or replace an access review."
+                        }
+                      ]
+                    },
+                    {
+                      "title": "A repair technician needs to work near the wallet desk",
+                      "prompt": "What should Meera do?",
+                      "options": [
+                        {
+                          "id": "supervise",
+                          "text": "Move wallet work out of view, secure devices and records, and escort the technician in restricted areas.",
+                          "correct": true,
+                          "feedback": "Limit unnecessary exposure and keep track of third-party access to sensitive areas."
+                        },
+                        {
+                          "id": "leave",
+                          "text": "Leave the signer unlocked so the technician can move it if needed.",
+                          "correct": false,
+                          "feedback": "An unattended, accessible signer or recovery record can be inspected or taken."
+                        },
+                        {
+                          "id": "photo",
+                          "text": "Photograph the recovery note before moving it, then leave the image on the desk computer.",
+                          "correct": false,
+                          "feedback": "A digital copy creates another exposure point and should not be made casually."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "risk-management",
+            "label": "4 · Risk management",
+            "title": "Prioritize the risks that could hurt the shop most",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "A risk is a possible event, the weakness that could let it happen, and the harm that could follow. List the shop's important assets and likely threats, then estimate likelihood and impact using a simple scale such as low, medium, or high. Prioritize risks with severe impact or a plausible path to loss; choose a control, name an owner, and review what risk remains afterward. Ratings are estimates for this shop, not universal facts. [NIST SP 800-30 describes assessing likelihood and impact to support risk decisions](https://csrc.nist.gov/pubs/sp/800/30/r1/final)."
+              },
+              {
+                "type": "table",
+                "headers": [
+                  "Risk scenario",
+                  "Example likelihood",
+                  "Example impact",
+                  "First control to consider"
+                ],
+                "rows": [
+                  [
+                    "A changed supplier address is accepted without independent confirmation.",
+                    "Medium",
+                    "High: payment may go to the wrong destination.",
+                    "Verify a changed destination through contact details already on file."
+                  ],
+                  [
+                    "Two signer keys and their recovery backups are kept together, and the room is burgled or flooded.",
+                    "Low to medium",
+                    "High: one incident could expose enough keys or disable the signing threshold.",
+                    "Separate signers and backups across failure domains; rehearse recovery."
+                  ],
+                  [
+                    "A bookkeeping service receives the account xpub.",
+                    "Medium",
+                    "Medium: signing is not enabled, but wallet activity may be exposed.",
+                    "Limit sharing and accept the privacy trade-off only after review."
+                  ],
+                  [
+                    "A signer role changes, but old access remains active.",
+                    "Medium",
+                    "High if a former holder retains a key or privileged account.",
+                    "Review access at role changes and follow the key-replacement process."
+                  ]
+                ]
+              },
+              {
+                "type": "text",
+                "md": "Risk management repeats: update the list after a new device, staff change, incident, or wallet-policy change. Confirm that each control still works, test the recovery process, and record who owns the follow-up. A plan is useful only when the shop can carry it out under pressure."
+              },
+              {
+                "type": "widget",
+                "id": "ex-132-risk-priority",
+                "name": "DecisionTrail",
+                "props": {
+                  "key": "ex-132-risk-priority",
+                  "label": "Prioritize Aarav's wallet risks",
+                  "intro": "Use likelihood and impact to choose a practical first response. The estimates below are for this fictional shop.",
+                  "done": "Aarav and Meera have prioritized a severe shared-location risk and selected controls they can review and practise.",
+                  "steps": [
+                    {
+                      "title": "Two signers are stored together; an xpub was also shared",
+                      "prompt": "Which issue should the shop address first to protect both funds and privacy?",
+                      "options": [
+                        {
+                          "id": "keys",
+                          "text": "Separate and secure the signer keys first; then review whether the xpub exposure needs a privacy response.",
+                          "correct": true,
+                          "feedback": "A shared location may expose or disable enough signing keys to affect funds. An xpub does not authorize spending, but its privacy impact still deserves follow-up."
+                        },
+                        {
+                          "id": "xpub",
+                          "text": "Treat the xpub as a private key and immediately give every employee a new seed phrase.",
+                          "correct": false,
+                          "feedback": "An xpub cannot sign, and distributing seed phrases would increase exposure rather than manage it."
+                        },
+                        {
+                          "id": "ignore",
+                          "text": "Ignore both issues because a 2-of-3 wallet cannot lose funds.",
+                          "correct": false,
+                          "feedback": "Multisig reduces some single-key risks but does not prevent threshold compromise, common-location loss, or privacy exposure."
+                        }
+                      ]
+                    },
+                    {
+                      "title": "The control is written but never tested",
+                      "prompt": "How can they know the plan will work during an outage?",
+                      "options": [
+                        {
+                          "id": "rehearse",
+                          "text": "Schedule a safe recovery and signing rehearsal with test funds, then record gaps and owners.",
+                          "correct": true,
+                          "feedback": "A rehearsal checks whether people can follow the process and whether the wallet configuration is recoverable."
+                        },
+                        {
+                          "id": "assume",
+                          "text": "Assume the wallet's setup screen proves every backup and signer will work later.",
+                          "correct": false,
+                          "feedback": "A setup screen cannot prove the shop has usable, protected backups or a workable handoff."
+                        },
+                        {
+                          "id": "publish",
+                          "text": "Post the recovery checklist and exact backup locations in the public staff chat.",
+                          "correct": false,
+                          "feedback": "Share procedures with authorized people, but do not publish sensitive locations or recovery secrets."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              { "type": "next", "title": "End of Module 13" }
+            ]
+          }
+        ]
+      }
+    </script>
+    <script src="./figures.js" defer></script>
+    <script src="../../shared/lesson-engine.js" defer></script>
+    <script type="module" src="../../navigation.js"></script>
+  </body>
+</html>

@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Lightning Network — Bitshala Learn 14.2</title>
+    <link rel="stylesheet" href="../../../styles/global.css" />
+    <link rel="stylesheet" href="../../../styles/lesson.css" />
+    <link rel="stylesheet" href="../../../styles/widgets.css" />
+    <link rel="stylesheet" href="./lightning.css" />
+  </head>
+  <body>
+    <nav>
+      <span>Bitshala Learn: Lesson 14.2</span><span id="prog">Ready</span>
+      <div id="bar"></div>
+    </nav>
+    <div class="wrap">
+      <header id="head"></header>
+      <div id="warn"></div>
+      <main id="lesson"></main>
+    </div>
+    <script type="application/json" id="lesson-data">
+      {
+        "id": "14.2",
+        "title": "Lightning Network",
+        "subtitle": "Follow a payment across channels, conditional HTLCs, and a route to its recipient.",
+        "phase": "Bitcoin Applications",
+        "module": "Module 14",
+        "minutes": 35,
+        "level": "Beginner",
+        "sections": [
+          {
+            "id": "opening",
+            "label": "A supplier payment",
+            "title": "A payment can travel without an on-chain transaction at every hop",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Aarav wants to pay supplier Dev's Lightning invoice. Aarav's node has a channel with Meera's node, and Meera has a channel with Dev. The route is Aarav → Meera → Dev. To understand what happens, separate the channel that carries a balance update, the HTLC that makes each hop conditional, and the route that connects the payer to the payee."
+              },
+              {
+                "type": "aside",
+                "md": "This is a simplified two-channel example. Real payments may use different routes, channel types, and payment features. Amounts, fees, and timeouts must satisfy each hop's policies."
+              }
+            ]
+          },
+          {
+            "id": "payment-channels",
+            "label": "1 · Payment channels",
+            "title": "A channel keeps a current balance state between two peers",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "In the basic channel model, two peers open a channel by funding a shared Bitcoin output. They exchange signed commitment transactions that represent the current channel state and how the funds would be divided if the channel closed. After it is open, many payments can update that state off-chain instead of publishing a separate Bitcoin transaction for every payment."
+              },
+              {
+                "type": "text",
+                "md": "A channel has a total capacity, but the useful amount for a payment depends on the balance available in the direction the payment needs to travel. If Aarav's side does not have enough outbound balance, the channel cannot carry his payment in that direction even if its total capacity looks large. Peers can close a channel cooperatively, or one peer can publish a commitment transaction to settle on-chain; details vary by channel type and protocol version."
+              },
+              {
+                "type": "reflect",
+                "prompt": "Explain how a payment channel works in your own words. What is recorded on-chain when the channel opens, and what changes when the peers make later payments?",
+                "placeholder": "Describe the shared funding output and off-chain balance updates. Do not enter wallet secrets.",
+                "model": "The peers fund a shared Bitcoin output and exchange signed commitment transactions representing channel balances. Later payments update the signed channel state off-chain; the Bitcoin blockchain is used for opening and closing rather than recording every ordinary payment."
+              },
+              {
+                "type": "text",
+                "md": "For a protocol-level description, see [BOLT 2's channel establishment and peer messages](https://github.com/lightning/bolts/blob/master/02-peer-protocol.md) and [BOLT 3's commitment transaction format](https://github.com/lightning/bolts/blob/master/03-transactions.md)."
+              }
+            ]
+          },
+          {
+            "id": "htlcs",
+            "label": "2 · HTLCs",
+            "title": "A hash and a timeout make each forwarded hop conditional",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "HTLC means Hashed Time-Locked Contract. Dev creates a secret preimage P and gives Aarav's payment request a payment hash H = SHA256(P). Aarav's payment is offered through each channel with that hash and an expiry. A hop can be fulfilled by revealing a preimage that matches the hash, or it can time out if the preimage is not revealed before the deadline."
+              },
+              {
+                "type": "text",
+                "md": "Meera receives a conditional HTLC from Aarav and offers a corresponding one to Dev. If Dev reveals the matching preimage when claiming the payment, Meera learns it and can use it to claim the incoming HTLC from Aarav. The timeouts are staggered so an intermediary has time to resolve the outgoing hop before its incoming hop expires. If the payment cannot complete, the HTLCs fail back rather than leaving a permanent payment in limbo. In the real protocol, HTLCs are represented in the channel's commitment state and have carefully specified on-chain resolution paths."
+              },
+              {
+                "type": "aside",
+                "md": "The hash does not prove that a product was delivered or that a merchant kept a promise. It links the conditional payment across hops: the same preimage that satisfies the payee's HTLC can satisfy the preceding HTLCs."
+              },
+              {
+                "type": "text",
+                "md": "See [BOLT 3's HTLC output rules](https://github.com/lightning/bolts/blob/master/03-transactions.md) and [BOLT 5's on-chain resolution rules](https://github.com/lightning/bolts/blob/master/05-onchain.md) for the technical conditions."
+              }
+            ]
+          },
+          {
+            "id": "routing",
+            "label": "3 · Lightning Network and routing",
+            "title": "Routing finds a usable sequence of channels",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "The Lightning Network is the collection of nodes and payment channels that can forward payments between people who do not share a direct channel. A payer looks for a path whose channels can carry the required amounts in the correct directions and whose forwarding policies, fees, and timeouts fit the payment. The routing graph describes channels and policies, but public channel capacity is not a promise that the needed directional liquidity is currently available."
+              },
+              {
+                "type": "figure",
+                "asset": "paymentRoute",
+                "caption": "Aarav's payment travels as conditional HTLCs through two channels. Dev's matching preimage lets the successful condition propagate back through Meera to Aarav."
+              },
+              {
+                "type": "text",
+                "md": "A forwarding node adds its fee, checks whether the outgoing channel can carry the next hop, and forwards the encrypted instructions. Onion routing lets each intermediate node learn the next step it needs to take without being given the whole route. A payment can fail if a channel lacks directional liquidity or a policy cannot be met; the sender may try another route. [BOLT 4 specifies onion routing](https://github.com/lightning/bolts/blob/master/04-onion-routing.md), while [BOLT 7 describes channel and node announcements used for routing](https://github.com/lightning/bolts/blob/master/07-routing-gossip.md)."
+              },
+              {
+                "type": "aside",
+                "md": "Routing does not move one HTLC through a single shared channel. Each hop has its own channel and conditional update, tied to the same payment hash and compatible expiry conditions."
+              }
+            ]
+          },
+          {
+            "id": "micro-exercise",
+            "label": "Micro-exercise · trace the payment",
+            "title": "Identify the role of each part of the route",
+            "blocks": [
+              {
+                "type": "text",
+                "md": "Trace Aarav → Meera → Dev. Match each description to the channel, HTLC, route, or preimage that makes the payment work."
+              },
+              {
+                "type": "widget",
+                "id": "ex-142-lightning-trace",
+                "name": "DecisionTrail",
+                "props": {
+                  "key": "ex-142-lightning-trace",
+                  "label": "Aarav pays Dev through Meera",
+                  "intro": "Choose the best explanation for each step in this simplified Lightning payment.",
+                  "done": "You traced the payment across channels, HTLCs, and a multi-hop route.",
+                  "steps": [
+                    {
+                      "title": "Aarav and Meera share a channel",
+                      "prompt": "What does their payment channel provide?",
+                      "options": [
+                        {
+                          "id": "channel",
+                          "text": "A shared funded channel whose signed balance state can be updated off-chain.",
+                          "correct": true,
+                          "feedback": "Correct. The channel carries updates between its two peers; ordinary balance changes do not each need a separate on-chain transaction."
+                        },
+                        {
+                          "id": "route",
+                          "text": "A guarantee that every Lightning node can send any amount in either direction.",
+                          "correct": false,
+                          "feedback": "A channel has limited capacity and directional balances. A network route needs usable liquidity at every hop."
+                        },
+                        {
+                          "id": "htlc",
+                          "text": "A proof that Dev has delivered the supplier order.",
+                          "correct": false,
+                          "feedback": "A channel carries payment state; it does not verify off-chain goods or services."
+                        }
+                      ]
+                    },
+                    {
+                      "title": "Meera forwards the payment to Dev",
+                      "prompt": "What does an HTLC add to each hop?",
+                      "options": [
+                        {
+                          "id": "condition",
+                          "text": "A conditional payment that can be fulfilled with a matching preimage or fail after its timeout.",
+                          "correct": true,
+                          "feedback": "Correct. The hash links the condition, and the expiry limits how long the payment can remain unresolved."
+                        },
+                        {
+                          "id": "broadcast",
+                          "text": "An immediate on-chain transaction that publishes the full route to everyone.",
+                          "correct": false,
+                          "feedback": "HTLC updates normally live in channel state; on-chain resolution is used if a channel closes with an unresolved HTLC."
+                        },
+                        {
+                          "id": "fee",
+                          "text": "The routing fee paid to every node, even if the payment never succeeds.",
+                          "correct": false,
+                          "feedback": "Fees are part of forwarding policy; the HTLC itself is the conditional payment mechanism."
+                        }
+                      ]
+                    },
+                    {
+                      "title": "The payment needs two channels",
+                      "prompt": "What must be true for this route to work?",
+                      "options": [
+                        {
+                          "id": "liquidity",
+                          "text": "Both channels must have enough usable balance in the required direction, including amounts needed for forwarding fees.",
+                          "correct": true,
+                          "feedback": "Right. A route succeeds only if every hop can forward its required amount under its channel policy."
+                        },
+                        {
+                          "id": "capacity",
+                          "text": "The two channels' total capacities simply add up, regardless of balances or direction.",
+                          "correct": false,
+                          "feedback": "Total capacity alone does not tell Aarav how much can move in each direction."
+                        },
+                        {
+                          "id": "direct",
+                          "text": "Aarav must open a direct channel to every possible supplier before sending anything.",
+                          "correct": false,
+                          "feedback": "Routing lets payments pass through intermediate nodes when a usable path is available."
+                        }
+                      ]
+                    },
+                    {
+                      "title": "Dev claims the payment",
+                      "prompt": "How does the successful condition travel back?",
+                      "options": [
+                        {
+                          "id": "preimage",
+                          "text": "Dev reveals the matching preimage; Meera uses it to fulfill the upstream HTLC to Aarav.",
+                          "correct": true,
+                          "feedback": "Correct. The same preimage satisfies the linked hash conditions along the successful path."
+                        },
+                        {
+                          "id": "invoice",
+                          "text": "Dev sends a new invoice to Meera, and that automatically settles Aarav's payment.",
+                          "correct": false,
+                          "feedback": "The linked HTLCs settle through the matching preimage, not a second invoice."
+                        },
+                        {
+                          "id": "timeout",
+                          "text": "The payment succeeds only when every HTLC expires.",
+                          "correct": false,
+                          "feedback": "Timeout is the fallback for an unresolved HTLC; success comes from revealing the matching preimage."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              { "type": "next", "title": "End of Module 14" }
+            ]
+          }
+        ]
+      }
+    </script>
+    <script src="./figures.js" defer></script>
+    <script src="../../shared/lesson-engine.js" defer></script>
+    <script type="module" src="../../navigation.js"></script>
+  </body>
+</html>

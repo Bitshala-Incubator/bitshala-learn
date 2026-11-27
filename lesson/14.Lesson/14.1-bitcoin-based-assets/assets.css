@@ -1,0 +1,32 @@
+#lesson figure {
+  margin: 26px 0;
+}
+#lesson figure .asset-svg {
+  display: block;
+  width: min(100%, 760px);
+  height: auto;
+  margin: 0 auto;
+  border-radius: 16px;
+}
+
+#lesson table {
+  width: 100%;
+  border-collapse: collapse;
+}
+#lesson th,
+#lesson td {
+  padding: 10px 12px;
+  border: 1px solid #d9cbb5;
+  text-align: left;
+  vertical-align: top;
+}
+#lesson th {
+  background: #f7f0e5;
+}
+
+@media (max-width: 560px) {
+  #lesson th,
+  #lesson td {
+    padding: 8px;
+  }
+}
